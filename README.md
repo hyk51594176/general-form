@@ -1,7 +1,7 @@
 # @hanyk/general-form
 
 ```bash
-  tnpm install @hanyk/general-form --save
+  npm install @hanyk/general-form --save
 ```
 
 ## 示例
