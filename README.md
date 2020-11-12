@@ -1,16 +1,15 @@
-# @alife/general-form
+# @hanyk/general-form
 
 ```bash
-  tnpm install @alife/general-form --save
+  tnpm install @hanyk/general-form --save
 ```
 
 ## 示例
 
 ```jsx
 import React from 'react'
-import { Input, Button } from 'antd'
-import { Input as AInput, Select } from '@alife/aisc'
-import { Form, FormItem, registerComponent } from '@alife/general-form'
+import { Input, Button, Select } from 'antd'
+import { Form, FormItem, registerComponent } from '@hanyk/general-form'
 registerComponent({ Input, Select })
 
 const data = { a: '1', b: 2, c: 3, d: 4, e: 5 }
@@ -194,8 +193,7 @@ export default class App extends React.Component {
 
 import React from 'react'
 import { Input, Button } from 'antd'
-import { Input as AInput } from '@alife/aisc'
-import { Form, FormItem, registerComponent } from '@alife/general-form'
+import { Form, FormItem, registerComponent } from '@hanyk/general-form'
 registerComponent({ Input })
 
 const data = [
@@ -217,7 +215,7 @@ export default class App extends React.Component {
   get columns() {
     return [
       {
-        el: <AInput />,
+        el: 'Input',
         field: '[0].a',
         label: '0a',
         rules: this.rules
