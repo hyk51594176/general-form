@@ -1,6 +1,6 @@
 {
   "name": "@hanyk/general-form",
-  "version": "0.3.2",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
@@ -9,9 +9,8 @@
   "scripts": {
     "build": "rimraf dist && rollup -c",
     "dev": "rollup -w -c",
-    "test": "jest",
     "lint": "eslint --fix  src --ext .ts",
-    "release": "npm run test && npm run build && npm publish --access public"
+    "release": "npm run build && npm publish --access public"
   },
   "repository": {
     "type": "git",
@@ -32,6 +31,7 @@
     "eslint-config-ali": "^9.0.2",
     "eslint-plugin-import": "^2.20.2",
     "install": "^0.13.0",
+    "rollup-plugin-terser": "^7.0.2",
     "jest": "^25.4.0",
     "rimraf": "^3.0.2",
     "rollup": "^1.32.1",
