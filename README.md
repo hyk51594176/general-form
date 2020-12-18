@@ -396,7 +396,6 @@ export default class App extends React.Component {
 | labelAligin | 透传 formItem  | string | right |
 | labelWidth | 透传 formItem  | string | 80px |
 | mintItemWidth | 透传 formItem  | string |
- |
 | defaultData | 要绑定数据对象 | object | array | {} | [] |
 | isArray | 要绑定的数据是否是数组 | boolean | false |
 | isNullClear | 当formitem 销毁的时候是否清除所绑定的字段的值 | boolean | false |
@@ -470,10 +469,3 @@ export default class App extends React.Component {
 | whitespace | 是否进行空白字 符校验（true进行校验) | Boolean |  |  |
 | validator | 自定义校验,(校验成功的时候不要忘记执行 callback(),否则会校验不返回) | Function(rule,value,callback) |  |  |
 | trigger | 触发校验的事件名称 | String/Array | onChange/onBlur/… | onChange |
-## 布局
-
-* xs <768px 响应式栅格数或者栅格属性对象 number/object (例如： {span: 4, offset: 4})
-* md ≥992px 响应式栅格数或者栅格属性对象 number/object (例如： {span: 4, offset: 4})
-* sm ≥768px 响应式栅格数或者栅格属性对象 number/object (例如： {span: 4, offset: 4})
-* lg ≥1200px 响应式栅格数或者栅格属性对象 number/object (例如： {span: 4, offset: 4})
-* xl ≥1920px 响应式栅格数或者栅格属性对象 number/object (例如： {span: 4, offset: 4})
