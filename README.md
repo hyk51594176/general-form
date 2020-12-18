@@ -386,7 +386,6 @@ export default class App extends React.Component {
 | className | css类名 | string |  |
 | style | style样式 | CSSProperties |  |
 | span | 透传 formItem  | number |
- |
 | size |  | string  |  |
 | offset | 透传 formItem  | number |  |
 | xs | <768px 响应式栅格数或者栅格属性对象 | number/object (例如： {span: 4, offset: 4}) |  |
