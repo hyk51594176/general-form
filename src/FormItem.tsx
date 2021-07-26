@@ -1,8 +1,8 @@
-import React from 'react';
+import React from 'react'
 
-import { components, isDiff } from './utils';
+import { components, isDiff } from './utils'
 
-import { FormItemProps, UpdateType, DefaultItemProps } from './interface';
+import { FormItemProps, UpdateType, DefaultItemProps } from './interface'
 
 interface State {
   value: unknown
@@ -13,64 +13,65 @@ export default class FormItem extends React.Component<FormItemProps, State> {
     onFiledChange() {},
     onLifeCycle() {},
     subscribe() {
-      return () => {};
+      // eslint-disable-next-line @typescript-eslint/semi
+      return () => {}
     },
     getValue() {},
     getValues() {
-      return {};
+      return {}
     },
     setValue() {},
     setValues() {},
     validate() {
-      return Promise.resolve({});
-    },
-  };
+      return Promise.resolve({})
+    }
+  }
 
   constructor(props: FormItemProps) {
-    super(props);
+    super(props)
     this.state = {
       value: props.value || props.defaultValue,
-      errorMsg: props.errorMsg,
-    };
+      errorMsg: props.errorMsg
+    }
   }
 
   componentDidMount() {
-    const { field, onLifeCycle } = this.props;
-    field && onLifeCycle(UpdateType.mount, field, this);
+    const { field, onLifeCycle } = this.props
+    field && onLifeCycle(UpdateType.mount, field, this)
   }
 
   componentWillReceiveProps(nexProps: FormItemProps) {
     if (isDiff(nexProps.value, this.props.value)) {
-      this.setState({ value: nexProps.value });
+      this.setState({ value: nexProps.value })
     }
     if (isDiff(this.props.errorMsg, nexProps.errorMsg)) {
-      this.setErrorMsg(nexProps.errorMsg);
+      this.setErrorMsg(nexProps.errorMsg)
     }
   }
 
   componentWillUnmount() {
-    const { field, onLifeCycle } = this.props;
-    field && onLifeCycle(UpdateType.unmount, field, this);
+    const { field, onLifeCycle } = this.props
+    field && onLifeCycle(UpdateType.unmount, field, this)
   }
 
   get triggerType() {
-    const { rules } = this.props;
-    let triggerKey: string | undefined;
-    if (!rules) return triggerKey;
+    const { rules } = this.props
+    let triggerKey: string | undefined
+    if (!rules) return triggerKey
     return (Array.isArray(rules) ? rules : [rules]).reduce(
       (str, { trigger }) => {
-        if (trigger) str = trigger;
-        return str;
+        if (trigger) str = trigger
+        return str
       },
-      'onChange',
-    );
+      'onChange'
+    )
   }
 
   get required() {
-    const { required, rules } = this.props;
-    if (!rules) return required;
-    if (Array.isArray(rules)) return rules.some((item) => item.required);
-    return rules.required;
+    const { required, rules } = this.props
+    if (!rules) return required
+    if (Array.isArray(rules)) return rules.some((item) => item.required)
+    return rules.required
   }
 
   get children() {
@@ -104,32 +105,36 @@ export default class FormItem extends React.Component<FormItemProps, State> {
       lg,
       xl,
       ...other
-    } = this.props;
-    const { value } = this.state;
-    let child: any = children || el;
+    } = this.props
+    const { value } = this.state
+    let child: any = children || el
     if (child) {
       const props: any = {
         value,
         ...other,
         onChange: (val: any, ...args: any[]) => {
-          this.onChange(val, ...args);
-          if (typeof onChange === 'function') onChange(val, ...args);
-        },
-      };
-      if (field && this.triggerType) {
-        const fn = props[this.triggerType];
-        props[this.triggerType] = (...args: any[]) => {
-          typeof fn === 'function' && fn(...args);
-          setTimeout(() => {
-            validate([field]);
-          }, 0);
-        };
+          this.onChange(val, ...args)
+          if (typeof onChange === 'function') onChange(val, ...args)
+        }
       }
-      if (React.isValidElement<{}>(child)) {
+      if (field && this.triggerType) {
+        const fn = props[this.triggerType]
+        props[this.triggerType] = (...args: any[]) => {
+          typeof fn === 'function' && fn(...args)
+          setTimeout(() => {
+            validate([field])
+          }, 0)
+        }
+      }
+      if (React.isValidElement<any>(child)) {
         child = React.cloneElement(child, {
           ...child.props,
           ...props,
-        });
+          disabled:
+            child.props.disabled !== undefined
+              ? child.props.disabled
+              : props.disabled
+        })
       } else if (typeof child === 'function') {
         child = child({
           ...props,
@@ -140,66 +145,65 @@ export default class FormItem extends React.Component<FormItemProps, State> {
           getValues,
           setValue,
           setValues,
-          validate,
-        });
+          validate
+        })
       } else if (typeof child === 'string' && components[child]) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const Comp = components[child];
-        return <Comp {...props} />;
+        const Comp = components[child]
+        return <Comp {...props} />
       }
-      return child;
+      return child
     }
-    return value;
+    return value
   }
 
   setErrorMsg = (errorMsg?: string) => {
-    this.setState({ errorMsg });
-  };
+    this.setState({ errorMsg })
+  }
 
-  setValue = (value: any) => {
-    this.setState({ value });
-  };
+  setValue = (value: any, cb?: () => void) => {
+    this.setState({ value }, cb)
+  }
 
   onChange = (e: any, ...args: any[]) => {
-    const { field, onFiledChange } = this.props;
-    let value!: any;
+    const { field, onFiledChange } = this.props
+    let value!: any
     try {
-      value = e.target.value;
+      value = e.target.value
     } catch (error) {
-      value = e;
+      value = e
     }
     this.setState({ value }, () => {
-      if (!field) return;
-      onFiledChange(field, { value, e, ...args });
-    });
-  };
+      if (!field) return
+      onFiledChange(field, { value, e, ...args })
+    })
+  }
 
   get computedClassName() {
-    const { span, offset } = this.props;
-    const str:string[] = [];
+    const { span, offset } = this.props
+    const str: string[] = []
     if (span) {
-      str.push(`col-${span}`);
+      str.push(`col-${span}`)
     }
     if (offset) {
-      str.push(`col-offset-${offset}`);
+      str.push(`col-offset-${offset}`)
     }
-    ['xs', 'sm', 'md', 'lg', 'xl'].forEach(key => {
-      const o = this.props[key];
-      if (!o) return;
+    ;['xs', 'sm', 'md', 'lg', 'xl'].forEach((key) => {
+      const o = this.props[key]
+      if (!o) return
       if (typeof o === 'object') {
         if (o.span) {
-          str.push(`col-${key}-${o.span}`);
+          str.push(`col-${key}-${o.span}`)
         }
         if (o.offset) {
-          str.push(`col-${key}-offset-${o.offset}`);
+          str.push(`col-${key}-offset-${o.offset}`)
         }
       } else {
-        str.push(`col-${key}-${o}`);
+        str.push(`col-${key}-${o}`)
       }
-    });
+    })
 
-
-    return str.join(' ');
+    return str.join(' ')
   }
 
   render() {
@@ -209,13 +213,13 @@ export default class FormItem extends React.Component<FormItemProps, State> {
       label,
       minItemWidth,
       itemClassName = '',
-      itemStyle = {},
-    } = this.props;
+      itemStyle = {}
+    } = this.props
     const labelStyles = {
       width: labelWidth,
-      textAlign: labelAlign,
-    };
-    const { errorMsg } = this.state;
+      textAlign: labelAlign
+    }
+    const { errorMsg } = this.state
     return (
       <div
         className={`hyk-form-item ${this.computedClassName} ${itemClassName}`}
@@ -223,7 +227,7 @@ export default class FormItem extends React.Component<FormItemProps, State> {
       >
         {label !== undefined && (
           <label
-            title={ typeof label === 'string' ? label : ''}
+            title={typeof label === 'string' ? label : ''}
             className={`hyk-form-item-label ${this.required ? 'required' : ''}`}
             style={labelStyles}
           >
@@ -235,6 +239,6 @@ export default class FormItem extends React.Component<FormItemProps, State> {
           <span className="hyk-form-item-error">{errorMsg}</span>
         </div>
       </div>
-    );
+    )
   }
 }

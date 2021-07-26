@@ -2,8 +2,8 @@
  * @Author: 韩玉凯
  * @Date: 2020-07-24 23:16:48
  * @LastEditors: 韩玉凯
- * @LastEditTime: 2020-09-01 09:48:41
- * @FilePath: /mcommon/src/interface.ts
+ * @LastEditTime: 2021-01-25 19:08:34
+ * @FilePath: /general-form/src/interface.ts
  */
 import { RuleItem } from 'async-validator';
 import { CSSProperties } from 'react';
@@ -33,6 +33,7 @@ export interface Context extends DefaultItemProps {
   md?: string | number | Layout
   lg?: string | number | Layout
   xl?: string | number | Layout
+  disabled?:boolean
 }
 
 export type ExcludeProps<P> = Omit<
@@ -114,6 +115,7 @@ export interface FormProps<DefaultData> {
   md?: string | number | Layout
   lg?: string | number | Layout
   xl?: string | number | Layout
+  disabled?:boolean
   onChange?(arg: EventArg<DefaultData>): void
 }
 export interface ValidateParams {
