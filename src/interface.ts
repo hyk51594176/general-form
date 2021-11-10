@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 /*
  * @Author: 韩玉凯
  * @Date: 2020-07-24 23:16:48
@@ -5,10 +6,10 @@
  * @LastEditTime: 2021-01-25 19:08:34
  * @FilePath: /general-form/src/interface.ts
  */
-import { RuleItem } from 'async-validator';
-import { CSSProperties } from 'react';
-import { Form } from './Form';
-import FormItem from './FormItem';
+import { RuleItem } from 'async-validator'
+import { CSSProperties } from 'react'
+import { Form } from './Form'
+import FormItem from './FormItem'
 
 export interface DefaultItemProps {
   onFiledChange: Form['onFiledChange']
@@ -33,20 +34,20 @@ export interface Context extends DefaultItemProps {
   md?: string | number | Layout
   lg?: string | number | Layout
   xl?: string | number | Layout
-  disabled?:boolean
+  disabled?: boolean
 }
 
 export type ExcludeProps<P> = Omit<
-P,
-| 'onFiledChange'
-| 'onLifeCycle'
-| 'subscribe'
-| 'getValue'
-| 'getValues'
-| 'setValue'
-| 'setValues'
-| 'validate'
->;
+  P,
+  | 'onFiledChange'
+  | 'onLifeCycle'
+  | 'subscribe'
+  | 'getValue'
+  | 'getValues'
+  | 'setValue'
+  | 'setValues'
+  | 'validate'
+>
 export interface Rule extends RuleItem {
   trigger?: string
 }
@@ -64,7 +65,13 @@ interface Layout {
 }
 
 interface RenderProps {
-  (props:any):JSX.Element
+  (props: any): JSX.Element
+}
+interface isShow {
+  relation: 'and' | 'or'
+  relyOn: {
+    [k: string]: Array<string | number | boolean | null | undefined>
+  }
 }
 export interface FormItemProps extends Context {
   value?: any
@@ -79,6 +86,7 @@ export interface FormItemProps extends Context {
   children?: React.ReactNode
   onChange?: (value: any, ...args: any[]) => void
   itemStyle?: CSSProperties
+  isShow?: boolean | isShow
 }
 
 export interface EventArg<DefaultData> {
@@ -115,7 +123,7 @@ export interface FormProps<DefaultData> {
   md?: string | number | Layout
   lg?: string | number | Layout
   xl?: string | number | Layout
-  disabled?:boolean
+  disabled?: boolean
   onChange?(arg: EventArg<DefaultData>): void
 }
 export interface ValidateParams {

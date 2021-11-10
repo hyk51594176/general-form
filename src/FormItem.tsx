@@ -3,10 +3,12 @@ import React from 'react'
 import { components, isDiff } from './utils'
 
 import { FormItemProps, UpdateType, DefaultItemProps } from './interface'
+import get from 'lodash/get'
 
 interface State {
   value: unknown
-  errorMsg?: string
+  errorMsg?: string,
+  show: boolean
 }
 export default class FormItem extends React.Component<FormItemProps, State> {
   static defaultProps: DefaultItemProps = {
@@ -31,13 +33,17 @@ export default class FormItem extends React.Component<FormItemProps, State> {
     super(props)
     this.state = {
       value: props.value || props.defaultValue,
-      errorMsg: props.errorMsg
+      errorMsg: props.errorMsg,
+      show: typeof props.isShow === 'boolean' ? props.isShow : true
     }
   }
 
+  unSubscribe=() => {}
+
   componentDidMount() {
-    const { field, onLifeCycle } = this.props
+    const { field, onLifeCycle, isShow } = this.props
     field && onLifeCycle(UpdateType.mount, field, this)
+    this.setShow(isShow)
   }
 
   componentWillReceiveProps(nexProps: FormItemProps) {
@@ -47,11 +53,35 @@ export default class FormItem extends React.Component<FormItemProps, State> {
     if (isDiff(this.props.errorMsg, nexProps.errorMsg)) {
       this.setErrorMsg(nexProps.errorMsg)
     }
+    if (nexProps.isShow !== this.props.isShow) {
+      this.setShow(nexProps.isShow)
+    }
+  }
+
+  setShow(show: FormItemProps['isShow']) {
+    this.unSubscribe()
+    if (typeof show === 'boolean') {
+      this.setState({ show })
+    } else {
+      const keys = Object.keys(show?.relyOn || {})
+      this.setShowByData(keys, show, this.props.getValues())
+      this.unSubscribe = this.props.subscribe(keys, (_, __, data) => {
+        this.setShowByData(keys, show, data)
+      })
+    }
+  }
+
+  setShowByData(keys: string[], show: FormItemProps['isShow'], data:any) {
+    if (typeof show === 'object') {
+      const isShow = keys[show?.relation === 'and' ? 'every' : 'some'](k => show?.relyOn[k].includes(get(data, k)))
+      this.setState({ show: isShow })
+    }
   }
 
   componentWillUnmount() {
     const { field, onLifeCycle } = this.props
     field && onLifeCycle(UpdateType.unmount, field, this)
+    this.unSubscribe()
   }
 
   get triggerType() {
@@ -60,6 +90,7 @@ export default class FormItem extends React.Component<FormItemProps, State> {
     if (!rules) return triggerKey
     return (Array.isArray(rules) ? rules : [rules]).reduce(
       (str, { trigger }) => {
+        // eslint-disable-next-line no-param-reassign
         if (trigger) str = trigger
         return str
       },
@@ -104,9 +135,10 @@ export default class FormItem extends React.Component<FormItemProps, State> {
       md,
       lg,
       xl,
+      isShow,
       ...other
     } = this.props
-    const { value } = this.state
+    const { value, show } = this.state
     let child: any = children || el
     if (child) {
       const props: any = {
@@ -138,6 +170,7 @@ export default class FormItem extends React.Component<FormItemProps, State> {
       } else if (typeof child === 'function') {
         child = child({
           ...props,
+          show,
           onFiledChange,
           onLifeCycle,
           subscribe,
@@ -219,9 +252,9 @@ export default class FormItem extends React.Component<FormItemProps, State> {
       width: labelWidth,
       textAlign: labelAlign
     }
-    const { errorMsg } = this.state
+    const { errorMsg, show } = this.state
     return (
-      <div
+      show ? <div
         className={`hyk-form-item ${this.computedClassName} ${itemClassName}`}
         style={{ minWidth: minItemWidth, ...itemStyle }}
       >
@@ -238,7 +271,7 @@ export default class FormItem extends React.Component<FormItemProps, State> {
           {this.children}
           <span className="hyk-form-item-error">{errorMsg}</span>
         </div>
-      </div>
+      </div> : null
     )
   }
 }
