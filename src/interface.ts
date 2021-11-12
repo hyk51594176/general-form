@@ -64,11 +64,17 @@ interface Layout {
   offset?: string | number
 }
 
-interface RenderProps {
-  (props: any): JSX.Element
+export interface RenderProps extends DefaultItemProps {
+  value: any
+  show: boolean
+  onChange: (val: any, ...args: any[]) => void
 }
-interface isShow {
-  relation: 'and' | 'or'
+interface RenderFn {
+  (props: RenderProps): JSX.Element
+}
+interface DynamicParameter {
+  relation?: 'and' | 'or'
+  notIn?: true
   relyOn: {
     [k: string]: Array<string | number | boolean | null | undefined>
   }
@@ -76,9 +82,9 @@ interface isShow {
 export interface FormItemProps extends Context {
   value?: any
   defaultValue?: any
-  el?: string | JSX.Element | RenderProps
+  el?: string | JSX.Element | RenderFn
   field?: string
-  label?: string | JSX.Element | RenderProps
+  label?: string | JSX.Element | RenderFn
   itemClassName?: string
   required?: boolean
   rules?: Rule | Rule[]
@@ -86,7 +92,7 @@ export interface FormItemProps extends Context {
   children?: React.ReactNode
   onChange?: (value: any, ...args: any[]) => void
   itemStyle?: CSSProperties
-  isShow?: boolean | isShow
+  isShow?: boolean | DynamicParameter
 }
 
 export interface EventArg<DefaultData> {

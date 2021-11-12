@@ -73,7 +73,11 @@ export default class FormItem extends React.Component<FormItemProps, State> {
 
   setShowByData(keys: string[], show: FormItemProps['isShow'], data:any) {
     if (typeof show === 'object') {
-      const isShow = keys[show?.relation === 'and' ? 'every' : 'some'](k => show?.relyOn[k].includes(get(data, k)))
+      const method = show.relation === 'and' ? 'every' : 'some'
+      const isShow = keys[method](k => {
+        const flag = show.relyOn[k].includes(get(data, k))
+        return show.notIn ? !flag : flag
+      })
       this.setState({ show: isShow })
     }
   }
@@ -162,10 +166,7 @@ export default class FormItem extends React.Component<FormItemProps, State> {
         child = React.cloneElement(child, {
           ...child.props,
           ...props,
-          disabled:
-            child.props.disabled !== undefined
-              ? child.props.disabled
-              : props.disabled
+          disabled: props.disabled
         })
       } else if (typeof child === 'function') {
         child = child({
