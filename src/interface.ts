@@ -7,7 +7,7 @@
  * @FilePath: /general-form/src/interface.ts
  */
 import { RuleItem } from 'async-validator'
-import { CSSProperties } from 'react'
+import { CSSProperties, ReactNode, FC, ComponentClass } from 'react'
 import { Form } from './Form'
 import FormItem from './FormItem'
 
@@ -47,6 +47,9 @@ export type ExcludeProps<P> = Omit<
   | 'setValue'
   | 'setValues'
   | 'validate'
+  | 'onChange'
+  | 'value'
+  | 'show'
 >
 export interface Rule extends RuleItem {
   trigger?: string
@@ -63,10 +66,13 @@ interface Layout {
   span?: string | number
   offset?: string | number
 }
-
+export interface Comp {
+  [key: string]: FC<any> | ComponentClass<any>
+}
 export interface RenderProps extends DefaultItemProps {
   value: any
   show: boolean
+  field: string
   onChange: (val: any, ...args: any[]) => void
 }
 interface RenderFn {
@@ -74,9 +80,9 @@ interface RenderFn {
 }
 interface DynamicParameter {
   relation?: 'and' | 'or'
-  notIn?: true
+  notIn?: boolean
   relyOn: {
-    [k: string]: Array<string | number | boolean | null | undefined>
+    [k: string]: any[] | undefined
   }
 }
 export interface FormItemProps extends Context {
@@ -89,10 +95,11 @@ export interface FormItemProps extends Context {
   required?: boolean
   rules?: Rule | Rule[]
   errorMsg?: string
-  children?: React.ReactNode
+  children?: ReactNode | RenderFn
   onChange?: (value: any, ...args: any[]) => void
   itemStyle?: CSSProperties
-  isShow?: boolean | DynamicParameter
+  isShow?: boolean | DynamicParameter | undefined
+  whitContext?: boolean
 }
 
 export interface EventArg<DefaultData> {

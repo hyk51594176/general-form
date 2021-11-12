@@ -89,9 +89,9 @@ export class Form<
     }
   }
 
-  componentWillReceiveProps(nextProps: FormProps<DefaultData>) {
-    if (nextProps.defaultData !== this.props.defaultData) {
-      this.resetFields(nextProps.defaultData)
+  componentDidUpdate(preProps: FormProps<DefaultData>) {
+    if (preProps.defaultData !== this.props.defaultData) {
+      this.resetFields(this.props.defaultData)
     }
   }
 
@@ -160,6 +160,12 @@ export class Form<
       item.setValue(value, () => {
         this.validate([field])
       })
+      this.eventList.forEach((obj, index) => {
+        if (obj.fields.includes(field)) {
+          if (obj.callback) obj.callback(field, value, this.formData)
+          else this.eventList.splice(index, 1)
+        }
+      })
     }
   }
 
@@ -174,7 +180,14 @@ export class Form<
   setValues = (values: any) => {
     this.formData = values
     Object.entries(this.itemInstances).forEach(([field, item]) => {
-      item.setValue(get(this.formData, field))
+      const value = get(this.formData, field)
+      item.setValue(value)
+      this.eventList.forEach((obj, index) => {
+        if (obj.fields.includes(field)) {
+          if (obj.callback) obj.callback(field, value, this.formData)
+          else this.eventList.splice(index, 1)
+        }
+      })
     })
   }
 

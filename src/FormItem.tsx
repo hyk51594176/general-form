@@ -7,7 +7,7 @@ import get from 'lodash/get'
 
 interface State {
   value: unknown
-  errorMsg?: string,
+  errorMsg?: string
   show: boolean
 }
 export default class FormItem extends React.Component<FormItemProps, State> {
@@ -38,7 +38,7 @@ export default class FormItem extends React.Component<FormItemProps, State> {
     }
   }
 
-  unSubscribe=() => {}
+  unSubscribe = () => {}
 
   componentDidMount() {
     const { field, onLifeCycle, isShow } = this.props
@@ -46,15 +46,15 @@ export default class FormItem extends React.Component<FormItemProps, State> {
     this.setShow(isShow)
   }
 
-  componentWillReceiveProps(nexProps: FormItemProps) {
-    if (isDiff(nexProps.value, this.props.value)) {
-      this.setState({ value: nexProps.value })
+  componentDidUpdate(preProps: FormItemProps) {
+    if (isDiff(preProps.value, this.props.value)) {
+      this.setState({ value: this.props.value })
     }
-    if (isDiff(this.props.errorMsg, nexProps.errorMsg)) {
-      this.setErrorMsg(nexProps.errorMsg)
+    if (isDiff(this.props.errorMsg, preProps.errorMsg)) {
+      this.setErrorMsg(this.props.errorMsg)
     }
-    if (nexProps.isShow !== this.props.isShow) {
-      this.setShow(nexProps.isShow)
+    if (preProps.isShow !== this.props.isShow) {
+      this.setShow(this.props.isShow)
     }
   }
 
@@ -71,14 +71,21 @@ export default class FormItem extends React.Component<FormItemProps, State> {
     }
   }
 
-  setShowByData(keys: string[], show: FormItemProps['isShow'], data:any) {
+  setShowByData(keys: string[], show: FormItemProps['isShow'], data: any) {
     if (typeof show === 'object') {
       const method = show.relation === 'and' ? 'every' : 'some'
-      const isShow = keys[method](k => {
-        const flag = show.relyOn[k].includes(get(data, k))
+      const isShow = keys[method]((k) => {
+        const flag = show.relyOn[k]?.includes(get(data, k))
         return show.notIn ? !flag : flag
       })
-      this.setState({ show: isShow })
+      const state: any = {
+        show: isShow
+      }
+      if (!isShow && this.props.field) {
+        this.props.onFiledChange(this.props.field, { value: undefined })
+        state.value = undefined
+      }
+      this.setState(state)
     }
   }
 
@@ -134,6 +141,7 @@ export default class FormItem extends React.Component<FormItemProps, State> {
       setValue,
       setValues,
       validate,
+      whitContext,
       xs,
       sm,
       md,
@@ -145,9 +153,22 @@ export default class FormItem extends React.Component<FormItemProps, State> {
     const { value, show } = this.state
     let child: any = children || el
     if (child) {
+      const context = {
+        show,
+        field,
+        onFiledChange,
+        onLifeCycle,
+        subscribe,
+        getValue,
+        getValues,
+        setValue,
+        setValues,
+        validate
+      }
       const props: any = {
         value,
         ...other,
+        ...(whitContext ? context : {}),
         onChange: (val: any, ...args: any[]) => {
           this.onChange(val, ...args)
           if (typeof onChange === 'function') onChange(val, ...args)
@@ -165,22 +186,10 @@ export default class FormItem extends React.Component<FormItemProps, State> {
       if (React.isValidElement<any>(child)) {
         child = React.cloneElement(child, {
           ...child.props,
-          ...props,
-          disabled: props.disabled
+          ...props
         })
       } else if (typeof child === 'function') {
-        child = child({
-          ...props,
-          show,
-          onFiledChange,
-          onLifeCycle,
-          subscribe,
-          getValue,
-          getValues,
-          setValue,
-          setValues,
-          validate
-        })
+        child = child(props)
       } else if (typeof child === 'string' && components[child]) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const Comp = components[child]
@@ -254,8 +263,8 @@ export default class FormItem extends React.Component<FormItemProps, State> {
       textAlign: labelAlign
     }
     const { errorMsg, show } = this.state
-    return (
-      show ? <div
+    return show ? (
+      <div
         className={`hyk-form-item ${this.computedClassName} ${itemClassName}`}
         style={{ minWidth: minItemWidth, ...itemStyle }}
       >
@@ -272,7 +281,7 @@ export default class FormItem extends React.Component<FormItemProps, State> {
           {this.children}
           <span className="hyk-form-item-error">{errorMsg}</span>
         </div>
-      </div> : null
-    )
+      </div>
+    ) : null
   }
 }

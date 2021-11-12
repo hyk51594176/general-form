@@ -34,7 +34,7 @@ export const ContextType = {
 };
 // eslint-disable-next-line import/prefer-default-export
 export function withFormContext<T extends Context>(
-  Component: React.ComponentClass<T>,
+  Component: React.FC<T>| React.ComponentClass<T>,
 ) {
   const NewComponent: React.FC<ExcludeProps<T>> = (
     prop: ExcludeProps<T>,
