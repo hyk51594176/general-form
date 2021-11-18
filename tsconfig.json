@@ -28,6 +28,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "removeComments": false,
+    "keyofStringsOnly": true,
     "jsx": "react"
   },
   "include": [

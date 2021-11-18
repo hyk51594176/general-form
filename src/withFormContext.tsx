@@ -6,9 +6,9 @@
  * @FilePath: /general-form/src/withFormContext.tsx
  */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Context, ExcludeProps } from './interface';
+import React from 'react'
+import PropTypes from 'prop-types'
+import { Context, ExcludeProps } from './interface'
 
 export const ContextType = {
   size: PropTypes.string,
@@ -26,26 +26,46 @@ export const ContextType = {
   setValues: PropTypes.func,
   validate: PropTypes.func,
   disabled: PropTypes.bool,
-  xs: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-  sm: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-  md: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-  lg: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-  xl: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-};
+  xs: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.object
+  ]),
+  sm: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.object
+  ]),
+  md: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.object
+  ]),
+  lg: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.object
+  ]),
+  xl: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.object
+  ])
+}
 // eslint-disable-next-line import/prefer-default-export
 export function withFormContext<T extends Context>(
-  Component: React.FC<T>| React.ComponentClass<T>,
+  Component: React.FC<T> | React.ComponentClass<T>
 ) {
   const NewComponent: React.FC<ExcludeProps<T>> = (
     prop: ExcludeProps<T>,
-    context: Context,
+    context: Context
   ) => {
     const props = {
       ...context,
-      ...prop,
-    } as T;
-    return <Component {...props} />;
-  };
-  NewComponent.contextTypes = ContextType;
-  return NewComponent;
+      ...prop
+    } as T
+    return <Component {...props} />
+  }
+  NewComponent.contextTypes = ContextType
+  return NewComponent
 }

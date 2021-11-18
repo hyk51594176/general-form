@@ -76,7 +76,7 @@ export interface RenderProps extends DefaultItemProps {
   onChange: (val: any, ...args: any[]) => void
 }
 interface RenderFn {
-  (props: RenderProps): JSX.Element
+  (props: RenderProps): ReactNode
 }
 interface DynamicParameter {
   relation?: 'and' | 'or'
@@ -85,12 +85,21 @@ interface DynamicParameter {
     [k: string]: any[] | undefined
   }
 }
+// type FirstType<U> = U extends (k: infer I, ...args: any[]) => any ? I : never
+
+// type WithoutNever<T> = Pick<
+//   T,
+//   { [k in keyof T]: T[k] extends never ? never : k }[keyof T]
+// >
+// type GetType<U> = WithoutNever<FirstType<U>>
+
 export interface FormItemProps extends Context {
+  [key: string]: any
   value?: any
   defaultValue?: any
-  el?: string | JSX.Element | RenderFn
+  el?: string | ReactNode | RenderFn
   field?: string
-  label?: string | JSX.Element | RenderFn
+  label?: string | ReactNode | RenderFn
   itemClassName?: string
   required?: boolean
   rules?: Rule | Rule[]
@@ -100,6 +109,7 @@ export interface FormItemProps extends Context {
   itemStyle?: CSSProperties
   isShow?: boolean | DynamicParameter | undefined
   whitContext?: boolean
+  // props?: GetType<T[K]>
 }
 
 export interface EventArg<DefaultData> {
@@ -113,10 +123,8 @@ export interface EventItem<DefaultData> {
   callback(field: string, value: any, data: DefaultData): void
 }
 
-export interface Column extends ExcludeProps<FormItemProps> {
-  [key: string]: any
-}
-
+export type Column = ExcludeProps<FormItemProps>
+export const defineColumns = (columns: Column[]) => columns
 export interface FormProps<DefaultData> {
   columns?: Column[]
   className?: string
