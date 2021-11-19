@@ -37,20 +37,7 @@ export interface Context extends DefaultItemProps {
   disabled?: boolean
 }
 
-export type ExcludeProps<P> = Omit<
-  P,
-  | 'onFiledChange'
-  | 'onLifeCycle'
-  | 'subscribe'
-  | 'getValue'
-  | 'getValues'
-  | 'setValue'
-  | 'setValues'
-  | 'validate'
-  | 'onChange'
-  | 'value'
-  | 'show'
->
+export type ExcludeProps<P> = Omit<P, keyof DefaultItemProps>
 export interface Rule extends RuleItem {
   trigger?: string
 }
@@ -94,7 +81,6 @@ interface DynamicParameter {
 // type GetType<U> = WithoutNever<FirstType<U>>
 
 export interface FormItemProps extends Context {
-  [key: string]: any
   value?: any
   defaultValue?: any
   el?: string | ReactNode | RenderFn
@@ -109,7 +95,6 @@ export interface FormItemProps extends Context {
   itemStyle?: CSSProperties
   isShow?: boolean | DynamicParameter | undefined
   whitContext?: boolean
-  // props?: GetType<T[K]>
 }
 
 export interface EventArg<DefaultData> {
