@@ -1,267 +1,199 @@
-/* eslint-disable no-param-reassign */
-import React from 'react'
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef
+} from 'react'
 import Schema from 'async-validator'
-import Item from './FormItem'
 import get from 'lodash/get'
 import set from 'lodash/set'
-import cloneDeep from 'lodash/cloneDeep'
+import { getContextWithProps } from './utils'
+import Context from './Context'
+import FormItem from './FormItem'
 import './index.scss'
 import {
   FormProps,
-  ItemInstance,
   EventItem,
-  UpdateType,
+  FormItemInstance,
+  FormItemInstances,
   ValidateParams,
-  Context
+  UpdateType,
+  FormRef
 } from './interface'
-import { withFormContext, ContextType } from './withFormContext'
-
-export const FormItem = withFormContext(Item)
-
-export class Form<
-  DefaultData extends Record<string, any> = {}
-> extends React.Component<FormProps<DefaultData>> {
-  static defaultProps = {
-    columns: [],
-    labelAlign: 'right',
-    labelWidth: '80px'
-  }
-
-  static childContextTypes = ContextType
-
-  itemInstances: ItemInstance = {}
-
-  formData!: DefaultData
-
-  eventList: Array<EventItem<DefaultData>> = []
-
-  constructor(props: FormProps<DefaultData>) {
-    super(props)
-    this.initFormData(this.props.defaultData)
-  }
-
-  getChildContext(): Context {
-    const {
-      size,
-      span,
-      offset,
-      labelWidth,
-      labelAlign,
-      minItemWidth,
-      xs,
-      sm,
-      md,
-      lg,
-      xl,
-      disabled
-    } = this.props
-    const {
-      getValue,
-      getValues,
-      setValue,
-      setValues,
-      onFiledChange,
-      onLifeCycle,
-      subscribe,
-      validate
-    } = this
-    return {
-      size,
-      span,
-      offset,
-      labelWidth,
-      minItemWidth,
-      labelAlign,
-      getValue,
-      getValues,
-      setValue,
-      setValues,
-      onFiledChange,
-      onLifeCycle,
-      subscribe,
-      validate,
-      disabled,
-      xs,
-      sm,
-      md,
-      lg,
-      xl
-    }
-  }
-
-  componentDidUpdate(preProps: FormProps<DefaultData>) {
-    if (preProps.defaultData !== this.props.defaultData) {
-      this.resetFields(this.props.defaultData)
-    }
-  }
-
-  subscribe = (
-    fields: string[],
-    callback: EventItem<DefaultData>['callback']
-  ) => {
+const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref) => {
+  type Data = typeof props['defaultData']
+  const { columns = [], onChange, className = '', children, notLayout, style } = props
+  const itemInstances = useRef<FormItemInstances>({})
+  const eventList = useRef<Array<EventItem<Data>>>([])
+  const subscribe = (fields: string[], callback: EventItem<Data>['callback']) => {
     const obj = { fields, callback }
-    this.eventList.push(obj)
+    eventList.current.push(obj)
     return () => {
-      this.eventList = this.eventList.filter((item) => item !== obj)
+      eventList.current = eventList.current.filter((item) => item !== obj)
     }
   }
-
-  initFormData = (defaultData: DefaultData | undefined, isSet = false) => {
-    this.formData = cloneDeep<DefaultData>(
-      defaultData || ((this.props.isArray ? [] : {}) as any)
-    )
-    // JSON.parse(
-    //   JSON.stringify(defaultData || (this.props.isArray ? [] : {})),
-    // );
-    if (isSet) {
-      this.setValues(this.formData)
-    }
-  }
-
-  onLifeCycle = (type: UpdateType, field: string, comp: Item) => {
-    if (type === UpdateType.mount) {
-      if (this.itemInstances[field]) {
-        if (this.itemInstances[field] !== comp) {
-          console.error(`重复的field字段定义: ${field}`)
-        }
-      }
-      this.itemInstances[field] = comp
-      comp.setValue(this.getValue(field))
-    } else if (type === UpdateType.unmount) {
-      delete this.itemInstances[field]
-      if (this.props.isNullClear && get(this.formData, field) !== undefined) {
-        set(this.formData, field, undefined)
-      }
-    }
-  }
-
-  onFiledChange = (field: string, options: any) => {
-    set(this.formData, field, options.value)
-    if (typeof this.props.onChange === 'function') {
-      this.props.onChange({
-        field,
-        value: options.value,
-        e: options.e,
-        formData: this.formData
-      })
-    }
-    this.eventList.forEach((obj, index) => {
-      if (obj.fields.includes(field)) {
-        if (obj.callback) obj.callback(field, options.value, this.formData)
-        else this.eventList.splice(index, 1)
-      }
-    })
-  }
-
-  setValue = (field: string, value: any) => {
-    set(this.formData, field, value)
-    const item = this.itemInstances[field]
-    if (item) {
-      item.setValue(value, () => {
-        this.validate([field])
-      })
-      this.eventList.forEach((obj, index) => {
+  const getValues = useCallback(() => {
+    return Object.entries(itemInstances.current)
+      .filter(([_, item]) => item.show)
+      .reduce(
+        (obj, [k, item]) => {
+          set(obj, k, item.value)
+          return obj
+        },
+        Array.isArray(props.defaultData) ? [] : {}
+      )
+  }, [props.defaultData])
+  const bootstrap = useCallback(
+    (field: string, value: any) => {
+      eventList.current.forEach((obj, index) => {
         if (obj.fields.includes(field)) {
-          if (obj.callback) obj.callback(field, value, this.formData)
-          else this.eventList.splice(index, 1)
+          if (obj.callback) obj.callback(field, value, getValues())
+          else eventList.current.splice(index, 1)
         }
       })
-    }
-  }
-
-  getValue = (field: string) => {
-    return get(this.formData, field)
-  }
-
-  getValues = () => {
-    return this.formData
-  }
-
-  setValues = (values: any) => {
-    this.formData = values
-    Object.entries(this.itemInstances).forEach(([field, item]) => {
-      const value = get(this.formData, field)
-      item.setValue(value)
-      this.eventList.forEach((obj, index) => {
-        if (obj.fields.includes(field)) {
-          if (obj.callback) obj.callback(field, value, this.formData)
-          else this.eventList.splice(index, 1)
-        }
+    },
+    [getValues]
+  )
+  const setValues = useCallback(
+    (data: Data = {}) => {
+      Object.entries(itemInstances.current).forEach(([field, item]) => {
+        const value = get(data, field)
+        item.setValue(value)
+        bootstrap(field, value)
       })
-    })
+    },
+    [bootstrap]
+  )
+  const getValue = (field: string) => {
+    const item = itemInstances.current[field]
+    if (item && item.show) return item.value
+    return undefined
   }
 
-  resetFields = (
-    defaultData: DefaultData | undefined = this.props.defaultData
-  ) => {
-    this.initFormData(defaultData, true)
-    this.clearValidate()
-  }
-
-  clearValidate = (params?: string[]) => {
-    const fields = this.getFields(params)
+  const clearValidate = useCallback((params?: string[]) => {
+    const fields = getFields(params)
     fields.forEach((field) => {
-      const obj = this.itemInstances[field]
-      if (obj && obj.state.errorMsg) {
+      const obj = itemInstances.current[field]
+      if (obj && obj.errorMsg) {
         obj.setErrorMsg()
       }
     })
+  }, [])
+  const onLifeCycle = useCallback(
+    (type: UpdateType, field: string, comp: FormItemInstance) => {
+      if (type === UpdateType.mount) {
+        if (itemInstances.current[field]) {
+          if (itemInstances.current[field] !== comp) {
+            console.error(`重复的field字段定义: ${field}`)
+          }
+        }
+        itemInstances.current[field] = comp
+        comp.setValue(getValue(field))
+      } else if (type === UpdateType.unmount) {
+        clearValidate([field])
+        delete itemInstances.current[field]
+      }
+    },
+    [clearValidate]
+  )
+  const setValue = (field: string, value: any) => {
+    const item = itemInstances.current[field]
+    if (item) {
+      item.setValue(value)
+      bootstrap(field, value)
+      validate([field])
+    }
   }
 
-  getFields = (fields?: string[]): string[] => {
-    return fields || Object.keys(this.itemInstances)
-  }
-
-  validate = (params?: string[]): Promise<DefaultData> => {
-    const fields = this.getFields(params)
-    if (!fields.length) return Promise.resolve(this.formData)
+  const validate = (params?: string[]): Promise<Data> => {
+    const fields = getFields(params)
+    const data = getValues()
+    if (!fields.length) return Promise.resolve(data)
     const validateParams: ValidateParams = fields.reduce(
       ({ rule, source }: ValidateParams, field) => {
-        const obj = this.itemInstances[field]
-        if (obj && obj.props.rules) {
-          rule[field] = obj.props.rules
-          source[field] = obj.state.value
+        const obj = itemInstances.current[field]
+        if (obj && obj.rules && obj.show) {
+          rule[field] = obj.rules
+          source[field] = obj.value
         }
         return { rule, source }
       },
       { rule: {}, source: {} }
     )
     if (!Object.keys(validateParams.rule).length) {
-      return Promise.resolve(this.formData)
+      return Promise.resolve(data)
     }
     return new Schema(validateParams.rule)
       .validate(validateParams.source)
       .then(() => {
-        this.clearValidate(fields)
-        return Promise.resolve(this.formData)
+        clearValidate(fields)
+        return Promise.resolve(data)
       })
       .catch((err) => {
         const { errors = [] } = err
         errors.forEach((obj: any) => {
-          this.itemInstances[obj.field].setErrorMsg(obj.message)
+          itemInstances.current[obj.field].setErrorMsg(obj.message)
         })
         return Promise.reject(err)
       })
   }
+  const resetFields = (defaultData: Data = props.defaultData) => {
+    setValues(defaultData)
+    clearValidate()
+  }
+  const onFiledChange = (field: string, options: any) => {
+    if (onChange) {
+      onChange({
+        field,
+        value: options.value,
+        e: options.e,
+        formData: getValues()
+      })
+    }
+    bootstrap(field, options.value)
+  }
 
-  render() {
-    const {
-      columns = [],
-      className = '',
-      children,
-      notLayout,
-      style
-    } = this.props
-    return (
-      <div
-        className={`hyk-form ${notLayout ? 'hyk-form-table' : ''} ${className}`}
-        style={style}
-      >
+  const getFields = (fields?: string[]): string[] => {
+    return fields || Object.keys(itemInstances.current)
+  }
+  useImperativeHandle(ref, () => ({
+    subscribe,
+    setValues,
+    getValue,
+    getValues,
+    setValue,
+    clearValidate,
+    validate,
+    resetFields
+  }))
+  useEffect(() => {
+    setValues(props.defaultData || {})
+  }, [props.defaultData, setValues])
+  return (
+    <Context.Provider
+      value={{
+        setValue,
+        setValues,
+        subscribe,
+        onLifeCycle,
+        getValue,
+        getValues,
+        validate,
+        resetFields,
+        clearValidate,
+        onFiledChange,
+        ...getContextWithProps(props)
+      }}
+    >
+      <div className={`hyk-form ${notLayout ? 'hyk-form-table' : ''} ${className}`} style={style}>
         {columns.map((obj, index) => (
           <FormItem key={obj.field || String(index)} {...obj} />
         ))}
         {children}
       </div>
-    )
-  }
-}
+    </Context.Provider>
+  )
+})
+
+export default Form

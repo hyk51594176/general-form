@@ -11,10 +11,11 @@ const isShow = {
     show: [true],
   },
 };
+// eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const { formEl, submit, reset } = useForm();
   return (
-    <Form ref={formEl} defaultData={defaultData} span={8}>
+    <Form ref={formEl} defaultData={defaultData} span={8} onChange={(e) => {}}>
       <FormItem label="姓名" field="name">
         <Input />
       </FormItem>

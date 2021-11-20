@@ -35,7 +35,6 @@ npm i @hanyk/general-form
 | labelWidth| 透传 formItem| string | 80px|
 | mintItemWidth | 透传 formItem| string |
 | defaultData| 要绑定数据对象| object/array|
-| isNullClear| 当 formitem 销毁的时候是否清除所绑定的字段的值 | boolean| false|
 | notLayout| 是否禁用布局，表格的时候建议开启| boolean| false|
 | onChange| 值变化的 change 事件| object{field:'xxx', value:'xxx', formData, e:event} | |
 | disabled| 全局禁止编辑 | boolean|
@@ -79,6 +78,7 @@ npm i @hanyk/general-form
 | mintItemWidth| formItem 最小宽度超出换行| string| |
 | mintItemWidth| formItem 最小宽度超出换行| string| |
 |whitContext| 是否透传context | boolean | false |
+|content| el对应的children | ReactNode |   |
 | isShow| 是否展示| boolean/DynamicParameter| |
 | 其他所有额属性透传输入组件 | el 所对应的组件需要的 props 都可以透传 | any| |
 

@@ -10,6 +10,7 @@ const rules = {
   required: true,
   message: '该字段必填',
 };
+// eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const { formEl, submit, reset } = useForm();
   return (

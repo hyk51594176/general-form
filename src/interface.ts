@@ -1,34 +1,27 @@
 /* eslint-disable @typescript-eslint/indent */
-/*
- * @Author: 韩玉凯
- * @Date: 2020-07-24 23:16:48
- * @LastEditors: 韩玉凯
- * @LastEditTime: 2021-01-25 19:08:34
- * @FilePath: /general-form/src/interface.ts
- */
 import { RuleItem } from 'async-validator'
-import { CSSProperties, ReactNode, FC, ComponentClass } from 'react'
-import { Form } from './Form'
-import FormItem from './FormItem'
+import { ComponentClass, ComponentProps, CSSProperties, FC, ReactNode } from 'react'
 
-export interface DefaultItemProps {
-  onFiledChange: Form['onFiledChange']
-  onLifeCycle: Form['onLifeCycle']
-  subscribe: Form['subscribe']
-  getValue: Form['getValue']
-  getValues: Form['getValues']
-  setValue: Form['setValue']
-  setValues: Form['setValues']
-  validate: Form['validate']
-}
-
-export interface Context extends DefaultItemProps {
-  size?: string
+type Layout = {
   span?: string | number
   offset?: string | number
+}
+export interface Comp {
+  [key: string]: FC<any> | ComponentClass<any>
+}
+export type EventArg<DefaultData> = {
+  field: string
+  value: any
+  e: any
+  formData?: DefaultData
+}
+export type Common = {
+  size?: string
+  span?: number
+  offset?: number
+  labelAlign?: CSSProperties['textAlign']
   labelWidth?: CSSProperties['width']
   minItemWidth?: CSSProperties['minWidth']
-  labelAlign?: CSSProperties['textAlign']
   xs?: string | number | Layout
   sm?: string | number | Layout
   md?: string | number | Layout
@@ -36,56 +29,86 @@ export interface Context extends DefaultItemProps {
   xl?: string | number | Layout
   disabled?: boolean
 }
+export type FormProps<T = any> = {
+  columns?: Array<Column<any>>
+  className?: string
+  defaultData?: Partial<T>
+  notLayout?: boolean
+  style?: CSSProperties
+  onChange?(arg: EventArg<T>): void
+} & Common
 
-export type ExcludeProps<P> = Omit<P, keyof DefaultItemProps>
-export interface Rule extends RuleItem {
-  trigger?: string
-}
+type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>
 export enum UpdateType {
   unmount,
   mount
 }
-export interface ValidateParam {
+export interface EventItem<D> {
+  fields: string[]
+  callback(field: string, value: any, data: D): void
+}
+export interface ValidateParams {
+  rule: {
+    [k: string]: RuleItem | RuleItem[]
+  }
+  source: {
+    [k: string]: any
+  }
+}
+export interface FormItemInstance {
+  errorMsg?: string
   rules?: RuleItem | RuleItem[]
-  value: any
+  value?: any
+  show?: boolean
+  setValue(v: any): void
+  setErrorMsg(msg?: string): void
 }
-interface Layout {
-  span?: string | number
-  offset?: string | number
+export interface FormItemInstances {
+  [key: string]: FormItemInstance
 }
-export interface Comp {
-  [key: string]: FC<any> | ComponentClass<any>
+export type FormRef<T = unknown> = {
+  subscribe: (fields: string[], callback: EventItem<T>['callback']) => () => void
+  getValue: (field: string) => any
+  getValues: () => any
+  setValue: (field: string, value: any) => void
+  clearValidate: (field: string[]) => void
+  setValues: (data: Partial<FormProps['defaultData']>) => void
+  validate: (params?: string[]) => Promise<T>
+  resetFields: (data?: Partial<T>) => void
 }
-export interface RenderProps extends DefaultItemProps {
+export type Context<T = {} | undefined> = Omit<
+  FormProps<T>,
+  'columns' | 'className' | 'onChange' | 'notLayout' | 'style'
+> &
+  FormRef<T> & {
+    onFiledChange: (field: string, options: any) => void
+    onLifeCycle: (type: UpdateType, field: string, comp: FormItemInstance) => void
+  }
+export type RenderProps = {
   value: any
   show: boolean
   field: string
   onChange: (val: any, ...args: any[]) => void
-}
+} & Pick<Context, keyof FormRef>
+
 interface RenderFn {
   (props: RenderProps): ReactNode
 }
-interface DynamicParameter {
+type DynamicParameter = {
   relation?: 'and' | 'or'
   notIn?: boolean
   relyOn: {
     [k: string]: any[] | undefined
   }
 }
-// type FirstType<U> = U extends (k: infer I, ...args: any[]) => any ? I : never
-
-// type WithoutNever<T> = Pick<
-//   T,
-//   { [k in keyof T]: T[k] extends never ? never : k }[keyof T]
-// >
-// type GetType<U> = WithoutNever<FirstType<U>>
-
-export interface FormItemProps extends Context {
-  value?: any
-  defaultValue?: any
+export interface Rule extends RuleItem {
+  trigger?: string
+}
+export type FormItemProps = Common & {
   el?: string | ReactNode | RenderFn
   field?: string
   label?: string | ReactNode | RenderFn
+  content?: string | ReactNode | RenderFn
   itemClassName?: string
   required?: boolean
   rules?: Rule | Rule[]
@@ -96,51 +119,7 @@ export interface FormItemProps extends Context {
   isShow?: boolean | DynamicParameter | undefined
   whitContext?: boolean
 }
-
-export interface EventArg<DefaultData> {
-  field: string
-  value: any
-  e: any
-  formData: DefaultData
-}
-export interface EventItem<DefaultData> {
-  fields: string[]
-  callback(field: string, value: any, data: DefaultData): void
-}
-
-export type Column = ExcludeProps<FormItemProps>
-export const defineColumns = (columns: Column[]) => columns
-export interface FormProps<DefaultData> {
-  columns?: Column[]
-  className?: string
-  isArray?: boolean // defaultData 数据结构是否为数组
-  size?: string
-  span?: number
-  offset?: number
-  style?: CSSProperties
-  labelAlign?: CSSProperties['textAlign']
-  labelWidth?: CSSProperties['width']
-  minItemWidth?: CSSProperties['minWidth']
-  defaultData?: DefaultData
-  isNullClear?: boolean // 当formitem unmount的时候是否清除当前字段
-  notLayout?: boolean
-  xs?: string | number | Layout
-  sm?: string | number | Layout
-  md?: string | number | Layout
-  lg?: string | number | Layout
-  xl?: string | number | Layout
-  disabled?: boolean
-  onChange?(arg: EventArg<DefaultData>): void
-}
-export interface ValidateParams {
-  rule: {
-    [k: string]: RuleItem | RuleItem[]
-  }
-  source: {
-    [k: string]: any
-  }
-}
-
-export interface ItemInstance {
-  [key: string]: FormItem
-}
+type Column<T extends FC<any> | ComponentClass<any>> = FormItemProps & ComponentProps<T>
+export const defineColumns = <T extends Comp, K extends keyof T = keyof T>(
+  columns: Array<Column<T[K]>>
+) => columns

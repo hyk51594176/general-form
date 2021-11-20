@@ -1,34 +1,37 @@
 import React, { useMemo } from 'react';
 import { Input, Radio, Button, DatePicker } from 'antd';
-import { Column, Form, registerComponent } from '@hanyk/general-form';
+import { defineColumns, Form, registerComponent } from '@hanyk/general-form';
 import HotSelect from '../../components/HotSelect';
 import '@hanyk/general-form/dist/index.css';
 import { getList, defaultData } from '../../api';
 import { useForm } from '../../hooks';
 const RadioGroup = Radio.Group;
 
-registerComponent({
+const components = {
   Input,
   RadioGroup,
   HotSelect,
   DatePicker,
-});
+};
+registerComponent(components);
 const rules = {
   required: true,
   message: '该字段必填',
 };
+
+// eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const { formEl, submit, reset } = useForm();
-  const columns = useMemo<Column[]>(() => {
-    return [
+  const columns = useMemo(() => {
+    return defineColumns<typeof components>([
       { label: '姓名', rules, field: 'name', el: 'Input' },
+
       { label: '年龄', rules, field: 'age', el: 'Input', type: 'number' },
       {
         label: '性别',
         rules,
         field: 'sex',
         el: 'RadioGroup',
-        type: 'number',
         span: 20,
         options: [
           { label: '男', value: 1 },
@@ -107,8 +110,8 @@ export default () => {
           </>
         ),
       },
-    ];
-  }, []);
+    ]);
+  }, [reset, submit]);
 
   return (
     <Form columns={columns} ref={formEl} defaultData={defaultData} span={12} />

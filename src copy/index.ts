@@ -5,11 +5,7 @@
  * @LastEditTime: 2021-02-23 13:53:16
  * @FilePath: /general-form/src/index.ts
  */
-import FormItem from './FormItem'
-import Form from './Form'
-import Context from './Context'
-
-export { registerComponent } from './utils'
+export { withFormContext } from './withFormContext'
+export { Form, FormItem } from './Form'
 export * from './interface'
-
-export { FormItem, Form, Context }
+export { registerComponent } from './utils'

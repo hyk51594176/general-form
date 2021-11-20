@@ -1,8 +1,8 @@
-import { Form } from '@hanyk/general-form';
+import { FormRef } from '@hanyk/general-form';
 import { useRef, useCallback } from 'react';
 import { Modal } from 'antd';
-export const useForm = (defaultData = {}) => {
-  const formEl = useRef<Form>(null);
+export const useForm = () => {
+  const formEl = useRef<FormRef>(null);
   const submit = useCallback(async () => {
     try {
       const data = await formEl.current?.validate();
@@ -13,8 +13,8 @@ export const useForm = (defaultData = {}) => {
       });
     } catch (error) {}
   }, []);
-  const reset = useCallback(() => {
-    formEl.current?.resetFields(defaultData);
+  const reset = useCallback((defaultData = {}) => {
+    formEl.current?.resetFields();
   }, []);
   return {
     formEl,
