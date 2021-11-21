@@ -67,6 +67,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
   )
   const getValue = (field: string) => {
     const item = itemInstances.current[field]
+
     if (item && item.show) return item.value
     return undefined
   }
@@ -102,7 +103,6 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     if (item) {
       item.setValue(value)
       bootstrap(field, value)
-      validate([field])
     }
   }
 

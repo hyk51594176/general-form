@@ -4,7 +4,8 @@ import HotSelect from './HotSelect';
 import SubmitBtn from './SubmitBtn';
 import AddandDel from './AddandDel';
 import HeightBtn from './HeightBtn';
-// import FormTable from './FormTable';
+import FormList from './FormList';
+import TableBtn from './TableBtn';
 import '@hanyk/general-form/dist/index.css';
 
 const RadioGroup = Radio.Group;
@@ -17,7 +18,8 @@ const components = {
   SubmitBtn,
   AddandDel,
   HeightBtn,
-  // FormTable,
+  FormList,
+  TableBtn,
 };
 registerComponent(components);
 export type ComponentMap = typeof components;

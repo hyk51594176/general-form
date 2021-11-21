@@ -12,26 +12,33 @@ interface HotSelectProps {
 }
 const HotSelect: React.FC<RenderProps & HotSelectProps> = (props) => {
   const [options, setOptions] = useState<ResData>([]);
-  const getData = useCallback(async (data: any = {}) => {
-    const params = Object.entries(props.params || {}).reduce(
-      (item, [key, value]) => {
-        return {
-          ...item,
-          [key]: data[value as string] || value,
-        };
-      },
-      {} as any,
-    );
-    const res = await props.getList(params);
-    setOptions(res);
-  }, []);
+  const getData = useCallback(
+    (data: any = {}) => {
+      const params = Object.entries(props.params || {}).reduce(
+        (item, [key, value]) => {
+          return {
+            ...item,
+            [key]:
+              typeof value === 'string'
+                ? props.getValues?.()[value] || value
+                : value,
+          };
+        },
+        {} as any,
+      );
+      props.getList(params).then((res) => {
+        setOptions(res);
+      });
+    },
+    [props],
+  );
   useEffect(() => {
     getData(props.getValues?.());
     const list = Object.values(props.params || {}) as string[];
     if (list.length && props.field) {
-      const unSubscribe = props.subscribe?.(list, (_, __, data) => {
+      const unSubscribe = props.subscribe?.(list, () => {
         props.onChange?.(undefined);
-        getData(data);
+        getData();
       });
       return () => {
         unSubscribe?.();
