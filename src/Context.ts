@@ -1,6 +1,6 @@
 import React from 'react'
-import { Context as C } from './interface'
+import { ContextProp } from './interface'
 
-const Context = React.createContext<C>({} as C)
+const Context = React.createContext<ContextProp>({} as ContextProp)
 
 export default Context

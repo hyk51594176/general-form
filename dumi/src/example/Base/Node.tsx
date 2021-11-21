@@ -1,34 +1,38 @@
 import React from 'react';
-import { Input, Radio, Button, DatePicker } from 'antd';
+import { DatePicker } from 'antd';
 import { Form, FormItem } from '@hanyk/general-form';
 import { getList, defaultData } from '../../api';
 import HotSelect from '../../components/HotSelect';
-import '@hanyk/general-form/dist/index.css';
-import { useForm } from '../../hooks';
-const RadioGroup = Radio.Group;
+import SubmitBtn from '../../components/SubmitBtn';
+import { useSubmit } from '../../hooks';
 const rules = {
   required: true,
   message: '该字段必填',
 };
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const { formEl, submit, reset } = useForm();
+  const submit = useSubmit();
   return (
-    <Form ref={formEl} defaultData={defaultData} span={12}>
-      <FormItem rules={rules} label="姓名" field="name">
-        <Input />
-      </FormItem>
-      <FormItem rules={rules} label="年龄" field="age">
-        <Input type="number" />
-      </FormItem>
-      <FormItem rules={rules} label="性别" field="sex" span={20}>
-        <RadioGroup
-          options={[
-            { label: '男', value: 1 },
-            { label: '女', value: 0 },
-          ]}
-        />
-      </FormItem>
+    <Form defaultData={defaultData} span={12}>
+      <FormItem rules={rules} label="姓名" field="name" el="Input" />
+      <FormItem
+        rules={rules}
+        label="年龄"
+        field="age"
+        el="Input"
+        type="number"
+      />
+      <FormItem
+        rules={rules}
+        label="性别"
+        field="sex"
+        span={20}
+        el="RadioGroup"
+        options={[
+          { label: '男', value: 1 },
+          { label: '女', value: 0 },
+        ]}
+      />
       <FormItem
         label="生日"
         field="birthday"
@@ -84,12 +88,8 @@ export default () => {
         <HotSelect getList={getList} params={{ id: 'city' }} />
       </FormItem>
 
-      <FormItem label="" span={24}>
-        <Button onClick={submit} type="primary">
-          确定
-        </Button>
-        &nbsp;
-        <Button onClick={reset}>重置</Button>
+      <FormItem label="" span={24} whitContext>
+        <SubmitBtn submit={submit} />
       </FormItem>
     </Form>
   );

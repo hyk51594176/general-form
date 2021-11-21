@@ -1,18 +1,8 @@
 import React, { useMemo } from 'react';
-import { Input, Radio, Button, DatePicker } from 'antd';
-import { defineColumns, Form, registerComponent } from '@hanyk/general-form';
-import HotSelect from '../../components/HotSelect';
-import '@hanyk/general-form/dist/index.css';
+import { defineColumns, Form } from '@hanyk/general-form';
 import { getList, defaultData } from '../../api';
-import { useForm } from '../../hooks';
-const RadioGroup = Radio.Group;
-const components = {
-  Input,
-  RadioGroup,
-  HotSelect,
-  DatePicker,
-};
-registerComponent(components);
+import { useSubmit } from '../../hooks';
+import { ComponentMap } from '../../components';
 
 const isShow = {
   relyOn: {
@@ -21,9 +11,9 @@ const isShow = {
 };
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const { formEl, submit, reset } = useForm();
+  const submit = useSubmit();
   const columns = useMemo(() => {
-    return defineColumns<typeof components>([
+    return defineColumns<ComponentMap>([
       { label: '姓名', field: 'name', el: 'Input' },
       { label: '年龄', field: 'age', el: 'Input', type: 'number' },
       {
@@ -72,25 +62,12 @@ export default () => {
       {
         field: 'show',
         span: 10,
-        el: (props) => {
-          return (
-            <div>
-              <Button type="link" onClick={() => props.onChange(!props.value)}>
-                {props.value ? '收起' : '高级搜索'}
-              </Button>
-              <Button onClick={submit} type="primary">
-                搜索
-              </Button>
-              &nbsp;
-              <Button onClick={reset}>重置</Button>
-            </div>
-          );
-        },
+        el: 'HeightBtn',
+        submit,
+        whitContext: true,
       },
     ]);
-  }, [reset, submit]);
+  }, []);
 
-  return (
-    <Form columns={columns} ref={formEl} defaultData={defaultData} span={8} />
-  );
+  return <Form columns={columns} defaultData={defaultData} span={8} />;
 };

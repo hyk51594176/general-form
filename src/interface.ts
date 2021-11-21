@@ -76,7 +76,7 @@ export type FormRef<T = unknown> = {
   validate: (params?: string[]) => Promise<T>
   resetFields: (data?: Partial<T>) => void
 }
-export type Context<T = {} | undefined> = Omit<
+export type ContextProp<T = {} | undefined> = Omit<
   FormProps<T>,
   'columns' | 'className' | 'onChange' | 'notLayout' | 'style'
 > &
@@ -85,11 +85,11 @@ export type Context<T = {} | undefined> = Omit<
     onLifeCycle: (type: UpdateType, field: string, comp: FormItemInstance) => void
   }
 export type RenderProps = {
-  value: any
-  show: boolean
-  field: string
-  onChange: (val: any, ...args: any[]) => void
-} & Pick<Context, keyof FormRef>
+  value?: any
+  show?: boolean
+  field?: string
+  onChange?: (val: any, ...args: any[]) => void
+} & Partial<ContextProp>
 
 interface RenderFn {
   (props: RenderProps): ReactNode
@@ -105,6 +105,7 @@ export interface Rule extends RuleItem {
   trigger?: string
 }
 export type FormItemProps = Common & {
+  [k: string]: any
   el?: string | ReactNode | RenderFn
   field?: string
   label?: string | ReactNode | RenderFn
@@ -119,7 +120,7 @@ export type FormItemProps = Common & {
   isShow?: boolean | DynamicParameter | undefined
   whitContext?: boolean
 }
-type Column<T extends FC<any> | ComponentClass<any>> = FormItemProps & ComponentProps<T>
+export type Column<T extends FC<any> | ComponentClass<any>> = FormItemProps & ComponentProps<T>
 export const defineColumns = <T extends Comp, K extends keyof T = keyof T>(
   columns: Array<Column<T[K]>>
 ) => columns

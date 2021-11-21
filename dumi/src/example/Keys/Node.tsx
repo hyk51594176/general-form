@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
-import { Input, Button } from 'antd';
+import { Input } from 'antd';
 import { Form, FormItem } from '@hanyk/general-form';
-import '@hanyk/general-form/dist/index.css';
-import { useForm } from '../../hooks';
+import { useSubmit } from '../../hooks';
+import AddandDel from '../../components/AddandDel';
 const rules = {
   required: true,
   message: '该字段必填',
 };
+// eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const [data, setData] = useState<Array<{ name?: string; age?: number }>>([
     {},
   ]);
-  const { formEl, submit, reset } = useForm([]);
+  const submit = useSubmit();
   return (
-    <Form ref={formEl} defaultData={data} span={8}>
+    <Form defaultData={data} span={8}>
       {data
         .map((_, index) => {
           return [
@@ -23,40 +24,17 @@ export default () => {
             <FormItem rules={rules} label="年龄" field={`[${index}].age`}>
               <Input type="number" />
             </FormItem>,
-            <FormItem>
-              <Button
-                size="small"
-                type="link"
-                onClick={() => {
-                  setData([...(formEl.current?.getValues() as []), {}]);
-                }}
-              >
-                添加
-              </Button>
-              {data.length > 1 && (
-                <Button
-                  size="small"
-                  type="link"
-                  onClick={() => {
-                    const d = formEl.current?.getValues() as [];
-                    d.splice(index, 1);
-                    setData(d);
-                  }}
-                >
-                  删除
-                </Button>
-              )}
+            <FormItem whitContext>
+              <AddandDel
+                index={index}
+                dataSource={data}
+                onDataChange={setData}
+              />
             </FormItem>,
           ];
         })
         .flat()}
-      <FormItem label="" span={24}>
-        <Button onClick={submit} type="primary">
-          确定
-        </Button>
-        &nbsp;
-        <Button onClick={reset}>重置</Button>
-      </FormItem>
+      <FormItem label="" span={24} el="SubmitBtn" whitContext submit={submit} />
     </Form>
   );
 };

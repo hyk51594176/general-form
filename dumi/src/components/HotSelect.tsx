@@ -4,12 +4,13 @@ import { RenderProps } from '@hanyk/general-form';
 type ResData = Array<{ label: string; value: number }>;
 
 interface HotSelectProps {
+  value?: any;
   getList: (params: any) => Promise<ResData>;
   params?: {
     [k: string]: string | number | boolean | undefined;
   };
 }
-const HotSelect: React.FC<Partial<RenderProps> & HotSelectProps> = (props) => {
+const HotSelect: React.FC<RenderProps & HotSelectProps> = (props) => {
   const [options, setOptions] = useState<ResData>([]);
   const getData = useCallback(async (data: any = {}) => {
     const params = Object.entries(props.params || {}).reduce(

@@ -109,20 +109,13 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       const context = {
         show: _show,
         field,
-        onFiledChange: contextData.onFiledChange,
-        onLifeCycle: contextData.onLifeCycle,
-        subscribe: contextData.subscribe,
-        getValue: contextData.getValue,
-        getValues: contextData.getValues,
-        setValue: contextData.setValue,
-        setValues: contextData.setValues,
-        validate: contextData.validate
+        ...contextData
       }
       const propsData: any = {
+        ...(whitContext ? context : {}),
         size: contextData.size || props.size,
         disabled: contextData.disabled || props.disabled,
         ...other,
-        ...(whitContext ? context : {}),
         value: _value,
         onChange: (val: any, ...args: any[]) => {
           handlerChange(val, ...args)
