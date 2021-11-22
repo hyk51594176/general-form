@@ -19,7 +19,7 @@ export const getType = (obj: unknown) => {
 
 export const getContextWithProps = (data: FormProps) => {
   const {
-    labelAlign = 'right',
+    labelAlign = 'left',
     labelWidth = '80px',
     span,
     size,

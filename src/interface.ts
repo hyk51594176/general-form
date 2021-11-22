@@ -19,7 +19,7 @@ export type Common = {
   size?: string
   span?: number
   offset?: number
-  labelAlign?: CSSProperties['textAlign']
+  labelAlign?: 'left' | 'right' | 'top'
   labelWidth?: CSSProperties['width']
   minItemWidth?: CSSProperties['minWidth']
   xs?: string | number | Layout

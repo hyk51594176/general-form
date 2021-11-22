@@ -79,7 +79,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     }
     ;['xs', 'sm', 'md', 'lg', 'xl'].forEach((key) => {
       const o = props[key] || contextData[key]
-      if (!o) return
+      if (!o) return ''
       if (typeof o === 'object') {
         if (o.span) {
           str.push(`col-${key}-${o.span}`)
@@ -227,13 +227,15 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     itemInstance.current.rules = rules
   }, [rules])
 
+  const textAlign = contextData.labelAlign || labelAlign
   const labelStyles = {
     width: contextData.labelWidth || labelWidth,
-    textAlign: contextData.labelAlign || labelAlign
+    textAlign: textAlign === 'top' ? 'left' : textAlign
   }
+  const topClass = textAlign === 'top' ? 'hyk-form-item-top' : ''
   return _show ? (
     <div
-      className={`hyk-form-item ${getClassName()} ${itemClassName}`}
+      className={`hyk-form-item  ${topClass} ${getClassName()} ${itemClassName || ''}`}
       style={{
         minWidth: contextData.minItemWidth || minItemWidth,
         ...itemStyle
@@ -248,7 +250,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
           {label}
         </label>
       )}
-      <div className="hyk-form-item-container">
+      <div className="hyk-form-item-container hyk-form-item-container_error ">
         {getChildren()}
         <span className="hyk-form-item-error">{_errorMsg}</span>
       </div>

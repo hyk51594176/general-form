@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Form, FormItem } from '@hanyk/general-form';
 import { useSubmit } from '../../hooks';
 import { getList } from '../../api';
-import FormList from '../../components/FormList';
 const rules = {
   required: true,
   message: '该字段必填',
@@ -72,6 +71,7 @@ export default () => {
 
       <FormItem
         field="address"
+        label=""
         span={24}
         whitContext
         el="FormList"
