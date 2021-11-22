@@ -1,11 +1,11 @@
 import { Button } from 'antd';
 import React from 'react';
-import { RenderProps } from '@hanyk/general-form';
-type Props = RenderProps & {
+import { defineComponent } from '@hanyk/general-form';
+type Props = {
   submit(data: any): void;
 };
 
-const SubmitBtn: React.FC<Props> = (props) => {
+export default defineComponent<Props>((props) => {
   return (
     <>
       <Button
@@ -20,5 +20,4 @@ const SubmitBtn: React.FC<Props> = (props) => {
       <Button onClick={() => props.resetFields?.()}>重置</Button>
     </>
   );
-};
-export default SubmitBtn;
+});

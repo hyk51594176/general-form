@@ -9,7 +9,7 @@ const rules = {
 };
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const [data, setData] = useState({
+  const [data] = useState({
     name: '站三',
     age: '12',
     address: [{}],

@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Select } from 'antd';
-import { RenderProps } from '@hanyk/general-form';
+import { defineComponent } from '@hanyk/general-form';
 type ResData = Array<{ label: string; value: number }>;
-
 interface HotSelectProps {
   value?: any;
   getList: (params: any) => Promise<ResData>;
@@ -10,7 +9,8 @@ interface HotSelectProps {
     [k: string]: string | number | boolean | undefined;
   };
 }
-const HotSelect: React.FC<RenderProps & HotSelectProps> = (props) => {
+
+export default defineComponent<HotSelectProps>((props) => {
   const [options, setOptions] = useState<ResData>([]);
   const getData = useCallback(
     (data: any = {}) => {
@@ -18,14 +18,12 @@ const HotSelect: React.FC<RenderProps & HotSelectProps> = (props) => {
         (item, [key, value]) => {
           return {
             ...item,
-            [key]:
-              typeof value === 'string'
-                ? props.getValues?.()[value] || value
-                : value,
+            [key]: typeof value === 'string' ? data[value] || value : value,
           };
         },
         {} as any,
       );
+      console.log('props: ', props);
       props.getList(params).then((res) => {
         setOptions(res);
       });
@@ -35,16 +33,18 @@ const HotSelect: React.FC<RenderProps & HotSelectProps> = (props) => {
   useEffect(() => {
     getData(props.getValues?.());
     const list = Object.values(props.params || {}) as string[];
+    let unSubscribe!: Function | undefined;
     if (list.length && props.field) {
-      const unSubscribe = props.subscribe?.(list, () => {
+      unSubscribe = props.subscribe?.(list, () => {
         props.onChange?.(undefined);
-        getData();
+        getData(props.getValues?.());
       });
-      return () => {
-        unSubscribe?.();
-      };
     }
-  }, []);
+    return () => {
+      unSubscribe?.();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.field]);
 
   return (
     <Select
@@ -54,6 +54,4 @@ const HotSelect: React.FC<RenderProps & HotSelectProps> = (props) => {
       style={{ width: '100%' }}
     />
   );
-};
-
-export default HotSelect;
+});

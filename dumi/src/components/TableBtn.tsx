@@ -1,12 +1,12 @@
 import { Button } from 'antd';
 import React from 'react';
-import { RenderProps } from '@hanyk/general-form';
-type Props = RenderProps & {
+import { defineComponent } from '@hanyk/general-form';
+type Props = {
   index: number;
   tableField: string;
 };
 
-const AddandDel: React.FC<Props> = (props) => {
+export default defineComponent<Props>((props) => {
   return (
     <>
       <Button
@@ -28,6 +28,7 @@ const AddandDel: React.FC<Props> = (props) => {
           if (!props.tableField) return;
           const d = [...(props.getValue?.(props.tableField) || [])];
           d.splice(props.index, 1);
+          console.log('d: ', JSON.stringify(d));
           props.setValue?.(props.tableField, d);
         }}
       >
@@ -35,5 +36,4 @@ const AddandDel: React.FC<Props> = (props) => {
       </Button>
     </>
   );
-};
-export default AddandDel;
+});

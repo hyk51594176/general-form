@@ -35,11 +35,16 @@ const FormItem: React.FC<FormItemProps> = (props) => {
   const contextData = useContext(Context)
   const [_errorMsg, setErrorMsg] = useState(errorMsg)
   const [_show, setShow] = useState(true)
-  const [_value, _setValue] = useState()
+  const [, _setValue] = useState()
   const listeners = useRef<any>()
 
   const setStateValue = (val: any) => {
-    itemInstance.current.value = val
+    if (val !== itemInstance.current.value) {
+      itemInstance.current.value = val
+      field && contextData.bootstrap(field, val)
+    } else {
+      itemInstance.current.value = val
+    }
     _setValue(val)
   }
   const setSateErrorMsg = (errMsg?: string) => {
@@ -58,7 +63,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     setErrorMsg: setSateErrorMsg,
     errorMsg,
     setValue: setStateValue,
-    value: _value,
+    value: undefined,
     show: _show,
     rules
   })
@@ -116,7 +121,8 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         size: contextData.size || props.size,
         disabled: contextData.disabled || props.disabled,
         ...other,
-        value: _value,
+        children: content,
+        value: itemInstance.current.value,
         onChange: (val: any, ...args: any[]) => {
           handlerChange(val, ...args)
           if (typeof onChange === 'function') onChange(val, ...args)
@@ -151,7 +157,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       }
       return child
     }
-    return _value
+    return itemInstance.current.value
   }
   const handlerChange = useCallback(
     (e: any, ...args: any[]) => {
@@ -209,7 +215,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         contextData.onLifeCycle(UpdateType.unmount, field, itemInstance.current)
       }
     }
-  }, [contextData, field])
+  }, [field])
   useEffect(() => {
     setSateErrorMsg(errorMsg)
   }, [errorMsg])

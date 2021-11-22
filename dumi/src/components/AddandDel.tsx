@@ -1,13 +1,13 @@
 import { Button } from 'antd';
 import React from 'react';
-import { RenderProps } from '@hanyk/general-form';
-type Props = RenderProps & {
+import { defineComponent } from '@hanyk/general-form';
+type Props = {
   dataSource: any;
   index: number;
   onDataChange(data: any): void;
 };
 
-const AddandDel: React.FC<Props> = (props) => {
+export default defineComponent<Props>((props) => {
   return (
     <>
       <Button
@@ -34,5 +34,4 @@ const AddandDel: React.FC<Props> = (props) => {
       )}
     </>
   );
-};
-export default AddandDel;
+});

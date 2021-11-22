@@ -30,7 +30,7 @@ export type Common = {
   disabled?: boolean
 }
 export type FormProps<T = any> = {
-  columns?: Array<Column<any>>
+  columns?: Array<Column>
   className?: string
   defaultData?: Partial<T>
   notLayout?: boolean
@@ -69,27 +69,28 @@ export interface FormItemInstances {
 export type FormRef<T = unknown> = {
   subscribe: (fields: string[], callback: EventItem<T>['callback']) => () => void
   getValue: (field: string) => any
-  getValues: () => any
+  getValues: () => T
   setValue: (field: string, value: any) => void
   clearValidate: (field: string[]) => void
-  setValues: (data: Partial<FormProps['defaultData']>) => void
+  setValues: (data: Partial<T>) => void
   validate: (params?: string[]) => Promise<T>
   resetFields: (data?: Partial<T>) => void
+  onFiledChange: (field: string, options: any) => void
+  bootstrap: (field: string, options: any) => void
+  onLifeCycle: (type: UpdateType, field: string, comp: FormItemInstance) => void
 }
 export type ContextProp<T = {} | undefined> = Omit<
   FormProps<T>,
   'columns' | 'className' | 'onChange' | 'notLayout' | 'style'
 > &
-  FormRef<T> & {
-    onFiledChange: (field: string, options: any) => void
-    onLifeCycle: (type: UpdateType, field: string, comp: FormItemInstance) => void
-  }
-export type RenderProps = {
+  FormRef<T>
+export type RenderProps<T = {}, FormData = unknown> = {
   value?: any
   show?: boolean
   field?: string
   onChange?: (val: any, ...args: any[]) => void
-} & Partial<ContextProp>
+} & Partial<ContextProp<FormData>> &
+  T
 
 interface RenderFn {
   (props: RenderProps): ReactNode
@@ -104,9 +105,9 @@ type DynamicParameter = {
 export interface Rule extends RuleItem {
   trigger?: string
 }
-export type FormItemProps = Common & {
+export type FormItemProps<T extends Comp = Comp> = Common & {
   [k: string]: any
-  el?: string | ReactNode | RenderFn
+  el?: keyof T | ReactNode | RenderFn
   field?: string
   label?: string | ReactNode | RenderFn
   content?: string | ReactNode | RenderFn
@@ -120,7 +121,9 @@ export type FormItemProps = Common & {
   isShow?: boolean | DynamicParameter | undefined
   whitContext?: boolean
 }
-export type Column<T extends FC<any> | ComponentClass<any>> = FormItemProps & ComponentProps<T>
-export const defineColumns = <T extends Comp, K extends keyof T = keyof T>(
-  columns: Array<Column<T[K]>>
-) => columns
+export type Column<T extends Comp = Comp, K extends keyof T = keyof T> = FormItemProps<T> &
+  ComponentProps<T[K]>
+export const defineColumns = <T extends Comp>(columns: Array<Column<T>>) => columns
+export const defineComponent = <T, D = unknown>(
+  fn: FC<RenderProps<T, D>> | ComponentClass<RenderProps<T, D>>
+) => fn

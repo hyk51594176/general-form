@@ -1,39 +1,45 @@
 import React, { useMemo } from 'react';
 import { Table } from 'antd';
-import { FormItem, RenderProps, Column } from '@hanyk/general-form';
+import { FormItem, defineComponent, Column } from '@hanyk/general-form';
 import { ColumnType } from 'antd/lib/table';
-type Props = RenderProps & {
-  columns: Array<ColumnType<any> & { formItem: Column<any> }>;
+import { ComponentMap } from '.';
+type Props = {
+  columns: Array<
+    ColumnType<any> & {
+      formItem: Array<Column<ComponentMap>>;
+    }
+  >;
 };
 
-const FormTable: React.FC<Props> = (props) => {
+export default defineComponent<Props>((props) => {
   const columns = useMemo<ColumnType<any>[]>(() => {
     return (props.columns || []).map((column, key) => {
       return {
         ...column,
         render: (_, row, index) => {
-          if (!row.__id__) {
-            row.__id__ = Date.now();
-          }
           return (
             <FormItem
               {...column.formItem}
               whitContext
-              key={row.__id__}
-              getValues={() => row}
+              index={index}
+              getValues={() => props.getValue?.(props.field as string)[index]}
               subscribe={(list: any[], callBack: any) => {
                 props.subscribe?.(
                   list.map((key) => `${props.field}[${index}][${key}]`),
                   callBack,
                 );
               }}
-              field={`${props.field}[${index}][${column.dataIndex}]`}
+              field={
+                column.dataIndex
+                  ? `${props.field}[${index}][${column.dataIndex}]`
+                  : undefined
+              }
             />
           );
         },
       };
     });
-  }, [props.value, props.field, props.subscribe]);
+  }, [props]);
 
   return (
     <Table
@@ -57,6 +63,4 @@ const FormTable: React.FC<Props> = (props) => {
       }}
     />
   );
-};
-
-export default FormTable;
+});

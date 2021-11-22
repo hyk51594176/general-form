@@ -8,6 +8,8 @@ import React, {
 import Schema from 'async-validator'
 import get from 'lodash/get'
 import set from 'lodash/set'
+import has from 'lodash/has'
+import cloneDeep from 'lodash/cloneDeep'
 import { getContextWithProps } from './utils'
 import Context from './Context'
 import FormItem from './FormItem'
@@ -55,19 +57,15 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     },
     [getValues]
   )
-  const setValues = useCallback(
-    (data: Data = {}) => {
-      Object.entries(itemInstances.current).forEach(([field, item]) => {
-        const value = get(data, field)
-        item.setValue(value)
-        bootstrap(field, value)
-      })
-    },
-    [bootstrap]
-  )
+  const setValues = useCallback((data: Data = {}) => {
+    data = cloneDeep(data)
+    Object.entries(itemInstances.current).forEach(([field, item]) => {
+      const value = get(data, field)
+      item.setValue(value)
+    })
+  }, [])
   const getValue = (field: string) => {
     const item = itemInstances.current[field]
-
     if (item && item.show) return item.value
     return undefined
   }
@@ -90,7 +88,6 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
           }
         }
         itemInstances.current[field] = comp
-        comp.setValue(getValue(field))
       } else if (type === UpdateType.unmount) {
         clearValidate([field])
         delete itemInstances.current[field]
@@ -101,8 +98,17 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
   const setValue = (field: string, value: any) => {
     const item = itemInstances.current[field]
     if (item) {
+      if (typeof value === 'object') {
+        Object.keys(itemInstances.current)
+          .filter((key) => key.startsWith(field) && key !== field)
+          .forEach((key) => {
+            const k = key.replace(field, '')
+            if (has(value, k)) {
+              setValue(key, get(value, k))
+            }
+          })
+      }
       item.setValue(value)
-      bootstrap(field, value)
     }
   }
 
@@ -143,15 +149,15 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     clearValidate()
   }
   const onFiledChange = (field: string, options: any) => {
+    const formData = getValues()
     if (onChange) {
       onChange({
         field,
         value: options.value,
         e: options.e,
-        formData: getValues()
+        formData
       })
     }
-    bootstrap(field, options.value)
   }
 
   const getFields = (fields?: string[]): string[] => {
@@ -165,7 +171,10 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     setValue,
     clearValidate,
     validate,
-    resetFields
+    resetFields,
+    onFiledChange,
+    onLifeCycle,
+    bootstrap
   }))
   useEffect(() => {
     setValues(props.defaultData || {})
@@ -177,6 +186,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
         setValues,
         subscribe,
         onLifeCycle,
+        bootstrap,
         getValue,
         getValues,
         validate,
