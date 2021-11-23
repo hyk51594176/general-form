@@ -65,7 +65,7 @@ export default () => {
         span: 8,
         getList,
         params: { id: 'province' },
-        whitContext: true,
+
         isShow: {
           notIn: true,
           relyOn: {
@@ -81,7 +81,7 @@ export default () => {
         span: 8,
         getList,
         params: { id: 'city' },
-        whitContext: true,
+
         isShow: {
           notIn: true,
           relyOn: {
@@ -94,7 +94,6 @@ export default () => {
         span: 24,
         el: 'SubmitBtn',
         submit,
-        whitContext: true,
       },
     ]);
   }, [submit]);

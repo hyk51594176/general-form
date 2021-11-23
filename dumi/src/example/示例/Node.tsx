@@ -2,7 +2,7 @@ import React from 'react';
 import { Input, Radio, DatePicker } from 'antd';
 import { Form, FormItem } from '@hanyk/general-form';
 import { getList, defaultData } from '../../api';
-import HotSelect from '../../components/HotSelect';
+import { HotSelect } from '../../components';
 import { useSubmit } from '../../hooks';
 const RadioGroup = Radio.Group;
 const isShow = {
@@ -35,19 +35,13 @@ export default () => {
       <FormItem label="省" field="province" isShow={isShow}>
         <HotSelect getList={getList} params={{ id: 0 }} />
       </FormItem>
-      <FormItem label="市" field="city" whitContext isShow={isShow}>
+      <FormItem label="市" field="city" isShow={isShow}>
         <HotSelect getList={getList} params={{ id: 'province' }} />
       </FormItem>
-      <FormItem label="区" field="area" whitContext isShow={isShow}>
+      <FormItem label="区" field="area" isShow={isShow}>
         <HotSelect getList={getList} params={{ id: 'city' }} />
       </FormItem>
-      <FormItem
-        field="show"
-        span={10}
-        el="HeightBtn"
-        submit={submit}
-        whitContext
-      />
+      <FormItem field="show" span={10} el="HeightBtn" submit={submit} />
     </Form>
   );
 };

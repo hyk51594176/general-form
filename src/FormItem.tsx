@@ -1,6 +1,14 @@
 /* eslint-disable prefer-const */
-import { get } from 'lodash'
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import get from 'lodash/get'
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
+import { RenderProps } from '.'
 import Context from './Context'
 import { FormItemProps, UpdateType } from './interface'
 import { components } from './utils'
@@ -22,7 +30,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     errorMsg,
     onChange,
     children,
-    whitContext,
     xs,
     sm,
     md,
@@ -116,18 +123,19 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         field,
         ...contextData
       }
-      const propsData: any = {
-        ...(whitContext ? context : {}),
+      const propsData: PropsWithChildren<RenderProps> = {
+        context,
         size: contextData.size || props.size,
         disabled: contextData.disabled || props.disabled,
-        ...other,
         children: content,
         value: itemInstance.current.value,
+        ...other,
         onChange: (val: any, ...args: any[]) => {
           handlerChange(val, ...args)
           if (typeof onChange === 'function') onChange(val, ...args)
         }
       }
+
       let status = false
       const triggerType = getTriggerType()
       if (field && triggerType) {

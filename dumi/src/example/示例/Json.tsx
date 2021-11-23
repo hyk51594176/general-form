@@ -46,7 +46,7 @@ export default () => {
         el: 'HotSelect',
         getList,
         params: { id: 'province' },
-        whitContext: true,
+
         isShow,
       },
       {
@@ -55,7 +55,7 @@ export default () => {
         el: 'HotSelect',
         getList,
         params: { id: 'city' },
-        whitContext: true,
+
         isShow,
       },
 
@@ -64,7 +64,6 @@ export default () => {
         span: 10,
         el: 'HeightBtn',
         submit,
-        whitContext: true,
       },
     ]);
   }, []);

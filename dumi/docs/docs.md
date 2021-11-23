@@ -77,7 +77,6 @@ npm i @hanyk/general-form
 | labelWidth | label 的宽度| string| 80px|
 | mintItemWidth| formItem 最小宽度超出换行| string| |
 | mintItemWidth| formItem 最小宽度超出换行| string| |
-|whitContext| 是否透传context | boolean | false |
 |content| el对应的children | ReactNode |   |
 | isShow| 是否展示| boolean/DynamicParameter| |
 | 其他所有额属性透传输入组件 | el 所对应的组件需要的 props 都可以透传 | any| |

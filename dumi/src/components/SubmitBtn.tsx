@@ -10,14 +10,14 @@ export default defineComponent<Props>((props) => {
     <>
       <Button
         onClick={() => {
-          props.validate?.().then(props.submit);
+          props.context?.validate().then(props.submit);
         }}
         type="primary"
       >
         确定
       </Button>
       &nbsp;
-      <Button onClick={() => props.resetFields?.()}>重置</Button>
+      <Button onClick={() => props.context?.resetFields()}>重置</Button>
     </>
   );
 });

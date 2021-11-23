@@ -29,7 +29,7 @@ export default () => {
             el: 'AddandDel',
             index,
             onDataChange: setData,
-            whitContext: true,
+
             dataSource: data,
           },
         ])
@@ -39,7 +39,6 @@ export default () => {
         span: 24,
         submit,
         el: 'SubmitBtn',
-        whitContext: true,
       },
     ]);
   }, [data, submit]);

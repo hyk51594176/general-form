@@ -14,9 +14,9 @@ export default defineComponent<Props>((props) => {
         type="link"
         onClick={() => {
           if (!props.tableField) return;
-          const d = props.getValue?.(props.tableField) || [];
+          const d = props.context?.getValue(props.tableField) || [];
           d.push({});
-          props.setValue?.(props.tableField, [...d]);
+          props.context?.setValue(props.tableField, [...d]);
         }}
       >
         添加
@@ -26,10 +26,9 @@ export default defineComponent<Props>((props) => {
         type="link"
         onClick={() => {
           if (!props.tableField) return;
-          const d = [...(props.getValue?.(props.tableField) || [])];
+          const d = [...(props.context?.getValue(props.tableField) || [])];
           d.splice(props.index, 1);
-          console.log('d: ', JSON.stringify(d));
-          props.setValue?.(props.tableField, d);
+          props.context?.setValue(props.tableField, d);
         }}
       >
         删除

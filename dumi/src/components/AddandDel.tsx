@@ -14,7 +14,7 @@ export default defineComponent<Props>((props) => {
         size="small"
         type="link"
         onClick={() => {
-          props.onDataChange([...(props.getValues?.() as []), {}]);
+          props.onDataChange([...(props.context?.getValues() as []), {}]);
         }}
       >
         添加
@@ -24,7 +24,7 @@ export default defineComponent<Props>((props) => {
           size="small"
           type="link"
           onClick={() => {
-            const d = props.getValues?.() as [];
+            const d = props.context?.getValues() as [];
             d.splice(props.index, 1);
             props.onDataChange(d);
           }}

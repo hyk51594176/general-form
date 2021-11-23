@@ -2,7 +2,7 @@ import React from 'react';
 import { DatePicker } from 'antd';
 import { Form, FormItem } from '@hanyk/general-form';
 import { getList, defaultData } from '../../api';
-import HotSelect from '../../components/HotSelect';
+import { HotSelect } from '../../components';
 import SubmitBtn from '../../components/SubmitBtn';
 import { useSubmit } from '../../hooks';
 const rules = {
@@ -62,7 +62,6 @@ export default () => {
         label="市"
         field="city"
         span={8}
-        whitContext
         isShow={{
           notIn: true,
           relyOn: {
@@ -77,7 +76,6 @@ export default () => {
         label="区"
         field="area"
         span={8}
-        whitContext
         isShow={{
           notIn: true,
           relyOn: {
@@ -88,7 +86,7 @@ export default () => {
         <HotSelect getList={getList} params={{ id: 'city' }} />
       </FormItem>
 
-      <FormItem label="" span={24} whitContext>
+      <FormItem label="" span={24}>
         <SubmitBtn submit={submit} />
       </FormItem>
     </Form>

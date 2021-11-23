@@ -13,7 +13,7 @@ export default defineComponent<Props>((props) => {
       </Button>
       <Button
         onClick={() => {
-          props.validate?.().then(props.submit);
+          props.context?.validate?.().then(props.submit);
         }}
         type="primary"
       >
@@ -22,7 +22,7 @@ export default defineComponent<Props>((props) => {
       &nbsp;
       <Button
         onClick={() => {
-          props.resetFields?.();
+          props.context?.resetFields?.();
         }}
       >
         重置

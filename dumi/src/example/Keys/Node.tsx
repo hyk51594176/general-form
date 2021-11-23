@@ -24,7 +24,7 @@ export default () => {
             <FormItem rules={rules} label="年龄" field={`[${index}].age`}>
               <Input type="number" />
             </FormItem>,
-            <FormItem whitContext>
+            <FormItem>
               <AddandDel
                 index={index}
                 dataSource={data}
@@ -34,7 +34,7 @@ export default () => {
           ];
         })
         .flat()}
-      <FormItem label="" span={24} el="SubmitBtn" whitContext submit={submit} />
+      <FormItem label="" span={24} el="SubmitBtn" submit={submit} />
     </Form>
   );
 };

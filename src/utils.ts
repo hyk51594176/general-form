@@ -1,4 +1,4 @@
-import { FormProps, Comp } from './interface'
+import { Common, Comp } from './interface'
 /*
  * @Author: 韩玉凯
  * @Date: 2020-07-04 23:01:47
@@ -17,9 +17,9 @@ export const getType = (obj: unknown) => {
   return _toString.call(obj).slice(8, -1)
 }
 
-export const getContextWithProps = (data: FormProps) => {
+export const getContextWithProps = (data: Common) => {
   const {
-    labelAlign = 'left',
+    labelAlign = 'right',
     labelWidth = '80px',
     span,
     size,

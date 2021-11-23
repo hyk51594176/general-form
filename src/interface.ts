@@ -28,6 +28,7 @@ export type Common = {
   lg?: string | number | Layout
   xl?: string | number | Layout
   disabled?: boolean
+  field?: string
 }
 export type FormProps<T = any> = {
   columns?: Array<Column>
@@ -38,7 +39,6 @@ export type FormProps<T = any> = {
   onChange?(arg: EventArg<T>): void
 } & Common
 
-type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>
 export enum UpdateType {
   unmount,
   mount
@@ -79,22 +79,19 @@ export type FormRef<T = unknown> = {
   bootstrap: (field: string, options: any) => void
   onLifeCycle: (type: UpdateType, field: string, comp: FormItemInstance) => void
 }
-export type ContextProp<T = {} | undefined> = Omit<
-  FormProps<T>,
-  'columns' | 'className' | 'onChange' | 'notLayout' | 'style'
-> &
-  FormRef<T>
+export type ContextProp<T = {} | undefined> = Common & FormRef<T>
 export type RenderProps<T = {}, FormData = unknown> = {
+  size?: string
+  disabled?: boolean
   value?: any
-  show?: boolean
-  field?: string
-  onChange?: (val: any, ...args: any[]) => void
-} & Partial<ContextProp<FormData>> &
-  T
+  onChange?: (e: any) => void
+  context?: ContextProp<FormData>
+} & T
 
 interface RenderFn {
   (props: RenderProps): ReactNode
 }
+export type ContextKey = keyof RenderProps
 type DynamicParameter = {
   relation?: 'and' | 'or'
   notIn?: boolean
@@ -119,7 +116,6 @@ export type FormItemProps<T extends Comp = Comp> = Common & {
   onChange?: (value: any, ...args: any[]) => void
   itemStyle?: CSSProperties
   isShow?: boolean | DynamicParameter | undefined
-  whitContext?: boolean
 }
 export type Column<T extends Comp = Comp, K extends keyof T = keyof T> = FormItemProps<T> &
   ComponentProps<T[K]>

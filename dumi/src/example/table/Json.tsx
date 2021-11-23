@@ -31,7 +31,6 @@ export default () => {
         label: '',
         field: 'address',
         span: 24,
-        whitContext: true,
         columns: [
           {
             dataIndex: 'province',
@@ -39,8 +38,6 @@ export default () => {
             formItem: {
               el: 'HotSelect',
               getList,
-              tableField: 'address',
-              whitContext: true,
               params: { id: 0 },
             },
           },
@@ -50,8 +47,6 @@ export default () => {
             formItem: {
               el: 'HotSelect',
               getList,
-              tableField: 'address',
-              whitContext: true,
               params: { id: 'province' },
             },
           },
@@ -61,8 +56,6 @@ export default () => {
             formItem: {
               el: 'HotSelect',
               getList,
-              tableField: 'address',
-              whitContext: true,
               params: { id: 'city' },
             },
           },
@@ -70,8 +63,6 @@ export default () => {
             title: '操作',
             formItem: {
               el: 'TableBtn',
-              tableField: 'address',
-              whitContext: true,
             },
           },
         ],
@@ -81,10 +72,9 @@ export default () => {
         span: 24,
         submit,
         el: 'SubmitBtn',
-        whitContext: true,
       },
     ]);
   }, [submit]);
 
-  return <Form columns={columns} defaultData={data} span={8}></Form>;
+  return <Form columns={columns} defaultData={data} span={8} />;
 };

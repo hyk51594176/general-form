@@ -21,8 +21,6 @@ export default () => {
       formItem: {
         el: 'HotSelect',
         getList,
-        tableField: 'address',
-        whitContext: true,
         params: { id: 0 },
       },
     },
@@ -32,8 +30,6 @@ export default () => {
       formItem: {
         el: 'HotSelect',
         getList,
-        tableField: 'address',
-        whitContext: true,
         params: { id: 'province' },
       },
     },
@@ -43,8 +39,6 @@ export default () => {
       formItem: {
         el: 'HotSelect',
         getList,
-        tableField: 'address',
-        whitContext: true,
         params: { id: 'city' },
       },
     },
@@ -52,8 +46,6 @@ export default () => {
       title: '操作',
       formItem: {
         el: 'TableBtn',
-        tableField: 'address',
-        whitContext: true,
       },
     },
   ];
