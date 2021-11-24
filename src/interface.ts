@@ -43,7 +43,7 @@ export enum UpdateType {
   unmount,
   mount
 }
-export interface EventItem<D> {
+export interface EventItem<D = {}> {
   fields: string[]
   callback(field: string, value: any, data: D): void
 }
@@ -66,7 +66,7 @@ export interface FormItemInstance {
 export interface FormItemInstances {
   [key: string]: FormItemInstance
 }
-export type FormRef<T = unknown> = {
+export type FormRef<T extends Object = {}> = {
   subscribe: (fields: string[], callback: EventItem<T>['callback']) => () => void
   getValue: (field: string) => any
   getValues: () => T
@@ -79,13 +79,14 @@ export type FormRef<T = unknown> = {
   bootstrap: (field: string, options: any) => void
   onLifeCycle: (type: UpdateType, field: string, comp: FormItemInstance) => void
 }
-export type ContextProp<T = {} | undefined> = Common & FormRef<T>
+export type ContextProp<T = {}> = Common & FormRef<T>
+type Rpor<FormData> = ContextProp<FormData> & { show?: boolean }
 export type RenderProps<T = {}, FormData = unknown> = {
   size?: string
   disabled?: boolean
   value?: any
   onChange?: (e: any) => void
-  context?: ContextProp<FormData>
+  context?: Rpor<FormData>
 } & T
 
 interface RenderFn {

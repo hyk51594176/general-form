@@ -1,10 +1,4 @@
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useRef
-} from 'react'
+import React, { useCallback, useEffect, useImperativeHandle, useRef } from 'react'
 import Schema from 'async-validator'
 import get from 'lodash/get'
 import set from 'lodash/set'
@@ -23,12 +17,12 @@ import {
   UpdateType,
   FormRef
 } from './interface'
-const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref) => {
-  type Data = typeof props['defaultData']
+import { ContextProp } from '.'
+const Form = React.forwardRef<FormRef, FormProps>((props, ref) => {
   const { columns = [], onChange, className = '', children, notLayout, style } = props
   const itemInstances = useRef<FormItemInstances>({})
-  const eventList = useRef<Array<EventItem<Data>>>([])
-  const subscribe = (fields: string[], callback: EventItem<Data>['callback']) => {
+  const eventList = useRef<Array<EventItem>>([])
+  const subscribe: ContextProp['subscribe'] = (fields, callback) => {
     const obj = { fields, callback }
     eventList.current.push(obj)
     return () => {
@@ -57,7 +51,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     },
     [getValues]
   )
-  const setValues = useCallback((data: Data = {}) => {
+  const setValues = useCallback((data = {}) => {
     data = cloneDeep(data)
     Object.entries(itemInstances.current).forEach(([field, item]) => {
       const value = get(data, field)
@@ -112,7 +106,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     }
   }
 
-  const validate = (params?: string[]): Promise<Data> => {
+  const validate: ContextProp['validate'] = (params?: string[]): Promise<any> => {
     const fields = getFields(params)
     const data = getValues()
     if (!fields.length) return Promise.resolve(data)
@@ -144,7 +138,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
         return Promise.reject(err)
       })
   }
-  const resetFields = (defaultData: Data = props.defaultData) => {
+  const resetFields = (defaultData = props.defaultData) => {
     setValues(defaultData)
     clearValidate()
   }
@@ -161,7 +155,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
   }
 
   const getFields = (fields?: string[]): string[] => {
-    return fields || Object.keys(itemInstances.current)
+    return fields ?? Object.keys(itemInstances.current)
   }
   useImperativeHandle(ref, () => ({
     subscribe,

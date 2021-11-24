@@ -10,11 +10,12 @@ type Props = {
     [k: string]: string | number | boolean | undefined
   }
   onChange?: any
-}
+} & RenderProps
 type RenderFn<T = any> = (props: T) => ReactElement<T>
+
 // eslint-disable-next-line import/no-anonymous-default-export
-export default function <T = any>(renderProps: RenderFn<T>) {
-  return ({ context, params, getList, ...rest }: RenderProps<T> & Props) => {
+export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
+  return ({ context, params, getList, ...rest }: T & Props) => {
     const [options, setDataSource] = useState<ResData>([])
     const getData = useCallback(
       (data: any = {}) => {
@@ -45,7 +46,7 @@ export default function <T = any>(renderProps: RenderFn<T>) {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [context?.field])
-    const data = { options, ...rest } as unknown
+    const data = { [k ?? 'options']: options, ...rest } as unknown
     return renderProps(data as T)
   }
 }

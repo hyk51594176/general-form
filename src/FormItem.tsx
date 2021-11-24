@@ -37,6 +37,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     xl,
     isShow,
     content,
+    context = {},
     ...other
   } = props
   const contextData = useContext(Context)
@@ -76,8 +77,8 @@ const FormItem: React.FC<FormItemProps> = (props) => {
   })
   const getClassName = () => {
     const str: string[] = []
-    span = span || contextData.span
-    offset = offset || contextData.offset
+    span = span ?? contextData.span
+    offset = offset ?? contextData.offset
     if (span) {
       str.push(`col-${span}`)
     }
@@ -85,7 +86,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       str.push(`col-offset-${offset}`)
     }
     ;['xs', 'sm', 'md', 'lg', 'xl'].forEach((key) => {
-      const o = props[key] || contextData[key]
+      const o = props[key] ?? contextData[key]
       if (!o) return ''
       if (typeof o === 'object') {
         if (o.span) {
@@ -116,17 +117,17 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     }, 'onChange')
   }
   const getChildren = () => {
-    let child: any = children || el
+    let child: any = children ?? el
     if (child) {
-      const context = {
-        show: _show,
-        field,
-        ...contextData
-      }
       const propsData: PropsWithChildren<RenderProps> = {
-        context,
-        size: contextData.size || props.size,
-        disabled: contextData.disabled || props.disabled,
+        context: {
+          show: _show,
+          field,
+          ...contextData,
+          ...context
+        },
+        size: contextData.size ?? props.size,
+        disabled: contextData.disabled ?? props.disabled,
         children: content,
         value: itemInstance.current.value,
         ...other,
@@ -154,7 +155,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         child = React.cloneElement(child, {
           ...child.props,
           ...propsData,
-          children: child.props.children || content
+          children: child.props.children ?? content
         })
       } else if (typeof child === 'function') {
         child = child(propsData)
@@ -203,7 +204,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       if (typeof show === 'boolean') {
         setSateShow(show)
       } else {
-        const keys = Object.keys(show?.relyOn || {})
+        const keys = Object.keys(show?.relyOn ?? {})
         setShowByData(keys, show, contextData.getValues())
         listeners.current = contextData.subscribe(keys, (_, __, data) => {
           setShowByData(keys, show, data, true)
@@ -235,17 +236,17 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     itemInstance.current.rules = rules
   }, [rules])
 
-  const textAlign = contextData.labelAlign || labelAlign
+  const textAlign = contextData.labelAlign ?? labelAlign
   const labelStyles = {
-    width: contextData.labelWidth || labelWidth,
+    width: contextData.labelWidth ?? labelWidth,
     textAlign: textAlign === 'top' ? 'left' : textAlign
   }
   const topClass = textAlign === 'top' ? 'hyk-form-item-top' : ''
   return _show ? (
     <div
-      className={`hyk-form-item  ${topClass} ${getClassName()} ${itemClassName || ''}`}
+      className={`hyk-form-item  ${topClass} ${getClassName()} ${itemClassName ?? ''}`}
       style={{
-        minWidth: contextData.minItemWidth || minItemWidth,
+        minWidth: contextData.minItemWidth ?? minItemWidth,
         ...itemStyle
       }}
     >

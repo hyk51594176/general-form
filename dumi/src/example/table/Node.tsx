@@ -70,7 +70,7 @@ export default () => {
         columns={columns}
       ></FormItem>
 
-      <FormItem label="" span={24} el="SubmitBtn" whitContext submit={submit} />
+      <FormItem label="" span={24} el="SubmitBtn" submit={submit} />
     </Form>
   );
 };
