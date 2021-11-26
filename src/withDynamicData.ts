@@ -1,6 +1,6 @@
 import get from 'lodash/get'
 import has from 'lodash/has'
-import { ReactElement, useCallback, useEffect, useState } from 'react'
+import React, { ReactElement, useCallback, useEffect, useState } from 'react'
 import { RenderProps } from './interface'
 type ResData = Array<{ label: string; value: number }>
 
@@ -25,7 +25,7 @@ export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
             [key]: typeof value === 'string' && has(data, value) ? get(data, value) : value
           }
         }, {} as any)
-        getList(_params).then((res) => {
+        getList?.(_params).then((res) => {
           setDataSource(res)
         })
       },
@@ -46,7 +46,7 @@ export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [context?.field])
-    const data = { [k ?? 'options']: options, ...rest } as unknown
-    return renderProps(data as T)
+    const data = { [k ?? 'options']: options, ...rest } as T
+    return React.createElement(renderProps, data)
   }
 }

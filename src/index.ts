@@ -9,7 +9,7 @@ import FormItem from './FormItem'
 import Form from './Form'
 import Context from './Context'
 import withDynamicData from './withDynamicData'
+import subscribeFields from './subscribeFields'
 export { registerComponent } from './utils'
 export * from './interface'
-
-export { FormItem, Form, Context, withDynamicData }
+export { FormItem, Form, Context, withDynamicData, subscribeFields }

@@ -7,9 +7,7 @@ import HeightBtn from './HeightBtn';
 import FormList from './FormList';
 import TableBtn from './TableBtn';
 import '@hanyk/general-form/dist/index.css';
-export const HotSelect = withDynamicData<ComponentProps<typeof Select>>((p) => (
-  <Select {...p} style={{ width: '100%' }} />
-));
+export const HotSelect = withDynamicData<ComponentProps<typeof Select>>(Select);
 const RadioGroup = Radio.Group;
 const components = {
   Input,
