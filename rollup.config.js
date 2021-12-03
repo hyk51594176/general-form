@@ -32,16 +32,16 @@ process.env.NODE_ENV = 'production'
 export default {
   input: 'src/index.ts',
   output: [
-    {
-      banner,
-      file: 'dist/index.js',
-      format: 'umd',
-      name: 'generalForm',
-      globals: {
-        react: 'React',
-        'prop-types': 'PropTypes'
-      }
-    },
+    // {
+    //   banner,
+    //   file: 'dist/index.js',
+    //   format: 'umd',
+    //   name: 'generalForm',
+    //   globals: {
+    //     react: 'React',
+    //     'prop-types': 'PropTypes'
+    //   }
+    // },
     {
       file: 'dist/index.cjs.js',
       banner,
@@ -54,7 +54,7 @@ export default {
     }
   ],
   cache: true,
-  external: ['react', 'prop-types'],
+  external: ['react', 'async-validator', 'lodash/has', 'lodash/get', 'lodash/set', 'lodash/cloneDeep'],
   plugins: [
     eslint({
       cache: true,

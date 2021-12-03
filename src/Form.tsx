@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useImperativeHandle, useRef } from 'react'
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef
+} from 'react'
 import Schema from 'async-validator'
 import get from 'lodash/get'
 import set from 'lodash/set'
@@ -15,10 +21,10 @@ import {
   FormItemInstances,
   ValidateParams,
   UpdateType,
-  FormRef
+  FormRef,
+  ContextProp
 } from './interface'
-import { ContextProp } from '.'
-const Form = React.forwardRef<FormRef, FormProps>((props, ref) => {
+const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref) => {
   const { columns = [], onChange, className = '', children, notLayout, style } = props
   const itemInstances = useRef<FormItemInstances>({})
   const eventList = useRef<Array<EventItem>>([])
