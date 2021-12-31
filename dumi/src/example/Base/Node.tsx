@@ -64,7 +64,9 @@ export default () => {
         span={8}
         isShow={{
           notIn: true,
+          relation: 'and',
           relyOn: {
+            sex: [0],
             province: [undefined],
           },
         }}
@@ -78,7 +80,9 @@ export default () => {
         span={8}
         isShow={{
           notIn: true,
+          relation: 'and',
           relyOn: {
+            sex: [0],
             city: [undefined],
           },
         }}

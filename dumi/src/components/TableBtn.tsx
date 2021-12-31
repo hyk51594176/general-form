@@ -14,18 +14,6 @@ export default defineComponent<Props>((props) => {
         type="link"
         onClick={() => {
           if (!props.tableField) return;
-          const d = props.context?.getValue(props.tableField) || [];
-          d.push({});
-          props.context?.setValue(props.tableField, [...d]);
-        }}
-      >
-        添加
-      </Button>
-      <Button
-        size="small"
-        type="link"
-        onClick={() => {
-          if (!props.tableField) return;
           const d = [...(props.context?.getValue(props.tableField) || [])];
           d.splice(props.index, 1);
           props.context?.setValue(props.tableField, d);

@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { defineColumns, Form } from '@hanyk/general-form';
+import { defineColumns, Form, FormRef } from '@hanyk/general-form';
 import { ComponentMap } from '../../components';
 import { useSubmit } from '../../hooks';
 import { getList } from '../../api';
+import { Button } from 'antd';
+import { useRef } from 'react';
 const rules = {
   required: true,
   message: '该字段必填',
@@ -12,9 +14,9 @@ export default () => {
   const [data] = useState({
     name: '站三',
     age: '12',
-    address: [{}],
   });
   const submit = useSubmit();
+  const formEl = useRef<FormRef>(null);
   const columns = useMemo(() => {
     return defineColumns<ComponentMap>([
       { label: '姓名', rules, field: `name`, el: 'Input' },
@@ -76,5 +78,19 @@ export default () => {
     ]);
   }, [submit]);
 
-  return <Form columns={columns} defaultData={data} span={8} />;
+  return (
+    <>
+      <Button
+        onClick={() => {
+          formEl.current?.setValue('address', [
+            { province: 1, city: 4, area: 9 },
+            { province: 1, city: 3, area: 8 },
+          ]);
+        }}
+      >
+        默认值
+      </Button>
+      <Form columns={columns} defaultData={data} span={8} ref={formEl} />
+    </>
+  );
 };

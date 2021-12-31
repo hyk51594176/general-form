@@ -43,17 +43,16 @@ const FormItem: React.FC<FormItemProps> = (props) => {
   const [_errorMsg, setErrorMsg] = useState(errorMsg)
   const [_show, setShow] = useState(true)
   const [, _setValue] = useState()
-  const listeners = useRef<any>()
+  const unSubscribe = useRef<any>()
 
-  const setStateValue = (val: any) => {
+  const setStateValue = useCallback((val: any) => {
     if (val !== itemInstance.current.value) {
       itemInstance.current.value = val
-      field && contextData.bootstrap(field, val)
     } else {
       itemInstance.current.value = val
     }
     _setValue(val)
-  }
+  }, [])
   const setSateErrorMsg = (errMsg?: string) => {
     itemInstance.current.errorMsg = errMsg
     setErrorMsg(errMsg)
@@ -132,7 +131,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         ...other,
         onChange: (val: any, ...args: any[]) => {
           handlerChange(val, ...args)
-          if (typeof onChange === 'function') onChange(val, ...args)
         }
       }
 
@@ -175,14 +173,22 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       } catch (error) {
         value = e
       }
+      if (field) {
+        contextData.onFiledChange(field, {
+          value,
+          e,
+          ...args,
+          rules,
+          oldVal: itemInstance.current.value
+        })
+      }
       setStateValue(value)
-      if (!field) return
-      contextData.onFiledChange(field, { value, e, ...args, rules })
+      onChange?.(e, ...args)
     },
-    [contextData, field, rules]
+    [contextData, field, onChange, rules, setStateValue]
   )
   const setShowByData = useCallback(
-    (keys: string[], show: FormItemProps['isShow'], change = false) => {
+    (keys: string[], show: FormItemProps['isShow']) => {
       if (typeof show === 'object') {
         const method = show.relation === 'and' ? 'every' : 'some'
         const _isShow = keys[method]((k) => {
@@ -190,23 +196,20 @@ const FormItem: React.FC<FormItemProps> = (props) => {
           return show.notIn ? !flag : flag
         })
         setSateShow(_isShow)
-        if (!_isShow && change) {
-          handlerChange(undefined)
-        }
       }
     },
-    [contextData, handlerChange, setSateShow]
+    [contextData, setSateShow]
   )
   const setIsShow = useCallback(
     (show: FormItemProps['isShow']) => {
-      listeners.current && listeners.current()
+      unSubscribe.current && unSubscribe.current()
       if (typeof show === 'boolean') {
         setSateShow(show)
       } else {
         const keys = Object.keys(show?.relyOn ?? {})
         setShowByData(keys, show)
-        listeners.current = contextData.subscribe(keys, (_, __) => {
-          setShowByData(keys, show, true)
+        unSubscribe.current = contextData.subscribe(keys, (_, __) => {
+          setShowByData(keys, show)
         })
       }
     },
@@ -223,7 +226,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         contextData.onLifeCycle(UpdateType.unmount, field, itemInstance.current)
       }
     }
-  }, [field])
+  }, [contextData, field])
   useEffect(() => {
     setSateErrorMsg(errorMsg)
   }, [errorMsg])

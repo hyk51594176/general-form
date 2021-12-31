@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { defineColumns, Form } from '@hanyk/general-form';
 import '@hanyk/general-form/dist/index.css';
-import { getList, defaultData } from '../../api';
+import { getList } from '../../api';
 import { useSubmit } from '../../hooks';
 import { ComponentMap } from '../../components';
 import '../../components';
@@ -68,8 +68,10 @@ export default () => {
 
         isShow: {
           notIn: true,
+          relation: 'and',
           relyOn: {
             province: [undefined],
+            sex: [0],
           },
         },
       },
@@ -81,11 +83,12 @@ export default () => {
         span: 8,
         getList,
         params: { id: 'city' },
-
         isShow: {
           notIn: true,
+          relation: 'and',
           relyOn: {
             city: [undefined],
+            sex: [0],
           },
         },
       },
@@ -98,5 +101,5 @@ export default () => {
     ]);
   }, [submit]);
 
-  return <Form columns={columns} defaultData={defaultData} span={12} />;
+  return <Form columns={columns} span={12} />;
 };

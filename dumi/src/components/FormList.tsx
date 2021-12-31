@@ -23,14 +23,9 @@ export default defineComponent<Props>((props) => {
               index={index}
               tableField={props.context?.field}
               context={{
-                ...props.context,
-                getValues: () => {
-                  return props.context?.getValue(
-                    props.context?.field as string,
-                  )[index];
-                },
+                getValues: () => row,
                 subscribe: (list: any[], callBack: any) => {
-                  props.context?.subscribe(
+                  return props.context?.subscribe(
                     list.map(
                       (key) => `${props.context?.field}[${index}][${key}]`,
                     ),
@@ -63,7 +58,7 @@ export default defineComponent<Props>((props) => {
               if (!props.context?.field) return;
               const d = props.context?.getValue?.(props.context?.field) || [];
               d.push({});
-              props.context?.setValue?.(props.context?.field, [...d]);
+              props.context?.setValue?.(props.context?.field, d);
             }}
           >
             添加一行

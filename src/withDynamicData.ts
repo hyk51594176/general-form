@@ -1,6 +1,6 @@
 import get from 'lodash/get'
 import has from 'lodash/has'
-import React, { ReactElement, useCallback, useEffect, useState } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import { RenderProps } from './interface'
 type ResData = Array<{ label: string; value: number }>
 
@@ -17,35 +17,40 @@ type RenderFn<T = any> = (props: T) => ReactElement<T>
 export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
   return ({ context, params, getList, ...rest }: T & Props) => {
     const [options, setDataSource] = useState<ResData>([])
-    const getData = useCallback(
-      (data: any = {}) => {
-        const _params = Object.entries(params || {}).reduce((item, [key, value]) => {
-          return {
-            ...item,
-            [key]: typeof value === 'string' && has(data, value) ? get(data, value) : value
+    const getData = (data: any = {}) => {
+      const _params = Object.entries(params || {}).reduce((item, [key, value]) => {
+        return {
+          ...item,
+          [key]: typeof value === 'string' && has(data, value) ? get(data, value) : value
+        }
+      }, {} as any)
+      getList?.(_params).then((res = []) => {
+        setDataSource(res)
+        if (rest.value) {
+          let list = Array.isArray(rest.value) ? rest.value : [rest.value]
+          let flag = list.every((val) => res.some((obj) => obj.value === val))
+          if (!flag) {
+            console.log('rest.value: ', rest.value)
+            console.log('_params: ', _params)
+            console.log('data: ', data)
+            ;(rest as any)?.onChange(undefined)
           }
-        }, {} as any)
-        getList?.(_params).then((res) => {
-          setDataSource(res)
-        })
-      },
-      [getList, params]
-    )
+        }
+      })
+    }
     useEffect(() => {
       getData(context?.getValues?.())
       const list = Object.values(params || {}) as string[]
       let unSubscribe!: Function | undefined
       if (list.length && context?.field) {
         unSubscribe = context?.subscribe?.(list, () => {
-          ;(rest as any).onChange?.(undefined)
           getData(context?.getValues?.())
         })
       }
       return () => {
         unSubscribe?.()
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [context?.field])
+    }, [context?.subscribe, context?.getValues, context?.field, params, rest.value])
     const data = { [k ?? 'options']: options, ...rest } as T
     return React.createElement(renderProps, data)
   }

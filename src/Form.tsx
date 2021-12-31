@@ -8,7 +8,7 @@ import React, {
 import Schema from 'async-validator'
 import get from 'lodash/get'
 import set from 'lodash/set'
-import has from 'lodash/has'
+import eq from 'lodash/eq'
 import cloneDeep from 'lodash/cloneDeep'
 import { getContextWithProps } from './utils'
 import Context from './Context'
@@ -25,9 +25,18 @@ import {
   ContextProp
 } from './interface'
 const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref) => {
-  const { columns = [], onChange, className = '', children, notLayout, style } = props
+  const {
+    columns = [],
+    onChange,
+    className = '',
+    children,
+    notLayout,
+    style,
+    defaultData = {}
+  } = props
   const itemInstances = useRef<FormItemInstances>({})
   const eventList = useRef<Array<EventItem>>([])
+  const formData = useRef<any>()
   const subscribe: ContextProp['subscribe'] = (fields, callback) => {
     const obj = { fields, callback }
     eventList.current.push(obj)
@@ -35,17 +44,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
       eventList.current = eventList.current.filter((item) => item !== obj)
     }
   }
-  const getValues = useCallback(() => {
-    return Object.entries(itemInstances.current)
-      .filter(([_, item]) => item.show)
-      .reduce(
-        (obj, [k, item]) => {
-          set(obj, k, item.value)
-          return obj
-        },
-        Array.isArray(props.defaultData) ? [] : {}
-      )
-  }, [props.defaultData])
+  const getValues = useCallback(() => formData.current, [])
   const bootstrap = useCallback((field: string, value: any) => {
     eventList.current.forEach((obj, index) => {
       if (obj.fields.includes(field)) {
@@ -54,18 +53,21 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
       }
     })
   }, [])
-  const setValues = useCallback((data = {}) => {
-    data = cloneDeep(data)
-    Object.entries(itemInstances.current).forEach(([field, item]) => {
-      const value = get(data, field)
-      item.setValue(value)
-    })
-  }, [])
-  const getValue = (field: string) => {
-    const item = itemInstances.current[field]
-    if (item && item.show) return item.value
-    return undefined
-  }
+  const setValues = useCallback(
+    (data = {}) => {
+      formData.current = cloneDeep(data)
+      Object.entries(itemInstances.current).forEach(([field, item]) => {
+        const value = get(formData.current, field)
+        const oldVal = item.value
+        if (!eq(value, oldVal)) {
+          bootstrap(field, { value, oldVal })
+          item.setValue(value)
+        }
+      })
+    },
+    [bootstrap]
+  )
+  const getValue = (field: string) => get(formData.current, field)
 
   const clearValidate = useCallback((params?: string[]) => {
     const fields = getFields(params)
@@ -85,6 +87,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
           }
         }
         itemInstances.current[field] = comp
+        comp.setValue(get(formData.current, field))
       } else if (type === UpdateType.unmount) {
         clearValidate([field])
         delete itemInstances.current[field]
@@ -93,30 +96,35 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     [clearValidate]
   )
   const setValue = (field: string, value: any) => {
-    const item = itemInstances.current[field]
-    if (item) {
-      if (typeof value === 'object') {
-        Object.keys(itemInstances.current)
-          .filter((key) => key.startsWith(field) && key !== field)
-          .forEach((key) => {
-            const k = key.replace(field, '')
-            if (has(value, k)) {
-              setValue(key, get(value, k))
-            }
-          })
+    if (typeof value === 'object') {
+      const data = cloneDeep(formData.current)
+      set(data, field, value)
+      setValues(data)
+      validate([field])
+    } else {
+      set(formData.current, field, value)
+      const item = itemInstances.current[field]
+      if (item) {
+        item.setValue(value)
+        validate([field])
       }
-      item.setValue(value)
     }
   }
 
   const validate: ContextProp['validate'] = (params?: string[]): Promise<any> => {
-    const fields = getFields(params)
-    const data = getValues()
+    const fields = getFields(params).filter((k) => {
+      const obj = itemInstances.current[k]
+      return obj && obj.show
+    })
+    let data = {}
+    fields.forEach((k) => {
+      set(data, k, getValue(k))
+    })
     if (!fields.length) return Promise.resolve(data)
     const validateParams: ValidateParams = fields.reduce(
       ({ rule, source }: ValidateParams, field) => {
         const obj = itemInstances.current[field]
-        if (obj && obj.rules && obj.show) {
+        if (obj && obj.rules) {
           rule[field] = obj.rules
           source[field] = obj.value
         }
@@ -131,7 +139,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
       .validate(validateParams.source)
       .then(() => {
         clearValidate(fields)
-        return Promise.resolve(data)
+        return data
       })
       .catch((err) => {
         const { errors = [] } = err
@@ -141,12 +149,16 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
         return Promise.reject(err)
       })
   }
-  const resetFields = (defaultData = props.defaultData) => {
-    setValues(defaultData)
+  const resetFields = (data = defaultData) => {
+    setValues(data)
     clearValidate()
   }
   const onFiledChange = (field: string, options: any) => {
-    const formData = getValues()
+    if (eq(options.value, get(formData.current, field))) {
+      return
+    }
+    set(formData.current, field, options.value)
+    bootstrap(field, options)
     if (onChange) {
       onChange({
         field,
@@ -174,8 +186,8 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     bootstrap
   }))
   useEffect(() => {
-    setValues(props.defaultData || {})
-  }, [props.defaultData, setValues])
+    setValues(defaultData)
+  }, [defaultData, setValues])
   return (
     <Context.Provider
       value={{
