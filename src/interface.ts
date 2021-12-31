@@ -43,9 +43,9 @@ export enum UpdateType {
   unmount,
   mount
 }
-export interface EventItem<D = {}> {
+export interface EventItem {
   fields: string[]
-  callback(field: string, value: any, data: D): void
+  callback(field: string, value: any): void
 }
 export interface ValidateParams {
   rule: {
@@ -67,7 +67,7 @@ export interface FormItemInstances {
   [key: string]: FormItemInstance
 }
 export type FormRef<T extends Object = {}> = {
-  subscribe: (fields: string[], callback: EventItem<T>['callback']) => () => void
+  subscribe: (fields: string[], callback: EventItem['callback']) => () => void
   getValue: (field: string) => any
   getValues: () => T
   setValue: (field: string, value: any) => void

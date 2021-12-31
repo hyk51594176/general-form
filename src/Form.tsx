@@ -46,17 +46,14 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
         Array.isArray(props.defaultData) ? [] : {}
       )
   }, [props.defaultData])
-  const bootstrap = useCallback(
-    (field: string, value: any) => {
-      eventList.current.forEach((obj, index) => {
-        if (obj.fields.includes(field)) {
-          if (obj.callback) obj.callback(field, value, getValues())
-          else eventList.current.splice(index, 1)
-        }
-      })
-    },
-    [getValues]
-  )
+  const bootstrap = useCallback((field: string, value: any) => {
+    eventList.current.forEach((obj, index) => {
+      if (obj.fields.includes(field)) {
+        if (obj.callback) obj.callback(field, value)
+        else eventList.current.splice(index, 1)
+      }
+    })
+  }, [])
   const setValues = useCallback((data = {}) => {
     data = cloneDeep(data)
     Object.entries(itemInstances.current).forEach(([field, item]) => {
