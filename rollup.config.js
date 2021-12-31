@@ -70,6 +70,6 @@ export default {
       cacheRoot: resolve('node_modules/.rts2_cache')
     }),
     scss({ output: 'dist/index.css' }),
-    // terser()
+    terser()
   ]
 }
