@@ -1,5 +1,4 @@
 /* eslint-disable prefer-const */
-import get from 'lodash/get'
 import React, {
   PropsWithChildren,
   useCallback,
@@ -183,11 +182,11 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     [contextData, field, rules]
   )
   const setShowByData = useCallback(
-    (keys: string[], show: FormItemProps['isShow'], data: any, change = false) => {
+    (keys: string[], show: FormItemProps['isShow'], change = false) => {
       if (typeof show === 'object') {
         const method = show.relation === 'and' ? 'every' : 'some'
         const _isShow = keys[method]((k) => {
-          const flag = show.relyOn[k]?.includes(get(data, k))
+          const flag = show.relyOn[k]?.includes(contextData.getValue(k))
           return show.notIn ? !flag : flag
         })
         setSateShow(_isShow)
@@ -196,7 +195,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         }
       }
     },
-    [handlerChange, setSateShow]
+    [contextData, handlerChange, setSateShow]
   )
   const setIsShow = useCallback(
     (show: FormItemProps['isShow']) => {
@@ -205,9 +204,9 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         setSateShow(show)
       } else {
         const keys = Object.keys(show?.relyOn ?? {})
-        setShowByData(keys, show, contextData.getValues())
-        listeners.current = contextData.subscribe(keys, (_, __, data) => {
-          setShowByData(keys, show, data, true)
+        setShowByData(keys, show)
+        listeners.current = contextData.subscribe(keys, (_, __) => {
+          setShowByData(keys, show, true)
         })
       }
     },
