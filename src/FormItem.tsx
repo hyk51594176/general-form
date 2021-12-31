@@ -126,8 +126,8 @@ const FormItem: React.FC<FormItemProps> = (props) => {
           ...contextData,
           ...context
         },
-        size: contextData.size ?? props.size,
-        disabled: contextData.disabled ?? props.disabled,
+        size: props.size ?? contextData.size,
+        disabled: props.disabled ?? contextData.disabled,
         children: content,
         value: itemInstance.current.value,
         ...other,
@@ -236,9 +236,9 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     itemInstance.current.rules = rules
   }, [rules])
 
-  const textAlign = contextData.labelAlign ?? labelAlign
+  const textAlign = labelAlign ?? contextData.labelAlign
   const labelStyles = {
-    width: contextData.labelWidth ?? labelWidth,
+    width: labelWidth ?? contextData.labelWidth,
     textAlign: textAlign === 'top' ? 'left' : textAlign
   }
   const topClass = textAlign === 'top' ? 'hyk-form-item-top' : ''
@@ -246,7 +246,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     <div
       className={`hyk-form-item  ${topClass} ${getClassName()} ${itemClassName ?? ''}`}
       style={{
-        minWidth: contextData.minItemWidth ?? minItemWidth,
+        minWidth: minItemWidth ?? contextData.minItemWidth,
         ...itemStyle
       }}
     >
