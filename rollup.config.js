@@ -54,7 +54,15 @@ export default {
     }
   ],
   cache: true,
-  external: ['react', 'async-validator', 'lodash/has', 'lodash/get', 'lodash/set', 'lodash/cloneDeep'],
+  external: [
+    'react',
+    'async-validator',
+    'lodash/has',
+    'lodash/get',
+    'lodash/set',
+    'lodash/cloneDeep',
+    'lodash/eq'
+  ],
   plugins: [
     eslint({
       cache: true,
@@ -70,6 +78,10 @@ export default {
       cacheRoot: resolve('node_modules/.rts2_cache')
     }),
     scss({ output: 'dist/index.css' }),
-    terser()
+    terser({
+      format: {
+        comments: false,
+      },
+    })
   ]
 }

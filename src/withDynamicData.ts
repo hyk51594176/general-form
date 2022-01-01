@@ -30,9 +30,6 @@ export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
           let list = Array.isArray(rest.value) ? rest.value : [rest.value]
           let flag = list.every((val) => res.some((obj) => obj.value === val))
           if (!flag) {
-            console.log('rest.value: ', rest.value)
-            console.log('_params: ', _params)
-            console.log('data: ', data)
             ;(rest as any)?.onChange(undefined)
           }
         }

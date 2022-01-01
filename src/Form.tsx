@@ -57,7 +57,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     (data = {}) => {
       formData.current = cloneDeep(data)
       Object.entries(itemInstances.current).forEach(([field, item]) => {
-        const value = get(formData.current, field)
+        const value = getValue(field)
         const oldVal = item.value
         if (!eq(value, oldVal)) {
           bootstrap(field, { value, oldVal })
@@ -87,7 +87,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
           }
         }
         itemInstances.current[field] = comp
-        comp.setValue(get(formData.current, field))
+        comp.setValue(getValue(field))
       } else if (type === UpdateType.unmount) {
         clearValidate([field])
         delete itemInstances.current[field]
@@ -154,7 +154,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     clearValidate()
   }
   const onFiledChange = (field: string, options: any) => {
-    if (eq(options.value, get(formData.current, field))) {
+    if (eq(options.value, getValue(field))) {
       return
     }
     set(formData.current, field, options.value)
