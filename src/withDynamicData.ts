@@ -26,15 +26,18 @@ export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
       }, {} as any)
       getList?.(_params).then((res = []) => {
         setDataSource(res)
-        if (rest.value) {
-          let list = Array.isArray(rest.value) ? rest.value : [rest.value]
-          let flag = list.every((val) => res.some((obj) => obj.value === val))
-          if (!flag) {
-            ;(rest as any)?.onChange(undefined)
-          }
-        }
       })
     }
+    useEffect(() => {
+      if (rest.value) {
+        let arr = Array.isArray(rest.value) ? rest.value : [rest.value]
+        let flag = arr.every((val) => options.some((obj: any) => obj.value === val))
+        if (!flag) {
+          ;(rest as any)?.onChange(undefined)
+        }
+      }
+    }, [rest.value, options])
+
     useEffect(() => {
       getData(context?.getValues?.())
       const list = Object.values(params || {}) as string[]
@@ -47,7 +50,7 @@ export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
       return () => {
         unSubscribe?.()
       }
-    }, [context?.subscribe, context?.getValues, context?.field, params, rest.value])
+    }, [context?.field, params])
     const data = { [k ?? 'options']: options, ...rest } as T
     return React.createElement(renderProps, data)
   }
