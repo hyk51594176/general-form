@@ -1,6 +1,6 @@
 import get from 'lodash/get'
 import has from 'lodash/has'
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import { RenderProps } from './interface'
 type ResData = Array<{ label: string; value: number }>
 
