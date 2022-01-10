@@ -1,6 +1,6 @@
 import get from 'lodash/get'
 import has from 'lodash/has'
-import React, { ReactElement, useEffect, useState } from 'react'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { RenderProps } from './interface'
 type ResData = Array<{ label: string; value: number }>
 
@@ -29,11 +29,24 @@ export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
       })
     }
     useEffect(() => {
-      if (rest.value) {
-        let arr = Array.isArray(rest.value) ? rest.value : [rest.value]
-        let flag = arr.every((val) => options.some((obj: any) => obj.value === val))
+      if (rest.value && options.length) {
+        const isArray = Array.isArray(rest.value)
+        let arr = isArray ? rest.value : [rest.value]
+        let list: any[] = []
+        const flag = arr.every((val: any) =>
+          options.some(function dep(obj: any) {
+            if (obj.value === val) {
+              list.push(val)
+              return true
+            }
+            if (obj.children && obj.children.length) {
+              return obj.children.some(dep)
+            }
+            return false
+          })
+        )
         if (!flag) {
-          ;(rest as any)?.onChange(undefined)
+          ;(rest as any)?.onChange(isArray ? list : list[0])
         }
       }
     }, [rest.value, options])
