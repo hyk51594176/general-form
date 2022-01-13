@@ -261,7 +261,10 @@ const FormItem: React.FC<FormItemProps> = (props) => {
           {label}
         </label>
       )}
-      <div className="hyk-form-item-container hyk-form-item-container_error ">
+      {/* hyk-form-item-container_error */}
+      <div
+        className={`hyk-form-item-container ${_errorMsg ? 'hyk-form-item-container_error' : ''}`}
+      >
         {getChildren()}
         <span className="hyk-form-item-error">{_errorMsg}</span>
       </div>
