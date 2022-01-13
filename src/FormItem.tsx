@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState
 } from 'react'
@@ -73,33 +74,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     show: _show,
     rules
   })
-  const getClassName = () => {
-    const str: string[] = []
-    span = span ?? contextData.span
-    offset = offset ?? contextData.offset
-    if (span) {
-      str.push(`col-${span}`)
-    }
-    if (offset) {
-      str.push(`col-offset-${offset}`)
-    }
-    ;['xs', 'sm', 'md', 'lg', 'xl'].forEach((key) => {
-      const o = props[key] ?? contextData[key]
-      if (!o) return ''
-      if (typeof o === 'object') {
-        if (o.span) {
-          str.push(`col-${key}-${o.span}`)
-        }
-        if (o.offset) {
-          str.push(`col-${key}-offset-${o.offset}`)
-        }
-      } else {
-        str.push(`col-${key}-${o}`)
-      }
-    })
 
-    return str.join(' ')
-  }
   const getRequired = () => {
     if (!rules) return required
     if (Array.isArray(rules)) return rules.some((item) => item.required)
@@ -243,10 +218,47 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     width: labelWidth ?? contextData.labelWidth,
     textAlign: textAlign === 'top' ? 'left' : textAlign
   }
-  const topClass = textAlign === 'top' ? 'hyk-form-item-top' : ''
+
+  const computedClass = useMemo(() => {
+    const str: string[] = ['hyk-form-item']
+    const _span = span ?? contextData.span
+    const _offset = offset ?? contextData.offset
+    const topClass = textAlign === 'top' ? 'hyk-form-item-top' : ''
+    const errorClass = _errorMsg ? 'item_error' : ''
+    if (_span) {
+      str.push(`col-${_span}`)
+    }
+    if (_offset) {
+      str.push(`col-offset-${_offset}`)
+    }
+    ;['xs', 'sm', 'md', 'lg', 'xl'].forEach((key) => {
+      const o = props[key] ?? contextData[key]
+      if (!o) return ''
+      if (typeof o === 'object') {
+        if (o.span) {
+          str.push(`col-${key}-${o.span}`)
+        }
+        if (o.offset) {
+          str.push(`col-${key}-offset-${o.offset}`)
+        }
+      } else {
+        str.push(`col-${key}-${o}`)
+      }
+    })
+    if (topClass) {
+      str.push(topClass)
+    }
+    if (errorClass) {
+      str.push(errorClass)
+    }
+    if (itemClassName) {
+      str.push(itemClassName)
+    }
+    return str.join(' ')
+  }, [span, contextData, offset, textAlign, _errorMsg, itemClassName, props])
   return _show ? (
     <div
-      className={`hyk-form-item  ${topClass} ${getClassName()} ${itemClassName ?? ''}`}
+      className={computedClass}
       style={{
         minWidth: minItemWidth ?? contextData.minItemWidth,
         ...itemStyle
@@ -261,10 +273,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
           {label}
         </label>
       )}
-      {/* hyk-form-item-container_error */}
-      <div
-        className={`hyk-form-item-container ${_errorMsg ? 'hyk-form-item-container_error' : ''}`}
-      >
+      <div className="hyk-form-item-container">
         {getChildren()}
         <span className="hyk-form-item-error">{_errorMsg}</span>
       </div>
