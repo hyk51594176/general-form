@@ -32,7 +32,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     children,
     notLayout,
     style,
-    defaultData = {}
+    defaultData
   } = props
   const itemInstances = useRef<FormItemInstances>({})
   const eventList = useRef<Array<EventItem>>([])
