@@ -36,6 +36,7 @@ export type FormProps<T = any> = {
   defaultData?: Partial<T>
   notLayout?: boolean
   style?: CSSProperties
+  submitShow?: boolean
   onChange?(arg: EventArg<T>): void
 } & Common
 

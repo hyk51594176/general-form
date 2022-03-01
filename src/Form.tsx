@@ -32,7 +32,8 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     children,
     notLayout,
     style,
-    defaultData
+    defaultData,
+    submitShow = true
   } = props
   const itemInstances = useRef<FormItemInstances>({})
   const eventList = useRef<Array<EventItem>>([])
@@ -114,7 +115,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
   const validate: ContextProp['validate'] = (params?: string[]): Promise<any> => {
     const fields = getFields(params).filter((k) => {
       const obj = itemInstances.current[k]
-      return obj && obj.show
+      return obj && (submitShow ? obj.show : true)
     })
     let data = {}
     fields.forEach((k) => {

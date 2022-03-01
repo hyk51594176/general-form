@@ -38,6 +38,7 @@ npm i @hanyk/general-form
 | notLayout     | 是否禁用布局，表格的时候建议开启      | boolean                                             | false  |
 | onChange      | 值变化的 change 事件                  | object{field:'xxx', value:'xxx', formData, e:event} |        |
 | disabled      | 全局禁止编辑                          | boolean                                             |        |
+| submitShow    | 仅显示时提交                          | boolean                                             |   true   |
 
 #### form 实例方法
 
