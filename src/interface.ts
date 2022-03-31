@@ -30,8 +30,8 @@ export type Common = {
   disabled?: boolean
   field?: string
 }
-export type FormProps<T = any> = {
-  columns?: Array<Column>
+export type FormProps<T = any, Components extends Comp = Comp> = {
+  columns?: Array<Column<Components>>
   className?: string
   defaultData?: Partial<T>
   notLayout?: boolean
