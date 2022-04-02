@@ -256,12 +256,12 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     }
     return str.join(' ')
   }, [span, contextData, offset, textAlign, _errorMsg, itemClassName, props])
-  return _show ? (
-    <div
+  return  <div
       className={computedClass}
       style={{
         minWidth: minItemWidth ?? contextData.minItemWidth,
-        ...itemStyle
+        ...itemStyle,
+        display:_show ? undefined :'none'
       }}
     >
       {label !== undefined && (
@@ -278,6 +278,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         <span className="hyk-form-item-error">{_errorMsg}</span>
       </div>
     </div>
-  ) : null
+ 
 }
 export default FormItem
