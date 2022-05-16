@@ -103,13 +103,14 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
       setValues(data)
       validate([field])
     } else {
-      bootstrap(field, { value, oldVal: getValue(field) })
+      const oldVal = getValue(field)
       set(formData.current, field, value)
       const item = itemInstances.current[field]
       if (item) {
         item.setValue(value)
         validate([field])
       }
+      bootstrap(field, { value, oldVal  })
     }
   }
 
