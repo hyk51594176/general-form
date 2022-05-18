@@ -89,6 +89,11 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       return str
     }, 'onChange')
   }
+  const textAlign = labelAlign ?? contextData.labelAlign
+  const labelStyles = {
+    width: labelWidth ?? contextData.labelWidth,
+    textAlign: textAlign === 'top' ? 'left' : textAlign
+  }
   const getChildren = () => {
     let child: any = children ?? el
     if (child) {
@@ -97,6 +102,8 @@ const FormItem: React.FC<FormItemProps> = (props) => {
           show: _show,
           field,
           ...contextData,
+          labelWidth: labelStyles.width,
+          labelAlign: textAlign,
           ...context
         },
         size: props.size ?? contextData.size,
@@ -213,11 +220,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     itemInstance.current.rules = rules
   }, [rules])
 
-  const textAlign = labelAlign ?? contextData.labelAlign
-  const labelStyles = {
-    width: labelWidth ?? contextData.labelWidth,
-    textAlign: textAlign === 'top' ? 'left' : textAlign
-  }
+
 
   const computedClass = useMemo(() => {
     const str: string[] = ['hyk-form-item']
