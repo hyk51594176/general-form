@@ -160,8 +160,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     if (eq(options.value, getValue(field))) {
       return
     }
-    set(formData.current, field, options.value)
-    bootstrap(field, options)
+    setValue(field, options.value)
     if (onChange) {
       onChange({
         field,
