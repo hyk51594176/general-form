@@ -5,8 +5,10 @@ import { useSubmit } from '../../hooks';
 import { ComponentMap } from '../../components';
 
 const isShow = {
+  relation: 'and',
   relyOn: {
     show: [true],
+    sex: [0],
   },
 };
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -30,6 +32,11 @@ export default () => {
         field: 'birthday',
         el: 'DatePicker',
         style: { width: '100%' },
+        isShow: {
+          relyOn: {
+            sex: [1],
+          },
+        },
       },
 
       {
@@ -38,7 +45,13 @@ export default () => {
         el: 'HotSelect',
         getList,
         params: { id: 0 },
-        isShow,
+        isShow: {
+          relation: 'or',
+          relyOn: {
+            show: [true],
+            sex: [0],
+          },
+        },
       },
       {
         label: '市',
@@ -47,7 +60,13 @@ export default () => {
         getList,
         params: { id: 'province' },
 
-        isShow,
+        isShow: {
+          relation: 'or',
+          relyOn: {
+            show: [true],
+            sex: [0],
+          },
+        },
       },
       {
         label: '区',
@@ -55,8 +74,13 @@ export default () => {
         el: 'HotSelect',
         getList,
         params: { id: 'city' },
-
-        isShow,
+        isShow: {
+          relation: 'and',
+          relyOn: {
+            show: [true],
+            sex: [0],
+          },
+        },
       },
 
       {

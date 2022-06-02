@@ -61,7 +61,7 @@ export default {
     'lodash/get',
     'lodash/set',
     'lodash/cloneDeep',
-    'lodash/eq'
+    'lodash/isEqual'
   ],
   plugins: [
     eslint({

@@ -8,7 +8,7 @@ import React, {
 import Schema from 'async-validator'
 import get from 'lodash/get'
 import set from 'lodash/set'
-import eq from 'lodash/eq'
+import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
 import { getContextWithProps } from './utils'
 import Context from './Context'
@@ -45,6 +45,8 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
       eventList.current = eventList.current.filter((item) => item !== obj)
     }
   }
+  const getValue = useCallback((field: string) => get(formData.current, field), [])
+
   const getValues = useCallback(() => formData.current, [])
   const bootstrap = useCallback((field: string, value: any) => {
     eventList.current.forEach((obj, index) => {
@@ -54,23 +56,24 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
       }
     })
   }, [])
-  const setValues = useCallback(
-    (data = {}) => {
-      formData.current = cloneDeep(data)
-      Object.entries(itemInstances.current).forEach(([field, item]) => {
-        const value = getValue(field)
-        const oldVal = item.value
-        if (!eq(value, oldVal)) {
-          bootstrap(field, { value, oldVal })
-          item.setValue(value)
-        }
-      })
-    },
-    [bootstrap]
-  )
-  const getValue = (field: string) => get(formData.current, field)
+  const setValue = (field: string, value: any) => {
+    set(formData.current, field, value)
+    setValues(formData.current)
+    validate([field])
+  }
+  const setValues = (data = {}) => {
+    formData.current = cloneDeep(data)
+    Object.entries(itemInstances.current).forEach(([field, item]) => {
+      const value = getValue(field)
+      const oldVal = item.value
+      if (!isEqual(value, oldVal)) {
+        bootstrap(field, { value, oldVal, row: getValues() })
+        item.setValue(value)
+      }
+    })
+  }
 
-  const clearValidate = useCallback((params?: string[]) => {
+  const clearValidate = (params?: string[]) => {
     const fields = getFields(params)
     fields.forEach((field) => {
       const obj = itemInstances.current[field]
@@ -78,39 +81,19 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
         obj.setErrorMsg()
       }
     })
-  }, [])
-  const onLifeCycle = useCallback(
-    (type: UpdateType, field: string, comp: FormItemInstance) => {
-      if (type === UpdateType.mount) {
-        if (itemInstances.current[field]) {
-          if (itemInstances.current[field] !== comp) {
-            console.error(`重复的field字段定义: ${field}`)
-          }
+  }
+  const onLifeCycle = (type: UpdateType, field: string, comp: FormItemInstance) => {
+    if (type === UpdateType.mount) {
+      if (itemInstances.current[field]) {
+        if (itemInstances.current[field] !== comp) {
+          console.error(`重复的field字段定义: ${field}`)
         }
-        itemInstances.current[field] = comp
-        comp.setValue(getValue(field))
-      } else if (type === UpdateType.unmount) {
-        clearValidate([field])
-        delete itemInstances.current[field]
       }
-    },
-    [clearValidate]
-  )
-  const setValue = (field: string, value: any) => {
-    if (typeof value === 'object') {
-      const data = cloneDeep(formData.current)
-      set(data, field, value)
-      setValues(data)
-      validate([field])
-    } else {
-      const oldVal = getValue(field)
-      set(formData.current, field, value)
-      const item = itemInstances.current[field]
-      if (item) {
-        item.setValue(value)
-        validate([field])
-      }
-      bootstrap(field, { value, oldVal  })
+      itemInstances.current[field] = comp
+      comp.setValue(getValue(field))
+    } else if (type === UpdateType.unmount) {
+      clearValidate([field])
+      delete itemInstances.current[field]
     }
   }
 
@@ -119,7 +102,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
       const obj = itemInstances.current[k]
       return obj && (submitShow ? obj.show : true)
     })
-    let data = {}
+    let data = Array.isArray(formData.current) ? [] : {}
     fields.forEach((k) => {
       set(data, k, getValue(k))
     })
@@ -157,16 +140,13 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     clearValidate()
   }
   const onFiledChange = (field: string, options: any) => {
-    if (eq(options.value, getValue(field))) {
-      return
-    }
     setValue(field, options.value)
     if (onChange) {
       onChange({
         field,
         value: options.value,
         e: options.e,
-        formData
+        formData: formData.current
       })
     }
   }
@@ -189,7 +169,8 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
   }))
   useEffect(() => {
     setValues(defaultData)
-  }, [defaultData, setValues])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultData])
   return (
     <Context.Provider
       value={{

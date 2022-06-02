@@ -1,13 +1,6 @@
 /* eslint-disable prefer-const */
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import isEqual from 'lodash/isEqual'
+import React, { PropsWithChildren, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { RenderProps } from '.'
 import Context from './Context'
 import { FormItemProps, UpdateType } from './interface'
@@ -41,45 +34,40 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     ...other
   } = props
   const contextData = useContext(Context)
-  const [_errorMsg, setErrorMsg] = useState(errorMsg)
-  const [_show, setShow] = useState(true)
-  const [, _setValue] = useState()
+  const [, updateState] = useState({})
   const unSubscribe = useRef<any>()
 
-  const setStateValue = useCallback((val: any) => {
+  const setValue = (val: any) => {
     if (val !== itemInstance.current.value) {
       itemInstance.current.value = val
     } else {
       itemInstance.current.value = val
     }
-    _setValue(val)
-  }, [])
-  const setSateErrorMsg = (errMsg?: string) => {
-    itemInstance.current.errorMsg = errMsg
-    setErrorMsg(errMsg)
+    updateState({})
   }
-  const setSateShow = useCallback(
-    (flag: boolean) => {
-      itemInstance.current.show = flag
-      field && contextData.clearValidate([field])
-      setShow(flag)
-    },
-    [contextData, field]
-  )
+  const setErrorMsg = (errMsg?: string) => {
+    itemInstance.current.errorMsg = errMsg
+    updateState({})
+  }
+  const setSateShow = (flag: boolean) => {
+    itemInstance.current.show = flag
+    field && contextData.clearValidate([field])
+    updateState({})
+  }
   const itemInstance = useRef({
-    setErrorMsg: setSateErrorMsg,
+    setErrorMsg,
     errorMsg,
-    setValue: setStateValue,
-    value: undefined,
-    show: _show,
+    setValue,
+    value: props.value,
+    show: true,
     rules
   })
 
-  const getRequired = () => {
+  const isRequired = useMemo(() => {
     if (!rules) return required
     if (Array.isArray(rules)) return rules.some((item) => item.required)
     return rules.required
-  }
+  }, [required, rules])
   const getTriggerType = () => {
     let triggerKey: string | undefined
     if (!rules) return triggerKey
@@ -89,17 +77,13 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       return str
     }, 'onChange')
   }
-  const textAlign = labelAlign ?? contextData.labelAlign
-  const labelStyles = {
-    width: labelWidth ?? contextData.labelWidth,
-    textAlign: textAlign === 'top' ? 'left' : textAlign
-  }
+
   const getChildren = () => {
     let child: any = children ?? el
     if (child) {
       const propsData: PropsWithChildren<RenderProps> = {
         context: {
-          show: _show,
+          show: itemInstance.current.show,
           field,
           ...contextData,
           labelWidth: labelStyles.width,
@@ -116,18 +100,12 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         }
       }
 
-      let status = false
       const triggerType = getTriggerType()
       if (field && triggerType) {
         const fn = propsData[triggerType]
         propsData[triggerType] = (...args: any[]) => {
-          typeof fn === 'function' && fn(...args)
-          if (status) return
-          setTimeout(() => {
-            status = false
-            contextData.validate([field as string])
-          }, 0)
-          status = true
+          fn?.(...args)
+          contextData.validate([field as string])
         }
       }
       if (React.isValidElement<any>(child)) {
@@ -147,56 +125,47 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     }
     return itemInstance.current.value
   }
-  const handlerChange = useCallback(
-    (e: any, ...args: any[]) => {
-      let value!: any
-      try {
-        value = e.target.value
-      } catch (error) {
-        value = e
-      }
-      if (field) {
-        contextData.onFiledChange(field, {
-          value,
-          e,
-          ...args,
-          rules,
-          oldVal: itemInstance.current.value
-        })
-      }
-      setStateValue(value)
-      onChange?.(e, ...args)
-    },
-    [contextData, field, onChange, rules, setStateValue]
-  )
-  const setShowByData = useCallback(
-    (keys: string[], show: FormItemProps['isShow']) => {
-      if (typeof show === 'object') {
-        const method = show.relation === 'and' ? 'every' : 'some'
-        const _isShow = keys[method]((k) => {
-          const flag = show.relyOn[k]?.includes(contextData.getValue(k))
-          return show.notIn ? !flag : flag
-        })
-        setSateShow(_isShow)
-      }
-    },
-    [contextData, setSateShow]
-  )
-  const setIsShow = useCallback(
-    (show: FormItemProps['isShow']) => {
-      unSubscribe.current && unSubscribe.current()
-      if (typeof show === 'boolean') {
-        setSateShow(show)
-      } else {
-        const keys = Object.keys(show?.relyOn ?? {})
+  const handlerChange = (e: any, ...args: any[]) => {
+    let value!: any
+    try {
+      value = e.target.value
+    } catch (error) {
+      value = e
+    }
+    if (isEqual(value, itemInstance.current.value)) return
+    if (field) {
+      contextData.onFiledChange(field, {
+        value,
+        e,
+        ...args,
+        rules,
+        oldVal: itemInstance.current.value
+      })
+    }
+    onChange?.(e, ...args)
+  }
+  const setShowByData = (keys: string[], show: FormItemProps['isShow']) => {
+    if (typeof show === 'object') {
+      const method = show.relation === 'and' ? 'every' : 'some'
+      const _isShow = keys[method]((k) => {
+        const flag = show.relyOn[k]?.includes(contextData.getValue(k))
+        return show.notIn ? !flag : flag
+      })
+      setSateShow(_isShow)
+    }
+  }
+  const setIsShow = (show: FormItemProps['isShow']) => {
+    unSubscribe.current && unSubscribe.current()
+    if (typeof show === 'boolean') {
+      setSateShow(show)
+    } else {
+      const keys = Object.keys(show?.relyOn ?? {})
+      setShowByData(keys, show)
+      unSubscribe.current = contextData.subscribe(keys, (_, __) => {
         setShowByData(keys, show)
-        unSubscribe.current = contextData.subscribe(keys, (_, __) => {
-          setShowByData(keys, show)
-        })
-      }
-    },
-    [contextData, setSateShow, setShowByData]
-  )
+      })
+    }
+  }
 
   useEffect(() => {
     if (field) {
@@ -209,25 +178,32 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       }
     }
   }, [contextData, field])
+
   useEffect(() => {
-    setSateErrorMsg(errorMsg)
+    setErrorMsg(errorMsg)
   }, [errorMsg])
+
   useEffect(() => {
     setIsShow(isShow)
-  }, [isShow, setIsShow])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isShow])
 
   useEffect(() => {
     itemInstance.current.rules = rules
   }, [rules])
 
+  const textAlign = labelAlign ?? contextData.labelAlign
+  const labelStyles = {
+    width: labelWidth ?? contextData.labelWidth,
+    textAlign: textAlign === 'top' ? 'left' : textAlign
+  }
 
-
-  const computedClass = useMemo(() => {
+  const getClassName = () => {
     const str: string[] = ['hyk-form-item']
     const _span = span ?? contextData.span
     const _offset = offset ?? contextData.offset
     const topClass = textAlign === 'top' ? 'hyk-form-item-top' : ''
-    const errorClass = _errorMsg ? 'item_error' : ''
+    const errorClass = itemInstance.current.errorMsg ? 'item_error' : ''
     if (_span) {
       str.push(`col-${_span}`)
     }
@@ -258,19 +234,20 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       str.push(itemClassName)
     }
     return str.join(' ')
-  }, [span, contextData, offset, textAlign, _errorMsg, itemClassName, props])
-  return  <div
-      className={computedClass}
+  }
+  return (
+    <div
+      className={getClassName()}
       style={{
         minWidth: minItemWidth ?? contextData.minItemWidth,
         ...itemStyle,
-        display:_show ? undefined :'none'
+        display: itemInstance.current.show ? undefined : 'none'
       }}
     >
       {label !== undefined && (
         <label
           title={typeof label === 'string' ? label : ''}
-          className={`hyk-form-item-label ${getRequired() ? 'required' : ''}`}
+          className={`hyk-form-item-label ${isRequired ? 'required' : ''}`}
           style={labelStyles}
         >
           {label}
@@ -278,9 +255,9 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       )}
       <div className="hyk-form-item-container">
         {getChildren()}
-        <span className="hyk-form-item-error">{_errorMsg}</span>
+        <span className="hyk-form-item-error">{itemInstance.current.errorMsg}</span>
       </div>
     </div>
- 
+  )
 }
 export default FormItem

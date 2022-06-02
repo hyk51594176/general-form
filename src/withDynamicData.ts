@@ -1,6 +1,7 @@
+import isEqual from 'lodash/isEqual';
 import get from 'lodash/get'
 import has from 'lodash/has'
-import React, { ReactElement, useEffect, useState } from 'react'
+import React, { JSXElementConstructor, useEffect, useRef, useState } from 'react'
 import { RenderProps } from './interface'
 type ResData = Array<{ label: string; value: number }>
 
@@ -11,13 +12,12 @@ type Props = {
   }
   onChange?: any
 } & RenderProps
-type RenderFn<T = any> = (props: T) => ReactElement<T>
-
 // eslint-disable-next-line import/no-anonymous-default-export
-export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
+export default function <T = any>(renderProps: JSXElementConstructor<T>, k?: keyof T) {
   return ({ context, params, getList, ...rest }: T & Props) => {
     const [options, setDataSource] = useState<ResData>([])
-    const getData = (data: any = {}) => {
+    const getData = () => {
+      const data = context?.getValues?.()
       const _params = Object.entries(params || {}).reduce((item, [key, value]) => {
         return {
           ...item,
@@ -28,6 +28,15 @@ export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
         setDataSource(res)
       })
     }
+    const first = useRef(true)
+    const oldParams = useRef<Props['params']>({})
+    useEffect(() => {
+      if (!first.current && !options.length) {
+        const isArray = Array.isArray(rest.value)
+        ;(rest as any)?.onChange(isArray ? [] : undefined)
+      }
+      first.current = false
+    }, [options])
     useEffect(() => {
       if (rest.value && options.length) {
         const isArray = Array.isArray(rest.value)
@@ -46,24 +55,29 @@ export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
           })
         )
         if (!flag) {
-          ;(rest as any)?.onChange(isArray ? list : list[0])
+          ; (rest as any)?.onChange(isArray ? list : list[0])
         }
       }
     }, [rest.value, options])
 
     useEffect(() => {
-      getData(context?.getValues?.())
+      if(!isEqual(params,oldParams.current)){
+        oldParams.current = params
+        getData()
+      }
+    }, [params])
+
+    useEffect(() => {
       const list = Object.values(params || {}) as string[]
       let unSubscribe!: Function | undefined
       if (list.length && context?.field) {
-        unSubscribe = context?.subscribe?.(list, () => {
-          getData(context?.getValues?.())
-        })
+        unSubscribe = context?.subscribe?.(list, getData)
       }
       return () => {
         unSubscribe?.()
       }
-    }, [context?.field, params])
+    }, [context, params])
+    
     const data = { [k ?? 'options']: options, ...rest } as T
     return React.createElement(renderProps, data)
   }

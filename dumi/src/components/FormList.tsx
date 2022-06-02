@@ -23,7 +23,10 @@ export default defineComponent<Props>((props) => {
               index={index}
               tableField={props.context?.field}
               context={{
-                getValues: () => row,
+                getValues: () =>
+                  props.context?.getValue(props.context?.field as string)?.[
+                    index
+                  ],
                 subscribe: (list: any[], callBack: any) => {
                   return props.context?.subscribe(
                     list.map(
@@ -36,7 +39,7 @@ export default defineComponent<Props>((props) => {
               field={
                 column.dataIndex
                   ? `${props.context?.field}[${index}][${column.dataIndex}]`
-                  : undefined
+                  : column.formItem.field
               }
             />
           );
@@ -56,9 +59,8 @@ export default defineComponent<Props>((props) => {
             style={{ textAlign: 'center' }}
             onClick={() => {
               if (!props.context?.field) return;
-              const d = props.context?.getValue?.(props.context?.field) || [];
-              d.push({});
-              props.context?.setValue?.(props.context?.field, d);
+              const d = props.value || [];
+              props.onChange?.([...d, {}]);
             }}
           >
             添加一行
