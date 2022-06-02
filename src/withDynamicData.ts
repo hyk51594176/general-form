@@ -10,7 +10,6 @@ type Props = {
   params?: {
     [k: string]: string | number | boolean | undefined
   }
-  onChange?: any
 } & RenderProps
 // eslint-disable-next-line import/no-anonymous-default-export
 export default function <T = any>(renderProps: JSXElementConstructor<T>, k?: keyof T) {
@@ -26,42 +25,35 @@ export default function <T = any>(renderProps: JSXElementConstructor<T>, k?: key
       }, {} as any)
       getList?.(_params).then((res = []) => {
         setDataSource(res)
+        if (rest.value) {
+          const isArray = Array.isArray(rest.value)
+          let arr = isArray ? rest.value : [rest.value]
+          let list: any[] = []
+          if(!res.length){
+            rest?.onChange?.(isArray ? list : list[0])
+          }
+          const flag = arr.every((val: any) =>
+            res.some(function dep(obj: any) {
+              if (obj.value === val) {
+                list.push(val)
+                return true
+              }
+              if (obj.children && obj.children.length) {
+                return obj.children.some(dep)
+              }
+              return false
+            })
+          )
+          if (!flag) {
+            ;(rest as any)?.onChange(isArray ? list : list[0])
+          }
+        }
       })
     }
-    const first = useRef(true)
     const oldParams = useRef<Props['params']>({})
-    useEffect(() => {
-      if (!first.current && !options.length) {
-        const isArray = Array.isArray(rest.value)
-        ;(rest as any)?.onChange(isArray ? [] : undefined)
-      }
-      first.current = false
-    }, [options])
-    useEffect(() => {
-      if (rest.value && options.length) {
-        const isArray = Array.isArray(rest.value)
-        let arr = isArray ? rest.value : [rest.value]
-        let list: any[] = []
-        const flag = arr.every((val: any) =>
-          options.some(function dep(obj: any) {
-            if (obj.value === val) {
-              list.push(val)
-              return true
-            }
-            if (obj.children && obj.children.length) {
-              return obj.children.some(dep)
-            }
-            return false
-          })
-        )
-        if (!flag) {
-          ; (rest as any)?.onChange(isArray ? list : list[0])
-        }
-      }
-    }, [rest.value, options])
 
     useEffect(() => {
-      if(!isEqual(params,oldParams.current)){
+      if (!isEqual(params, oldParams.current)) {
         oldParams.current = params
         getData()
       }
@@ -77,7 +69,7 @@ export default function <T = any>(renderProps: JSXElementConstructor<T>, k?: key
         unSubscribe?.()
       }
     }, [context, params])
-    
+
     const data = { [k ?? 'options']: options, ...rest } as T
     return React.createElement(renderProps, data)
   }
