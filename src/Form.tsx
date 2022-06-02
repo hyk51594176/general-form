@@ -67,8 +67,10 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
       const value = getValue(field)
       const oldVal = item.value
       if (!isEqual(value, oldVal)) {
-        bootstrap(field, { value, oldVal, row: getValues() })
         item.setValue(value)
+        setTimeout(() => {
+          bootstrap(field, { value, oldVal, row: getValues() })
+        }, 0)
       }
     })
   }
