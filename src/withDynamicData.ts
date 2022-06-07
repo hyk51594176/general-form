@@ -5,15 +5,15 @@ import React, { JSXElementConstructor, useEffect, useRef, useState } from 'react
 import { RenderProps } from './interface'
 type ResData = Array<{ label: string; value: number }>
 
-type Props = {
+type Props<V> = {
   getList: (params: any) => Promise<ResData>
   params?: {
     [k: string]: string | number | boolean | undefined
   }
-} & RenderProps
+} & RenderProps<any,V>
 // eslint-disable-next-line import/no-anonymous-default-export
-export default function <T = any>(renderProps: JSXElementConstructor<T>, k?: keyof T) {
-  return ({ context, params, getList, ...rest }: T & Props) => {
+export default function <T = any,V=any>(renderProps: JSXElementConstructor<T>, k?: keyof T) {
+  return ({ context, params, getList, ...rest }: T & Props<V>) => {
     const [options, setDataSource] = useState<ResData>([])
     const getData = () => {
       const data = context?.getValues?.()
@@ -50,7 +50,7 @@ export default function <T = any>(renderProps: JSXElementConstructor<T>, k?: key
         }
       })
     }
-    const oldParams = useRef<Props['params']>({})
+    const oldParams = useRef<Props<V>['params']>({})
 
     useEffect(() => {
       if (!isEqual(params, oldParams.current)) {

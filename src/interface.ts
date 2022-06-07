@@ -82,10 +82,10 @@ export type FormRef<T extends Object = {}> = {
 }
 export type ContextProp<T = {}> = Common & FormRef<T>
 type Rpor<FormData> = ContextProp<FormData> & { show?: boolean }
-export type RenderProps<T = {}, FormData = unknown> = {
+export type RenderProps<T = {}, FormData = unknown,V=any> = {
   size?: string
   disabled?: boolean
-  value?: any
+  value?: V
   onChange?: (e: any) => void
   context?: Rpor<FormData>
 } & T
@@ -122,6 +122,6 @@ export type FormItemProps<T extends Comp = Comp> = Common & {
 export type Column<T extends Comp = Comp, K extends keyof T = keyof T> = FormItemProps<T> &
   ComponentProps<T[K]>
 export const defineColumns = <T extends Comp>(columns: Array<Column<T>>) => columns
-export const defineComponent = <T, D = unknown>(
-  fn: FC<RenderProps<T, D>> | ComponentClass<RenderProps<T, D>>
+export const defineComponent = <T,V=unknown, D = unknown>(
+  fn: FC<RenderProps<T, D>> | ComponentClass<RenderProps<T, D,V>>
 ) => fn
