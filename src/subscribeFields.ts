@@ -1,27 +1,26 @@
-import React, { ComponentClass, FC, useEffect, useState } from 'react'
-import { RenderProps } from './interface'
+import React, { useState } from 'react'
+import { RenderProps, RcCom, Obj } from './interface'
+import { useDeepEqualEffect } from './useDeepEqualEffect'
 
 type Props = {
   fields: string[]
 } & RenderProps
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default function <T = any>(renderProps: FC<T> | ComponentClass<T>) {
-  return ({ context, fields, ...rest }: T & Props) => {
+export default function <T extends Obj = Obj>(Comp: RcCom<T>) {
+  return (props: T & Props) => {
     const [, setState] = useState({})
-
-    useEffect(() => {
+    useDeepEqualEffect(() => {
       let unSubscribe!: Function | undefined
-      if (fields?.length) {
-        unSubscribe = context?.subscribe?.(fields, () => {
+      if (props.fields?.length) {
+        unSubscribe = props.context?.subscribe?.(props.fields, () => {
           setState({})
         })
       }
       return () => {
         unSubscribe?.()
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fields])
-    return React.createElement(renderProps, rest as T)
+    }, [props.fields])
+    return React.createElement(Comp, props)
   }
 }

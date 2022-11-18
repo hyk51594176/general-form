@@ -1,59 +1,66 @@
 {
   "name": "@hanyk/general-form",
-  "version": "2.0.3",
-  "description": "",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.es.js",
-  "unpkg": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "version": "2.1.1",
   "scripts": {
-    "build": "rimraf dist && rollup -c",
-    "dev": "rollup -w -c",
-    "lint": "eslint --fix  src --ext .ts",
-    "release": "npm run build && npm publish --access public"
+    "start": "dumi dev",
+    "docs:build": "dumi build",
+    "docs:deploy": "gh-pages -d docs-dist",
+    "prebuild": "rm -fr dist",
+    "build": "father build",
+    "postbuild": "sass src/index.scss:dist/index.css --no-source-map",
+    "deploy": "npm run docs:build && npm run docs:deploy",
+    "prettier": "prettier --write \"**/*.{js,jsx,tsx,ts,less,md,json}\"",
+    "test": "umi-test",
+    "test:coverage": "umi-test --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "module": "dist/esm/index.js",
+  "main": "dist/cjs/index.js",
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,less,md,json}": [
+      "prettier --write"
+    ],
+    "*.ts?(x)": [
+      "prettier --parser=typescript --write"
+    ]
+  },
+  "peerDependencies": {
+    "async-validator": "^3.3.0",
+    "lodash": "^3 || ^4"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.15.1",
+    "@testing-library/react": "^13.0.0",
+    "@types/jest": "^27.0.3",
+    "@types/lodash": "^4.14.157",
+    "@umijs/fabric": "^2.8.1",
+    "@umijs/plugin-sass": "^1.1.1",
+    "@umijs/test": "^3.0.5",
+    "antd": "^5.0.0",
+    "async-validator": "^3.3.0",
+    "dumi": "^1.1.0",
+    "father": "^4.0.0-rc.2",
+    "gh-pages": "^3.0.0",
+    "lint-staged": "^10.0.7",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "prettier": "^2.2.1",
+    "react": "^16.14.0",
+    "sass": "^1.56.1",
+    "sass-loader": "^13.2.0",
+    "yorkie": "^2.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/hyk51594176/general-form"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "^13.0.0",
-    "@rollup/plugin-node-resolve": "^8.1.0",
-    "@types/lodash": "^4.14.157",
-    "@types/react": "^16.9.41",
-    "create-banner": "^1.0.0",
-    "eslint-config-react-app": "^6.0.0",
-    "@typescript-eslint/eslint-plugin": "^4.0.0",
-    "@typescript-eslint/parser": "^4.0.0",
-    "babel-eslint": "^10.0.0",
-    "eslint": "^7.5.0",
-    "eslint-plugin-flowtype": "^5.2.0",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-jest": "^24.0.0",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.20.3",
-    "eslint-plugin-react-hooks": "^4.0.8",
-    "eslint-plugin-testing-library": "^3.9.0",
-    "install": "^0.13.0",
-    "jest": "^25.4.0",
-    "node-sass": "^6.0.1",
-    "react": "^16.9.41",
-    "rimraf": "^3.0.2",
-    "rollup": "^1.32.1",
-    "rollup-plugin-eslint": "^7.0.0",
-    "rollup-plugin-scss": "^2.5.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.27.0",
-    "rollup-plugin-uglify": "^6.0.4",
-    "typescript": "^3.8.3"
-  },
-  "dependencies": {
-    "async-validator": "^3.3.0",
-    "lodash": "^3.x"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
   }
 }
