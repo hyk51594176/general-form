@@ -87,9 +87,21 @@ npm i @hanyk/general-form
 
 | 属性     | 说明                               | 类型                        | 默认值 |
 | -------- | ---------------------------------- | --------------------------- | ------ |
-| relyOn   | 依赖                               | Object {[k: string]: any[]} |        |
+| relyOn   | 依赖                               | Object {[k: string]: any[] \| ((value: any, context: Rpor<any>) => boolean)} |        |
 | relation | relyOn 有多个 key 时来确定逻辑关系 | 'and' 、 'or'               | 'or'   |
 | notIn    | 是否取反                           | boolean                     | false  |
+
+```ts
+export type DynamicParameter = {
+  relation?: 'and' | 'or'
+  notIn?: boolean
+  relyOn: {
+    [k: string]: any[] | ((value: any, context: Rpor<any>) => boolean)
+  },
+  external?: boolean
+}
+
+```
 
 #### Rules
 
@@ -134,3 +146,58 @@ npm i @hanyk/general-form
 | whitespace | 是否进行空白字符校验（true 进行校验)                                                                                        | Boolean                         |                    |          |
 | validator  | 自定义校验, (校验成功的时候不要忘记执行 callback(), 否则会校验不返回)                                                       | Function(rule, value, callback) |                    |          |
 | trigger    | 触发校验的事件名称                                                                                                          | String/Array                    | onChange/onBlur/… | onChange |
+
+#### hooks
+
+##### useForm
+
+2.3.0 新增，
+ 创建 Form 实例，用于管理所有数据状态。
+
+##### useFormInstance
+
+2.3.0 新增，
+```tsx | pure
+import React from 'react'
+import { useFormInstance, useForm } from '@hanyk/general-form'; 
+
+const Sub = () => {
+  const form = useFormInstance(); 
+
+  return <Button onClick={() => form.setValues({})} />; 
+}; 
+
+export default () => {
+  const form = useForm(); 
+
+  return (
+
+    <Form form={form}>
+      <Sub />
+    </Form>
+
+  ); 
+}; 
+
+```
+
+#### useWatch
+
+2.3.0 新增，用于直接获取 form 中字段对应的值。通过该 Hooks 可以触发当前组件的更新
+
+```tsx | pure
+import { useWatch, useForm,FormItem,Form } from '@hanyk/general-form'; 
+
+const Demo = () => {
+  const form = Form.useForm();
+  const [value,oldValue,formData] = useWatch('username', form);
+  useWatch(['username']); // 当位数数组的时候可以监听多个，无返回值，通过form.getValues 获取值
+  return (
+    <Form form={form}>
+      <FormItem name="username">
+        <Select options={[]} />
+      </FormItem>
+    </Form>
+  );
+};
+```

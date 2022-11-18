@@ -87,7 +87,7 @@ export interface FormRef<T = {}> {
 }
 export type Obj = Record<string, any>
 export type ContextProp<T = {}> = Common & FormRef<T>
-export type Rpor<FormData> = ContextProp<FormData> & { show?: boolean; getShow?: () => boolean }
+export type Rpor<FormData> = ContextProp<FormData> & { show?: boolean; getShow?: () => boolean, errorMsg?: string }
 export type RenderProps<T extends Obj = Obj, FormData = unknown, V = any> = {
   size?: string
   disabled?: boolean

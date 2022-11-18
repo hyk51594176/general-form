@@ -4,7 +4,7 @@ import React, { PropsWithChildren,  useMemo, useRef, useState } from 'react';
 import { RenderProps } from '.';
 import { FormItemProps, UpdateType } from './interface';
 import { useDeepEqualEffect } from './useDeepEqualEffect';
-import { components, useFormContext } from './utils';
+import { components, useFormInstance } from './utils';
 
 const FormItem: React.FC<FormItemProps> = (props) => {
   let {
@@ -33,7 +33,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     context = {},
     ...other
   } = props;
-  const contextData = useFormContext()
+  const contextData = useFormInstance()
   const [, updateState] = useState({});
   const unSubscribe = useRef<any>();
 
@@ -84,6 +84,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         context: {
           show: itemInstance.current.show,
           getShow: () => itemInstance.current.show,
+          errorMsg: itemInstance.current.errorMsg,
           field,
           ...contextData,
           labelWidth: labelStyles.width,

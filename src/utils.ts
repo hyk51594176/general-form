@@ -36,4 +36,4 @@ export const useWatch = <T = unknown>(field: string | string[], form: Store | Rp
 
 }
 
-export const useFormContext = () => useContext(Context);
+export const useFormInstance = () => useContext(Context);
