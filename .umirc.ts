@@ -2,7 +2,7 @@ import { defineConfig } from 'dumi';
 import path from 'path'
 export default defineConfig({
   base: '/general-form/',
-  outputPath: '../docs',
+  outputPath: 'docs-dist',
   title: '@hanyk/general-form',
   mode: 'site',
   publicPath: process.env.NODE_ENV === 'production' ? '/general-form/' : '/',
