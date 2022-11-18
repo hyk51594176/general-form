@@ -1,11 +1,10 @@
 /* eslint-disable prefer-const */
 import isEqual from 'lodash/isEqual';
-import React, { PropsWithChildren, useContext, useMemo, useRef, useState } from 'react';
+import React, { PropsWithChildren,  useMemo, useRef, useState } from 'react';
 import { RenderProps } from '.';
-import Context from './Context';
 import { FormItemProps, UpdateType } from './interface';
 import { useDeepEqualEffect } from './useDeepEqualEffect';
-import { components } from './utils';
+import { components, useFormContext } from './utils';
 
 const FormItem: React.FC<FormItemProps> = (props) => {
   let {
@@ -34,7 +33,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     context = {},
     ...other
   } = props;
-  const contextData = useContext(Context);
+  const contextData = useFormContext()
   const [, updateState] = useState({});
   const unSubscribe = useRef<any>();
 
@@ -59,7 +58,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     setErrorMsg,
     errorMsg,
     setValue,
-    value: props.value,
+    value: props.field ? contextData.getValue(props.field) : props.value,
     show: true,
     rules,
   });
@@ -73,7 +72,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     let triggerKey = 'onChange';
     if (!rules) return triggerKey;
     return (Array.isArray(rules) ? rules : [rules]).reduce((str, { trigger }) => {
-      // eslint-disable-next-line no-param-reassign
       if (trigger) str = trigger;
       return str;
     }, 'onChange');

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/indent */
 import { RuleItem } from 'async-validator'
 import { ComponentClass, ComponentProps, CSSProperties, FC, ReactNode } from 'react'
+import Store from './Store'
 
 type Layout = {
   span?: string | number
@@ -28,9 +29,9 @@ export type Common = {
   lg?: string | number | Layout
   xl?: string | number | Layout
   disabled?: boolean
-  field?: string
+  field?: string,
 }
-export type FormProps<T = any, Components extends Comp = Comp> = {
+export type FormProps<T extends Object = {}, Components extends Comp = Comp> = {
   columns?: Array<Column<Components>>
   className?: string
   defaultData?: Partial<T>
@@ -38,15 +39,17 @@ export type FormProps<T = any, Components extends Comp = Comp> = {
   style?: CSSProperties
   submitShow?: boolean
   onChange?(arg: EventArg<T>): void
+  form?: Store<T>
 } & Common
 
 export enum UpdateType {
   unmount,
   mount
 }
+export type SubCallback<V = any, D = any> = (field: string, value: { value: V, oldVal: V, row: D }) => void
 export interface EventItem {
   fields: string[]
-  callback(field: string, value: any): void
+  callback: SubCallback
 }
 export interface ValidateParams {
   rule: {
@@ -67,8 +70,9 @@ export interface FormItemInstance {
 export interface FormItemInstances {
   [key: string]: FormItemInstance
 }
-export type FormRef<T = {}> = {
-  subscribe: (fields: string[], callback: EventItem['callback']) => () => void
+export interface FormRef<T = {}> {
+  formData?: T
+  subscribe: <J>(fields: string[], callback: SubCallback<J, T>) => () => void
   getValue: (field: string) => any
   getValues: () => T
   setValue: (field: string, value: any) => void

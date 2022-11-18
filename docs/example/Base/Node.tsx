@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { DatePicker } from 'antd';
-import { Form, FormItem } from '@hanyk/general-form';
+import { Form, FormItem, FormRef } from '@hanyk/general-form';
 import { getList, defaultData } from '../../api';
 import { HotSelect } from '../../components';
 import SubmitBtn from '../../components/SubmitBtn';
 import { useSubmit } from '../../hooks';
+import { useForm, useWatch } from '../../../src/utils';
 const rules = {
   required: true,
   message: '该字段必填',
@@ -12,8 +13,10 @@ const rules = {
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const submit = useSubmit();
+  const form = useForm()
+  const arr = useWatch('sex', form)
   return (
-    <Form defaultData={defaultData} span={12}>
+    <Form defaultData={defaultData} span={12} form={form}>
       <FormItem rules={rules} label="姓名" field="name" el="Input" />
       <FormItem
         rules={rules}

@@ -1,7 +1,6 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@hanyk/general-form': ^2.0.4
   '@testing-library/jest-dom': ^5.15.1
   '@testing-library/react': ^13.0.0
   '@types/jest': ^27.0.3
@@ -22,9 +21,6 @@ specifiers:
   sass: ^1.56.1
   sass-loader: ^13.2.0
   yorkie: ^2.0.0
-
-dependencies:
-  '@hanyk/general-form': 2.0.4_69e0e3b969ff1661a44f58710c89d58f
 
 devDependencies:
   '@testing-library/jest-dom': 5.16.5
@@ -1733,24 +1729,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
-
-  /@hanyk/general-form/2.0.4_69e0e3b969ff1661a44f58710c89d58f:
-    resolution: {integrity: sha512-sH4FAGn/Djzfo32ahW+gB6b7u2vlFrecb39HpX/bSSzaGzKCs1OLaCxDmHio55DegonKXgYzMgr2haRM5NlMsg==}
-    peerDependencies:
-      async-validator: ^3.3.0
-      lodash: ^3 || ^4
-    dependencies:
-      '@hanyk/general-form': 2.1.0
-      async-validator: 3.5.2
-      lodash: 4.17.21
-    dev: false
-
-  /@hanyk/general-form/2.1.0:
-    resolution: {integrity: sha512-VAEuYCwAEHP69Vp9dj8wej8wBLUeSKY544Ps6xheKjL29aS5mar7DxRapL0NrQgcLa/OCcBj/iZgNiHzPXfDbA==}
-    dependencies:
-      async-validator: 3.5.2
-      lodash: 3.10.1
-    dev: false
 
   /@humanwhocodes/config-array/0.5.0:
     resolution: {integrity: sha512-FagtKFz74XrTl7y6HCzQpwDfXP0yhxe9lHLD1UZxjvZIcbyRz8zTFF/yYNfSfzU414eDwZ1SrO0Qvtyf+wFMQg==}
@@ -3894,6 +3872,7 @@ packages:
 
   /async-validator/3.5.2:
     resolution: {integrity: sha512-8eLCg00W9pIRZSB781UUX/H6Oskmm8xloZfr09lz5bikRpBVDlJ3hRVuxxP1SxcwsEYfJ4IU8Q19Y8/893r3rQ==}
+    dev: true
 
   /async-validator/4.2.5:
     resolution: {integrity: sha512-7HhHjtERjqlNbZtqNqy2rckN/SpOOlmDliet+lP7k+eKZEjPk3DgyeU9lIXLdeLz0uBbbVp+9Qdow9wJWgwwfg==}
@@ -9021,10 +9000,6 @@ packages:
   /lodash.zip/4.2.0:
     resolution: {integrity: sha512-C7IOaBBK/0gMORRBd8OETNx3kmOkgIWIPvyDpZSCTwUrpYmgZwJkjZeOD8ww4xbOUOs4/attY+pciKvadNfFbg==}
     dev: true
-
-  /lodash/3.10.1:
-    resolution: {integrity: sha512-9mDDwqVIma6OZX79ZlDACZl8sBm0TEnkf99zV3iMA4GzkIT/9hiqP5mY0HoT1iNLCrKc/R1HByV+yJfRWVJryQ==}
-    dev: false
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
