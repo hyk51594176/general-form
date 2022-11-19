@@ -1,33 +1,7 @@
-# src_father
-
-## Getting Started
-
-Install dependencies,
+# @dtd/general-form
 
 ```bash
-$ npm i
+  npm install @hanyk/general-form
 ```
 
-Start the dev server,
-
-```bash
-$ npm start
-```
-
-Build documentation,
-
-```bash
-$ npm run docs:build
-```
-
-Run test,
-
-```bash
-$ npm test
-```
-
-Build library via `father`,
-
-```bash
-$ npm run build
-```
+## [文档](https://hyk51594176.github.io/general-form/)
