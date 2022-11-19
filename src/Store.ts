@@ -3,13 +3,14 @@ import get from 'lodash/get'
 import set from 'lodash/set'
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
-import { Common, SubCallback, EventItem, FormItemInstances, ValidateParams, EventArg, UpdateType, FormItemInstance } from "./interface"
+import { SubCallback, EventItem, FormItemInstances, ValidateParams, EventArg, UpdateType, FormItemInstance } from "./interface"
 type Options<T> = { submitShow?: boolean, onChange?: (arg: EventArg<T>) => void }
 export default class Store<T extends Object = {}> {
   options: Options<T> = {
     submitShow: true
   }
   formData!: T
+  originFormData!: T
   eventList: Array<EventItem> = []
   itemInstances: FormItemInstances = {}
   constructor(defaultData?: T) {
@@ -51,14 +52,17 @@ export default class Store<T extends Object = {}> {
   setValue = (field: string, value: any) => {
     const oldVal = cloneDeep(this.getValue(field))
     set(this.formData, field, value)
-    this.setValues(this.formData)
+    this.setValues(this.formData, true)
     if (!this.itemInstances[field]) {
       this.bootstrap(field, { value, oldVal, row: this.getValues() })
     } else {
       this.validate([field])
     }
   }
-  setValues = (data: T = {} as T) => {
+  setValues = (data: T = {} as T, isChange?: boolean) => {
+    if (!isChange) {
+      this.originFormData = data
+    }
     this.formData = cloneDeep(data)
     Object.entries(this.itemInstances).forEach(([field, item]) => {
       const value = this.getValue(field)
@@ -109,11 +113,11 @@ export default class Store<T extends Object = {}> {
       })
   }
   resetFields = (data?: T) => {
-    this.setValues(data ?? this.formData)
+    this.setValues(data ?? this.originFormData)
     this.clearValidate()
   }
   resetField = (field: string, value?: any) => {
-    this.setValue(field, get(this.formData, field))
+    this.setValue(field, value ?? get(this.originFormData, field))
   }
   onFiledChange = (field: string, options: any) => {
     this.setValue(field, options.value)
