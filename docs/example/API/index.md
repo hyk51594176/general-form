@@ -151,12 +151,12 @@ export type DynamicParameter = {
 
 ##### useForm
 
-2.3.0 新增，
+3.0.0 新增，
  创建 Form 实例，用于管理所有数据状态。
 
 ##### useFormInstance
 
-2.3.0 新增，
+3.0.0 新增，
 ```tsx | pure
 import React from 'react'
 import { useFormInstance, useForm } from '@hanyk/general-form'; 
@@ -183,15 +183,15 @@ export default () => {
 
 #### useWatch
 
-2.3.0 新增，用于直接获取 form 中字段对应的值。通过该 Hooks 可以触发当前组件的更新
+3.0.0 新增，用于直接获取 form 中字段对应的值。通过该 Hooks 可以触发当前组件的更新
 
 ```tsx | pure
-import { useWatch, useForm,FormItem,Form } from '@hanyk/general-form'; 
+import { useWatch, useForm, FormItem, Form } from '@hanyk/general-form'; 
 
 const Demo = () => {
-  const form = Form.useForm();
+  const form = useForm();
   const [value,oldValue,formData] = useWatch('username', form);
-  useWatch(['username']); // 当位数数组的时候可以监听多个，无返回值，通过form.getValues 获取值
+  useWatch(['username']); // 当参数是数组的时候可以监听多个，无返回值，通过form.getValues 获取值
   return (
     <Form form={form}>
       <FormItem name="username">

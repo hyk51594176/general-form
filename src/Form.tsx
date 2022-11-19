@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import Context from './Context';
 import FormItem from './FormItem';
-import './index.scss';
+import './index.css';
 import { FormProps, FormRef } from './interface';
 import { useDeepEqualEffect } from './useDeepEqualEffect';
 import Store from './Store';

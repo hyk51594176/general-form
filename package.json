@@ -7,7 +7,6 @@
     "docs:deploy": "gh-pages -d docs-dist",
     "prebuild": "rm -fr dist",
     "build": "father build",
-    "postbuild": "sass src/index.scss:dist/index.css --no-source-map",
     "deploy": "npm run docs:build && npm run docs:deploy",
     "prettier": "prettier --write \"**/*.{js,jsx,tsx,ts,less,md,json}\"",
     "test": "umi-test",
