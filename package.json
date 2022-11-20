@@ -3,15 +3,17 @@
   "version": "3.0.0",
   "scripts": {
     "start": "dumi dev",
-    "docs:build": "dumi build",
-    "docs:deploy": "gh-pages -d docs-dist",
+    "docsbuild": "dumi build",
+    "predocsdeploy": "npm run docsbuild",
+    "docsdeploy": "gh-pages -d docs-dist",
     "prebuild": "rm -fr dist",
     "build": "father build",
     "deploy": "npm run docs:build && npm run docs:deploy",
     "prettier": "prettier --write \"**/*.{js,jsx,tsx,ts,less,md,json}\"",
     "test": "umi-test",
     "test:coverage": "umi-test --coverage",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "postpublish": "npm run docsdeploy"
   },
   "files": [
     "dist"
