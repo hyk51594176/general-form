@@ -1,10 +1,10 @@
 /* eslint-disable prefer-const */
 import isEqual from 'lodash/isEqual';
-import React, { PropsWithChildren,  useMemo, useRef, useState } from 'react';
-import { RenderProps } from '.';
-import { FormItemProps, UpdateType } from './interface';
+import React, { PropsWithChildren, useMemo, useRef, useState } from 'react';
+import { useFormInstance } from './hooks';
+import { FormItemProps, UpdateType, RenderProps } from './interface';
 import { useDeepEqualEffect } from './useDeepEqualEffect';
-import { components, useFormInstance } from './utils';
+import { components } from './utils';
 
 const FormItem: React.FC<FormItemProps> = (props) => {
   let {
@@ -33,7 +33,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     context = {},
     ...other
   } = props;
-  const contextData = useFormInstance()
+  const contextData = useFormInstance();
   const [, updateState] = useState({});
   const unSubscribe = useRef<any>();
 
