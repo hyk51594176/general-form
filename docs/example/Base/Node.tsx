@@ -1,11 +1,10 @@
 import React, { useRef } from 'react';
 import { DatePicker } from 'antd';
-import { Form, FormItem, FormRef } from '@hanyk/general-form';
+import { Form, FormItem, FormRef, useForm, useWatch } from '@hanyk/general-form';
 import { getList, defaultData } from '../../api';
 import { HotSelect } from '../../components';
 import SubmitBtn from '../../components/SubmitBtn';
 import { useSubmit } from '../../hooks';
-import { useForm, useWatch } from '../../../src/utils';
 const rules = {
   required: true,
   message: '该字段必填',
