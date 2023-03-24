@@ -1,6 +1,6 @@
 {
   "name": "@hanyk/general-form",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "scripts": {
     "start": "dumi dev",
     "docsbuild": "dumi build",
