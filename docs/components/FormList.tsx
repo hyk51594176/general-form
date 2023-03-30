@@ -1,48 +1,50 @@
-import React, { useMemo } from 'react';
-import { Table } from 'antd';
-import { FormItem, defineComponent, Column } from '@hanyk/general-form';
-import { ComponentMap } from '.';
-import { ColumnType } from 'antd/es/table';
+import React, { useMemo } from 'react'
+import { Table } from 'antd'
+import { FormItem, defineComponent, FormItemProps } from '@hanyk/general-form'
+import { ColumnType } from 'antd/es/table'
+import { ComponentMap } from '.'
+
 type Props = {
   columns: Array<
     ColumnType<any> & {
-      formItem: Column<ComponentMap>;
+      formItem: FormItemProps<ComponentMap>
     }
-  >;
-};
+  >
+}
 
-export default defineComponent<Props,any[]>((props) => {
+export default defineComponent<Props, any[]>((props) => {
   const columns = useMemo<ColumnType<any>[]>(() => {
-    return (props.columns || []).map((column, key) => {
+    return (props.columns || []).map((column) => {
       return {
         ...column,
         render: (_, row, index) => {
           const field = column.dataIndex
-          ? `${props.context?.field}[${index}][${column.dataIndex}]`
-          : column.formItem.field
+            ? `${props.context?.field}[${index}][${column.dataIndex}]`
+            : column.formItem.field
           return (
             <FormItem
               {...column.formItem}
               index={index}
               tableField={props.context?.field}
               context={{
-                getValues: () => props.context?.getValue(props.context.field as string)[0],
+                getValues: () =>
+                  props.context?.getValue(props.context.field as string)[0],
                 subscribe: (list: any[], callBack: any) => {
                   return props.context?.subscribe(
                     list.map(
-                      (key) => `${props.context?.field}[${index}][${key}]`,
+                      (key) => `${props.context?.field}[${index}][${key}]`
                     ),
-                    callBack,
-                  );
-                },
+                    callBack
+                  )
+                }
               }}
               field={field}
             />
-          );
-        },
-      };
-    });
-  }, [props]);
+          )
+        }
+      }
+    })
+  }, [props])
 
   return (
     <Table
@@ -54,15 +56,15 @@ export default defineComponent<Props,any[]>((props) => {
           <div
             style={{ textAlign: 'center' }}
             onClick={() => {
-              if (!props.context?.field) return;
-              const d = props.value || [];
-              props.onChange?.([...d, {}]);
+              if (!props.context?.field) return
+              const d = props.value || []
+              props.onChange?.([...d, {}])
             }}
           >
             添加一行
           </div>
-        );
+        )
       }}
     />
-  );
-});
+  )
+})

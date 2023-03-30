@@ -1,11 +1,12 @@
-import { Button } from 'antd';
-import React from 'react';
-import { defineComponent } from '@hanyk/general-form';
+import { Button } from 'antd'
+import React from 'react'
+import { defineComponent } from '@hanyk/general-form'
+
 type Props = {
-  dataSource: any;
-  index: number;
-  onDataChange(data: any): void;
-};
+  dataSource: any
+  index: number
+  onDataChange(data: any): void
+}
 
 export default defineComponent<Props>((props) => {
   return (
@@ -14,7 +15,7 @@ export default defineComponent<Props>((props) => {
         size="small"
         type="link"
         onClick={() => {
-          props.onDataChange([...(props.context?.getValues() as []), {}]);
+          props.onDataChange([...(props.context?.getValues() as []), {}])
         }}
       >
         添加
@@ -24,14 +25,14 @@ export default defineComponent<Props>((props) => {
           size="small"
           type="link"
           onClick={() => {
-            const d = props.context?.getValues() as [];
-            d.splice(props.index, 1);
-            props.onDataChange(d);
+            const d = props.context?.getValues() as []
+            d.splice(props.index, 1)
+            props.onDataChange(d)
           }}
         >
           删除
         </Button>
       )}
     </>
-  );
-});
+  )
+})

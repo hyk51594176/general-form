@@ -1,16 +1,16 @@
-import { ComponentMap } from '@/components';
-import { Common, defineColumns, Form } from '@hanyk/general-form';
-import React, { useMemo } from 'react';
+import { Common, defineColumns, Form } from '@hanyk/general-form'
+import React, { useMemo } from 'react'
+import { ComponentMap } from '../../components'
 
-type LayoutData = Omit<Common, 'field'>;
+type LayoutData = Omit<Common, 'field'>
 
 type Props = {
-  onChange(e: LayoutData): void;
-};
+  onChange(e: LayoutData): void
+}
 const defaultData = {
   labelWidth: '80px',
-  labelAlign: 'right',
-};
+  labelAlign: 'right'
+}
 const Layout: React.FC<Props> = (props: Props) => {
   const columns = useMemo(() => {
     return defineColumns<ComponentMap>([
@@ -22,8 +22,8 @@ const Layout: React.FC<Props> = (props: Props) => {
         options: [
           { label: 'large', value: 'large' },
           { label: 'middle', value: 'middle' },
-          { label: 'small', value: 'small' },
-        ],
+          { label: 'small', value: 'small' }
+        ]
       },
       { label: 'span', field: 'span', el: 'InputNumber' },
       { label: 'offset', field: 'offset', el: 'InputNumber' },
@@ -35,8 +35,8 @@ const Layout: React.FC<Props> = (props: Props) => {
         options: [
           { label: 'left', value: 'left' },
           { label: 'right', value: 'right' },
-          { label: 'top', value: 'top' },
-        ],
+          { label: 'top', value: 'top' }
+        ]
       },
       { label: 'labelWidth', field: 'labelWidth', el: 'Input' },
       { label: 'minItemWidth', field: 'minItemWidth', el: 'Input' },
@@ -47,11 +47,11 @@ const Layout: React.FC<Props> = (props: Props) => {
         style: { width: '100%' },
         options: [
           { label: 'true', value: true },
-          { label: 'false', value: false },
-        ],
-      },
-    ]);
-  }, []);
+          { label: 'false', value: false }
+        ]
+      }
+    ])
+  }, [])
 
   return (
     <Form
@@ -61,7 +61,7 @@ const Layout: React.FC<Props> = (props: Props) => {
       labelWidth="100px"
       span={12}
     />
-  );
-};
+  )
+}
 
-export default Layout;
+export default Layout

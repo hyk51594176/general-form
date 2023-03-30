@@ -8,6 +8,12 @@
     "types": ["jest"],
     "strict": true,
     "skipLibCheck": true,
-    "declaration": true
-  }
+    "declaration": true,
+    "allowJs": true,
+    "baseUrl": "./",
+    "paths": {
+      "@hanyk/general-form": ["src/index.ts"]
+    }
+  },
+  "include": ["src", "docs", ".eslintrc.js"]
 }

@@ -1,18 +1,17 @@
-import React, { useMemo } from 'react';
-import { defineColumns, Form } from '@hanyk/general-form';
-import { getList } from '../../api';
-import { useSubmit } from '../../hooks';
-import { ComponentMap } from '../../components';
-import '../../components';
+import React, { useMemo } from 'react'
+import { defineColumns, Form } from '@hanyk/general-form'
+import { getList } from '../../api'
+import { useSubmit } from '../../hooks'
+import { ComponentMap } from '../../components'
 
 const rules = {
   required: true,
-  message: '该字段必填',
-};
+  message: '该字段必填'
+}
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const submit = useSubmit();
+  const submit = useSubmit()
   const columns = useMemo(() => {
     return defineColumns<ComponentMap>([
       { label: '姓名', rules, field: 'name', el: 'Input' },
@@ -26,8 +25,8 @@ export default () => {
         span: 20,
         options: [
           { label: '男', value: 1 },
-          { label: '女', value: 0 },
-        ],
+          { label: '女', value: 0 }
+        ]
       },
       {
         label: '生日',
@@ -37,9 +36,9 @@ export default () => {
         style: { width: '100%' },
         isShow: {
           relyOn: {
-            sex: [0],
-          },
-        },
+            sex: [0]
+          }
+        }
       },
 
       {
@@ -52,9 +51,9 @@ export default () => {
         params: { id: 0 },
         isShow: {
           relyOn: {
-            sex: [1],
-          },
-        },
+            sex: [1]
+          }
+        }
       },
       {
         label: '市',
@@ -70,9 +69,9 @@ export default () => {
           relation: 'and',
           relyOn: {
             province: [undefined],
-            sex: [0],
-          },
-        },
+            sex: [0]
+          }
+        }
       },
       {
         label: '区',
@@ -87,18 +86,18 @@ export default () => {
           relation: 'and',
           relyOn: {
             city: [undefined],
-            sex: [0],
-          },
-        },
+            sex: [0]
+          }
+        }
       },
       {
         label: '',
         span: 24,
         el: 'SubmitBtn',
-        submit,
-      },
-    ]);
-  }, [submit]);
+        submit
+      }
+    ])
+  }, [submit])
 
-  return <Form columns={columns} span={12} />;
-};
+  return <Form columns={columns} span={12} />
+}

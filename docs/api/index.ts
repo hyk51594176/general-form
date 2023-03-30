@@ -1,4 +1,5 @@
-import moment from 'moment';
+import moment from 'moment'
+
 export const getList = (params: { id?: number } = {}) => {
   const data = [
     { label: '山东省', value: 1, parentId: 0 },
@@ -14,12 +15,11 @@ export const getList = (params: { id?: number } = {}) => {
     { label: '西湖区', value: 11, parentId: 5 },
     { label: '余杭区', value: 12, parentId: 5 },
     { label: '海曙区', value: 13, parentId: 6 },
-    { label: '鄞州区', value: 14, parentId: 6 },
-  ];
-
-  if(typeof params.id ==='string') return Promise.reject()
-  return Promise.resolve(data.filter((obj) => obj.parentId === params.id));
-};
+    { label: '鄞州区', value: 14, parentId: 6 }
+  ]
+  if (typeof params.id === 'string') return Promise.reject()
+  return Promise.resolve(data.filter((obj) => obj.parentId === params.id))
+}
 
 export const defaultData = {
   name: '123',
@@ -28,5 +28,5 @@ export const defaultData = {
   province: 1,
   city: 3,
   area: 7,
-  birthday: moment(),
-};
+  birthday: moment()
+}

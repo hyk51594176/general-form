@@ -1,16 +1,17 @@
-import { Button } from 'antd';
-import React from 'react';
-import { defineComponent } from '@hanyk/general-form';
+import { Button } from 'antd'
+import React from 'react'
+import { defineComponent } from '@hanyk/general-form'
+
 type Props = {
-  submit(data: any): void;
-};
+  submit(data: any): void
+}
 
 export default defineComponent<Props>((props) => {
   return (
     <>
       <Button
         onClick={() => {
-          props.context?.validate().then(props.submit);
+          props.context?.validate().then(props.submit)
         }}
         type="primary"
       >
@@ -19,5 +20,5 @@ export default defineComponent<Props>((props) => {
       &nbsp;
       <Button onClick={() => props.context?.resetFields()}>重置</Button>
     </>
-  );
-});
+  )
+})

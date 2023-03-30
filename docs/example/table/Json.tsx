@@ -1,22 +1,21 @@
-import React, { useState, useMemo } from 'react';
-import { defineColumns, Form, FormRef } from '@hanyk/general-form';
-import { ComponentMap } from '../../components';
-import { useSubmit } from '../../hooks';
-import { getList } from '../../api';
-import { Button } from 'antd';
-import { useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react'
+import { defineColumns, Form, FormRef } from '@hanyk/general-form'
+import { Button } from 'antd'
+import { ComponentMap } from '../../components'
+import { useSubmit } from '../../hooks'
+import { getList } from '../../api'
+
 const rules = {
   required: true,
-  message: '该字段必填',
-};
-// eslint-disable-next-line import/no-anonymous-default-export
+  message: '该字段必填'
+}
 export default () => {
   const [data] = useState({
     name: '站三',
-    age: '12',
-  });
-  const submit = useSubmit();
-  const formEl = useRef<FormRef>(null);
+    age: '12'
+  })
+  const submit = useSubmit()
+  const formEl = useRef<FormRef>(null)
   const columns = useMemo(() => {
     return defineColumns<ComponentMap>([
       { label: '姓名', rules, field: `name`, el: 'Input' },
@@ -25,7 +24,7 @@ export default () => {
         rules,
         field: `age`,
         el: 'Input',
-        type: 'number',
+        type: 'number'
       },
       { label: '收货地址', span: 24 },
       {
@@ -40,8 +39,8 @@ export default () => {
             formItem: {
               el: 'HotSelect',
               getList,
-              params: { id: 0 },
-            },
+              params: { id: 0 }
+            }
           },
           {
             dataIndex: 'city',
@@ -49,8 +48,8 @@ export default () => {
             formItem: {
               el: 'HotSelect',
               getList,
-              params: { id: 'province' },
-            },
+              params: { id: 'province' }
+            }
           },
           {
             dataIndex: 'area',
@@ -58,25 +57,25 @@ export default () => {
             formItem: {
               el: 'HotSelect',
               getList,
-              params: { id: 'city' },
-            },
+              params: { id: 'city' }
+            }
           },
           {
             title: '操作',
             formItem: {
-              el: 'TableBtn',
-            },
-          },
-        ],
+              el: 'TableBtn'
+            }
+          }
+        ]
       },
       {
         label: '',
         span: 24,
         submit,
-        el: 'SubmitBtn',
-      },
-    ]);
-  }, [submit]);
+        el: 'SubmitBtn'
+      }
+    ])
+  }, [submit])
 
   return (
     <>
@@ -84,13 +83,13 @@ export default () => {
         onClick={() => {
           formEl.current?.setValue('address', [
             { province: 1, city: 4, area: 9 },
-            { province: 1, city: 3, area: 8 },
-          ]);
+            { province: 1, city: 3, area: 8 }
+          ])
         }}
       >
         默认值
       </Button>
       <Form columns={columns} defaultData={data} span={8} ref={formEl} />
     </>
-  );
-};
+  )
+}

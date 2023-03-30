@@ -1,19 +1,19 @@
-import React, { useMemo } from 'react';
-import { defineColumns, Form } from '@hanyk/general-form';
-import { getList, defaultData } from '../../api';
-import { useSubmit } from '../../hooks';
-import { ComponentMap } from '../../components';
+import React, { useMemo } from 'react'
+import { defineColumns, Form } from '@hanyk/general-form'
+import { getList, defaultData } from '../../api'
+import { useSubmit } from '../../hooks'
+import { ComponentMap } from '../../components'
 
 const isShow = {
   relation: 'and',
   relyOn: {
     show: [true],
-    sex: [0],
-  },
-};
+    sex: [0]
+  }
+}
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const submit = useSubmit();
+  const submit = useSubmit()
   const columns = useMemo(() => {
     return defineColumns<ComponentMap>([
       { label: '姓名', field: 'name', el: 'Input' },
@@ -24,8 +24,8 @@ export default () => {
         el: 'RadioGroup',
         options: [
           { label: '男', value: 1 },
-          { label: '女', value: 0 },
-        ],
+          { label: '女', value: 0 }
+        ]
       },
       {
         label: '生日',
@@ -34,9 +34,9 @@ export default () => {
         style: { width: '100%' },
         isShow: {
           relyOn: {
-            sex: [1],
-          },
-        },
+            sex: [1]
+          }
+        }
       },
 
       {
@@ -49,9 +49,9 @@ export default () => {
           relation: 'or',
           relyOn: {
             show: [true],
-            sex: [0],
-          },
-        },
+            sex: [0]
+          }
+        }
       },
       {
         label: '市',
@@ -64,9 +64,9 @@ export default () => {
           relation: 'or',
           relyOn: {
             show: [true],
-            sex: [0],
-          },
-        },
+            sex: [0]
+          }
+        }
       },
       {
         label: '区',
@@ -78,19 +78,19 @@ export default () => {
           relation: 'and',
           relyOn: {
             show: [true],
-            sex: [0],
-          },
-        },
+            sex: [0]
+          }
+        }
       },
 
       {
         field: 'show',
         span: 10,
         el: 'HeightBtn',
-        submit,
-      },
-    ]);
-  }, []);
+        submit
+      }
+    ])
+  }, [])
 
-  return <Form columns={columns} defaultData={defaultData} span={8} />;
-};
+  return <Form columns={columns} defaultData={defaultData} span={8} />
+}

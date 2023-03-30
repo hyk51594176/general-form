@@ -1,18 +1,16 @@
-import React, { useState, useMemo } from 'react';
-import { defineColumns, Form } from '@hanyk/general-form';
-import { ComponentMap } from '../../components';
-import { useSubmit } from '../../hooks';
+import React, { useState, useMemo } from 'react'
+import { defineColumns, Form } from '@hanyk/general-form'
+import { ComponentMap } from '../../components'
+import { useSubmit } from '../../hooks'
 
 const rules = {
   required: true,
-  message: '该字段必填',
-};
+  message: '该字段必填'
+}
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const [data, setData] = useState<Array<{ name?: string; age?: number }>>([
-    {},
-  ]);
-  const submit = useSubmit();
+  const [data, setData] = useState<Array<{ name?: string; age?: number }>>([{}])
+  const submit = useSubmit()
   const columns = useMemo(() => {
     return defineColumns<ComponentMap>([
       ...data
@@ -23,25 +21,25 @@ export default () => {
             rules,
             field: `[${index}]age`,
             el: 'Input',
-            type: 'number',
+            type: 'number'
           },
           {
             el: 'AddandDel',
             index,
             onDataChange: setData,
 
-            dataSource: data,
-          },
+            dataSource: data
+          }
         ])
         .flat(),
       {
         label: '',
         span: 24,
         submit,
-        el: 'SubmitBtn',
-      },
-    ]);
-  }, [data, submit]);
+        el: 'SubmitBtn'
+      }
+    ])
+  }, [data, submit])
 
-  return <Form columns={columns} defaultData={data} span={6}></Form>;
-};
+  return <Form columns={columns} defaultData={data} span={6} />
+}

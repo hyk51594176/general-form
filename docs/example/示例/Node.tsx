@@ -1,18 +1,19 @@
-import React from 'react';
-import { Input, Radio, DatePicker } from 'antd';
-import { Form, FormItem } from '@hanyk/general-form';
-import { getList, defaultData } from '../../api';
-import { HotSelect } from '../../components';
-import { useSubmit } from '../../hooks';
-const RadioGroup = Radio.Group;
+import React from 'react'
+import { Input, Radio, DatePicker } from 'antd'
+import { Form, FormItem } from '@hanyk/general-form'
+import { getList, defaultData } from '../../api'
+import { HotSelect } from '../../components'
+import { useSubmit } from '../../hooks'
+
+const RadioGroup = Radio.Group
 const isShow = {
   relyOn: {
-    show: [true],
-  },
-};
+    show: [true]
+  }
+}
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const submit = useSubmit();
+  const submit = useSubmit()
   return (
     <Form defaultData={defaultData} span={8} onChange={(e) => {}}>
       <FormItem label="姓名" field="name">
@@ -25,7 +26,7 @@ export default () => {
         <RadioGroup
           options={[
             { label: '男', value: 1 },
-            { label: '女', value: 0 },
+            { label: '女', value: 0 }
           ]}
         />
       </FormItem>
@@ -43,5 +44,5 @@ export default () => {
       </FormItem>
       <FormItem field="show" span={10} el="HeightBtn" submit={submit} />
     </Form>
-  );
-};
+  )
+}

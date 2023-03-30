@@ -3,22 +3,43 @@ import get from 'lodash/get'
 import set from 'lodash/set'
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
-import { SubCallback, EventItem, FormItemInstances, ValidateParams, EventArg, UpdateType, FormItemInstance } from "./interface"
-type Options<T> = { submitShow?: boolean, onChange?: (arg: EventArg<T>) => void }
-export default class Store<T extends Object = {}> {
+import {
+  SubCallback,
+  EventItem,
+  FormItemInstances,
+  ValidateParams,
+  EventArg,
+  UpdateType,
+  FormItemInstance
+} from './interface'
+
+type Options<T> = {
+  submitShow?: boolean
+  onChange?: (arg: EventArg<T>) => void
+}
+export default class Store<T extends Record<string, any> = any> {
   options: Options<T> = {
     submitShow: true
   }
+
   formData!: T
+
   originFormData!: T
+
+  preFromData!: T
+
   eventList: Array<EventItem> = []
+
   itemInstances: FormItemInstances = {}
+
   constructor(defaultData?: T) {
     this.setValues(defaultData)
   }
+
   setOptions(options: Options<T>) {
     Object.assign(this.options, options)
   }
+
   subscribe = <J>(fields: string[], callback: SubCallback<J, T>) => {
     const obj = { fields, callback }
     this.eventList.push(obj)
@@ -26,9 +47,11 @@ export default class Store<T extends Object = {}> {
       this.eventList = this.eventList.filter((item) => item !== obj)
     }
   }
+
   getFields = (fields?: string[]) => {
     return fields ?? Object.keys(this.itemInstances)
   }
+
   clearValidate = (params?: string[]) => {
     const fields = this.getFields(params)
     fields.forEach((field) => {
@@ -38,40 +61,50 @@ export default class Store<T extends Object = {}> {
       }
     })
   }
+
   bootstrap = (field: string, value: any) => {
-    this.eventList.forEach((obj, index) => {
+    this.eventList.forEach((obj) => {
       if (obj.fields.includes(field)) {
         obj.callback?.(field, value)
       }
     })
   }
+
   getValue = (field: string) => get(this.formData, field)
 
   getValues = () => this.formData
 
-  setValue = (field: string, value: any) => {
-    const oldVal = cloneDeep(this.getValue(field))
+  setValue = (field: string, value: any, validate = true) => {
     set(this.formData, field, value)
     this.setValues(this.formData, true)
-    if (!this.itemInstances[field]) {
-      this.bootstrap(field, { value, oldVal, row: this.getValues() })
-    } else {
-      this.validate([field])
+    if (this.itemInstances[field]) {
+      if (validate) {
+        this.validate([field])
+      }
     }
   }
+
   setValues = (data: T = {} as T, isChange?: boolean) => {
+    this.formData = cloneDeep(data)
     if (!isChange) {
       this.originFormData = data
     }
-    this.formData = cloneDeep(data)
-    Object.entries(this.itemInstances).forEach(([field, item]) => {
-      const value = this.getValue(field)
-      const oldVal = item.value
+    const eventKeys = this.eventList.map((o) => o.fields).flat()
+    const instanceKeys = Object.keys(this.itemInstances)
+    const keys = Array.from(new Set([...eventKeys, ...instanceKeys]))
+    keys.forEach((key) => {
+      const value = get(data, key)
+      const item = this.itemInstances[key]
+      let oldVal = item?.value
+      if (!item) {
+        oldVal = get(this.preFromData, key)
+      }
       if (!isEqual(value, oldVal)) {
-        item.setValue(value)
-        this.bootstrap(field, { value, oldVal, row: this.getValues() })
+        item?.setValue?.(value)
+        this.bootstrap(key, { value, oldVal, row: this.getValues() })
       }
     })
+    this.preFromData = data
   }
 
   validate = (params?: string[]) => {
@@ -79,7 +112,7 @@ export default class Store<T extends Object = {}> {
       const obj = this.itemInstances[k]
       return obj && (this.options.submitShow ? obj.show : true)
     })
-    let data = Array.isArray(this.formData) ? [] : {}
+    const data = Array.isArray(this.formData) ? [] : {}
     fields.forEach((k) => {
       set(data, k, this.getValue(k))
     })
@@ -112,13 +145,16 @@ export default class Store<T extends Object = {}> {
         return Promise.reject(err)
       })
   }
+
   resetFields = (data?: T) => {
     this.setValues(data ?? this.originFormData)
     this.clearValidate()
   }
+
   resetField = (field: string, value?: any) => {
     this.setValue(field, value ?? get(this.originFormData, field))
   }
+
   onFiledChange = (field: string, options: any) => {
     this.setValue(field, options.value)
     this.options.onChange?.({
@@ -128,6 +164,7 @@ export default class Store<T extends Object = {}> {
       formData: this.formData
     })
   }
+
   onLifeCycle = (type: UpdateType, field: string, comp: FormItemInstance) => {
     if (type === UpdateType.mount) {
       if (this.itemInstances[field] && this.itemInstances[field].show) {
@@ -136,7 +173,6 @@ export default class Store<T extends Object = {}> {
         }
       }
       this.itemInstances[field] = comp
-      comp.setValue(this.getValue(field))
     } else if (type === UpdateType.unmount) {
       this.clearValidate([field])
       delete this.itemInstances[field]

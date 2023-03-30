@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { Form, FormItem } from '@hanyk/general-form';
-import { useSubmit } from '../../hooks';
-import { getList } from '../../api';
+import React, { useState } from 'react'
+import { Form, FormItem } from '@hanyk/general-form'
+import { useSubmit } from '../../hooks'
+import { getList } from '../../api'
+
 const rules = {
   required: true,
-  message: '该字段必填',
-};
-// eslint-disable-next-line import/no-anonymous-default-export
+  message: '该字段必填'
+}
 export default () => {
   const [data] = useState({
     name: '站三',
     age: '12',
-    address: [{}],
-  });
-  const submit = useSubmit();
+    address: [{}]
+  })
+  const submit = useSubmit()
   const columns = [
     {
       dataIndex: 'province',
@@ -21,8 +21,8 @@ export default () => {
       formItem: {
         el: 'HotSelect',
         getList,
-        params: { id: 0 },
-      },
+        params: { id: 0 }
+      }
     },
     {
       dataIndex: 'city',
@@ -30,8 +30,8 @@ export default () => {
       formItem: {
         el: 'HotSelect',
         getList,
-        params: { id: 'province' },
-      },
+        params: { id: 'province' }
+      }
     },
     {
       dataIndex: 'area',
@@ -39,16 +39,16 @@ export default () => {
       formItem: {
         el: 'HotSelect',
         getList,
-        params: { id: 'city' },
-      },
+        params: { id: 'city' }
+      }
     },
     {
       title: '操作',
       formItem: {
-        el: 'TableBtn',
-      },
-    },
-  ];
+        el: 'TableBtn'
+      }
+    }
+  ]
   return (
     <Form defaultData={data} span={8}>
       <FormItem label="姓名" el="Input" field="name" rules={rules} />
@@ -68,9 +68,9 @@ export default () => {
         whitContext
         el="FormList"
         columns={columns}
-      ></FormItem>
+      />
 
       <FormItem label="" span={24} el="SubmitBtn" submit={submit} />
     </Form>
-  );
-};
+  )
+}

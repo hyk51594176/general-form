@@ -1,35 +1,39 @@
-import { useContext, useEffect, useLayoutEffect, useMemo } from 'react';
-import { useState } from 'react';
-import Context from './Context';
-import {  Rpor } from './interface'
-import Store from './Store';
+import { useContext, useLayoutEffect, useMemo, useState } from 'react'
+import Context from './Context'
+import { OBJ, Rpor } from './interface'
+import Store from './Store'
 
+type State<T, D> = [T, T | undefined, D, string] | []
 
-type State<T, D> = [T, T | undefined, D] | []
-
-
-export const useForm = <T extends Object = {}>() => {
-  return useMemo(() => new Store<T>(), [])
+export const useForm = <T extends OBJ = OBJ>(data?: T) => {
+  return useMemo(() => new Store<T>(data), [])
 }
+type CallBack<T, D> = (state: State<T, D>) => void
 
-export const useWatch = <T = unknown>(field: string | string[], form: Store | Rpor<any>) => {
+export const useFormInstance = () => useContext(Context)
+export const useWatch = <T = unknown, D extends OBJ = any>(
+  field: string | string[],
+  outForm?: Store | Rpor<any>,
+  callBack?: CallBack<T, D>
+) => {
+  const inform = useFormInstance()
+  const form = outForm ?? inform
   const data = form.formData
 
   const [state, setState] = useState<State<T, typeof data>>(
-    Array.isArray(field) ? [] : [form.getValue(field), undefined, form.getValues()]
+    Array.isArray(field)
+      ? []
+      : [form.getValue(field), undefined, form.getValues(), field]
   )
-  useEffect(() => {
-    setTimeout(() => {
-      if (!Array.isArray(field)) {
-        setState([form.getValue(field), undefined, form.getValues()])
+  useLayoutEffect(() => {
+    return form?.subscribe<T>(
+      Array.isArray(field) ? field : [field],
+      (_field, { value, oldVal, row }) => {
+        setState([value, oldVal, row, _field])
+        callBack?.([value, oldVal, row, _field])
       }
-    }, 0);
-    return form?.subscribe<T>(Array.isArray(field) ? field : [field], (field, { value, oldVal, row }) => {
-      setState([value, oldVal, row])
-    })
-  }, [form, field])
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [field])
   return state
-
 }
-
-export const useFormInstance = () => useContext(Context);
