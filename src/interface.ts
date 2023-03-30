@@ -121,7 +121,7 @@ export type FormItemProps<
   FormData = unknown,
   EL = unknown
 > = Common & {
-  el?: EL | ReactElement<CP> | string | null | ComponentType<CP>
+  el?: EL | ReactNode | ComponentType<CP>
   field?: string
   label?: React.ReactNode
   content?: React.ReactNode
