@@ -166,11 +166,9 @@ const FormItem: React.FC<FormItemProps> = (props) => {
           ...propsData,
           children: child.props.children ?? content
         })
-      } else if (child.isReactClass) {
+      } else if (typeof child === 'function') {
         const Comp = child
         return <Comp {...propsData} />
-      } else if (typeof child === 'function') {
-        child = child(propsData)
       } else if (typeof child === 'string' && components[child]) {
         const Comp = components[child]
         return <Comp {...propsData} />
