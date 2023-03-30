@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import Schema from 'async-validator'
 import get from 'lodash/get'
 import set from 'lodash/set'
@@ -17,7 +18,7 @@ type Options<T> = {
   submitShow?: boolean
   onChange?: (arg: EventArg<T>) => void
 }
-export default class Store<T extends Record<string, any> = any> {
+export default class Store<T = {}> {
   options: Options<T> = {
     submitShow: true
   }
@@ -41,6 +42,7 @@ export default class Store<T extends Record<string, any> = any> {
   }
 
   subscribe = <J>(fields: string[], callback: SubCallback<J, T>) => {
+    console.log('store :', fields)
     const obj = { fields, callback }
     this.eventList.push(obj)
     return () => {
@@ -63,6 +65,8 @@ export default class Store<T extends Record<string, any> = any> {
   }
 
   bootstrap = (field: string, value: any) => {
+    console.log('store.bootstrap :', field)
+
     this.eventList.forEach((obj) => {
       if (obj.fields.includes(field)) {
         obj.callback?.(field, value)
@@ -75,7 +79,7 @@ export default class Store<T extends Record<string, any> = any> {
   getValues = () => this.formData
 
   setValue = (field: string, value: any, validate = true) => {
-    set(this.formData, field, value)
+    set(this.formData as Object, field, value)
     this.setValues(this.formData, true)
     if (this.itemInstances[field]) {
       if (validate) {
@@ -101,6 +105,7 @@ export default class Store<T extends Record<string, any> = any> {
       }
       if (!isEqual(value, oldVal)) {
         item?.setValue?.(value)
+
         this.bootstrap(key, { value, oldVal, row: this.getValues() })
       }
     })
@@ -176,7 +181,7 @@ export default class Store<T extends Record<string, any> = any> {
         const value = this.getValue(field)
         if (value === undefined) {
           if (comp.value !== undefined) {
-            set(this.formData, field, comp.value)
+            set(this.formData as Object, field, comp.value)
           }
         } else {
           comp.setValue(value)

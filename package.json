@@ -1,6 +1,6 @@
 {
   "name": "@hanyk/general-form",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "scripts": {
     "start": "dumi dev",
     "docs:build": "dumi build",
@@ -12,7 +12,8 @@
     "prettier": "prettier --write \"**/*.{js,jsx,tsx,ts,less,md,json}\"",
     "test": "umi-test",
     "test:coverage": "umi-test --coverage",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "postpublish": "npm run deploy"
   },
   "files": [
     "dist"

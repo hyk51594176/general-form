@@ -1,5 +1,5 @@
 import React from 'react'
-import { DatePicker } from 'antd'
+import { DatePicker, Input } from 'antd'
 import { Form, FormItem, useForm, useWatch } from '@hanyk/general-form'
 import { getList, defaultData } from '../../api'
 import { HotSelect } from '../../components'
@@ -15,7 +15,6 @@ export default () => {
   const submit = useSubmit()
   const form = useForm(defaultData)
   const arr = useWatch('sex', form)
-  console.log('arr :', arr)
   return (
     <Form span={12} form={form}>
       <FormItem rules={rules} label="姓名" field="name" el="Input" />

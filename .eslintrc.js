@@ -63,6 +63,8 @@ module.exports = {
     '@typescript-eslint/unbound-method': 0,
     '@typescript-eslint/ban-ts-comment': 'off',
     'import/no-unresolved': 0,
-    'react/destructuring-assignment': 0
+    'react/destructuring-assignment': 0,
+    'consistent-return': 0,
+    'jsx-a11y/label-has-associated-control': 0
   }
 }

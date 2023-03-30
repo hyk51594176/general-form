@@ -1,22 +1,23 @@
 import get from 'lodash/get'
 import has from 'lodash/has'
 import isEqual from 'lodash/isEqual'
-import React, { useState } from 'react'
-import { Noop, OBJ, RcCom, RenderProps } from './interface'
+import React, { ComponentType, useState } from 'react'
+import { Noop, OBJ, RenderProps } from './interface'
 import { useDeepEqualEffect } from './useDeepEqualEffect'
 
 type ResData = Array<{ label: string; value: number }>
 
-type Props<T extends OBJ, V> = {
-  getList?: (params: any) => Promise<ResData>
+type Props<V> = {
+  getList?: (params: OBJ) => Promise<ResData>
   params?: {
     [k: string]: string | number | boolean | undefined
   }
-} & RenderProps<T, V>
+  changeClearable?: boolean
+} & RenderProps<V>
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default function <T extends OBJ = OBJ, V = unknown>(
-  Component: RcCom<T> | RcCom<Props<T, V>>,
+export default function <T extends OBJ, V = any>(
+  Component: ComponentType<T>,
   k: keyof T = 'options',
   clearable = true
 ) {
@@ -26,7 +27,7 @@ export default function <T extends OBJ = OBJ, V = unknown>(
     getList,
     changeClearable = clearable,
     ...rest
-  }: Props<T, V>) => {
+  }: Props<V> & T) => {
     const [options, setDataSource] = useState<ResData>([])
     const getData = () => {
       if (!context?.show) return
@@ -41,7 +42,7 @@ export default function <T extends OBJ = OBJ, V = unknown>(
                 : value
           }
         },
-        {} as any
+        {} as OBJ
       )
       getList?.(_params)
         .then((res = []) => {
@@ -91,7 +92,12 @@ export default function <T extends OBJ = OBJ, V = unknown>(
       }
     }, [context?.field, params, context?.show])
 
-    const data = { [k ?? 'options']: options, context, getData, ...rest } as any
+    const data = {
+      [k ?? 'options']: options,
+      context,
+      getData,
+      ...rest
+    } as T
     return <Component {...data} />
   }
 }

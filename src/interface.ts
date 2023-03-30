@@ -1,24 +1,28 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RuleItem } from 'async-validator'
 import {
-  ComponentClass,
-  ComponentProps,
   ComponentType,
   CSSProperties,
-  FC,
+  JSXElementConstructor,
+  ReactElement,
   ReactNode
 } from 'react'
 import Store from './Store'
 
 export type Noop = () => void
 export type OBJ = Record<string, any>
-
+type ComponentProps<T> = T extends JSXElementConstructor<infer P>
+  ? P
+  : T extends keyof JSX.IntrinsicElements
+  ? JSX.IntrinsicElements[T]
+  : {}
 type Layout = {
   span?: string | number
   offset?: string | number
 }
 export interface Comp {
-  [key: string]: any
+  [key: string]: keyof JSX.IntrinsicElements | JSXElementConstructor<any>
 }
 export type EventArg<DefaultData> = {
   field: string
@@ -41,8 +45,9 @@ export type Common = {
   disabled?: boolean
   field?: string
 }
-export type FormProps<T extends OBJ = any, C extends Comp = Comp> = {
-  columns?: Array<FormItemProps<C>>
+
+export type FormProps<T = any, C extends Comp = Comp> = {
+  columns?: Array<FormItemProps<ComponentProps<C[keyof C]>, T>>
   className?: string
   defaultData?: Partial<T>
   notLayout?: boolean
@@ -83,39 +88,22 @@ export interface FormItemInstance {
 export interface FormItemInstances {
   [key: string]: FormItemInstance
 }
-export interface FormRef<T = OBJ> {
-  formData?: T
-  subscribe: <J>(fields: string[], callback: SubCallback<J, T>) => () => void
-  getValue: (field: string) => any
-  getValues: () => T
-  setValue: (field: string, value: any, validate?: boolean) => void
-  clearValidate: (fields?: string[]) => void
-  setValues: (data: Partial<T>) => void
-  validate: (fields?: string[]) => Promise<T>
-  resetFields: (data?: Partial<T>) => void
-  resetField: (field: string, value?: any) => void
-  onFiledChange: (field: string, options: any) => void
-  bootstrap: (field: string, options: any) => void
-  onLifeCycle: (type: UpdateType, field: string, comp: FormItemInstance) => void
-}
+export type FormRef<T = {}> = Omit<Store<T>, 'setOptions'>
 
-export type ContextProp<T = OBJ> = Common & FormRef<T>
-export type Rpor<FormData> = ContextProp<FormData> & {
+export type ContextProp<T extends OBJ = OBJ> = Common & FormRef<T>
+export type Rpor<FormData extends OBJ> = ContextProp<FormData> & {
   show?: boolean
   errorMsg?: string
 }
-export type RenderProps<T extends OBJ = OBJ, V = any, FormData = unknown> = {
+export type RenderProps<V = any, FormData extends OBJ = OBJ> = {
   size?: string
   disabled?: boolean
   value?: V
+  field?: string
   onChange?: (...e: any[]) => void
   context?: Rpor<FormData>
-} & T
-
-interface RenderFn {
-  (props: RenderProps): ReactNode
 }
-export type ContextKey = keyof RenderProps
+
 export type DynamicParameter = {
   relation?: 'and' | 'or'
   notIn?: boolean
@@ -129,10 +117,11 @@ export interface Rule extends RuleItem {
 }
 
 export type FormItemProps<
-  T extends Comp = Comp,
-  K extends keyof T = keyof T
+  CP = {},
+  FormData = unknown,
+  EL = unknown
 > = Common & {
-  el?: K | ReactNode | ComponentType
+  el?: EL | ReactElement<CP> | string | null | ComponentType<CP>
   field?: string
   label?: React.ReactNode
   content?: React.ReactNode
@@ -140,17 +129,21 @@ export type FormItemProps<
   required?: boolean
   rules?: Rule | Rule[]
   errorMsg?: string
-  children?: ReactNode | RenderFn
+  children?: ReactNode
   doNotRegister?: boolean
   onChange?: (value: any, ...args: any[]) => void
   itemStyle?: CSSProperties
   isShow?: boolean | DynamicParameter | undefined
-} & ComponentProps<T[K]>
-export type RcCom<T> = React.FunctionComponent<T> | React.ComponentClass<T, any>
+  value?: any
+  defaultValue?: any
+  context?: Partial<FormRef<FormData>>
+  [k: string]: any
+} & CP
+export type RcCom<T> = ComponentType<T>
 
-export const defineColumns = <T extends Comp>(
-  columns: Array<FormItemProps<T>>
+export const defineColumns = <T, FormData = any>(
+  columns: Array<FormItemProps<ComponentProps<T[keyof T]>, FormData, keyof T>>
 ) => columns
-export const defineComponent = <T extends OBJ = OBJ, V = unknown, D = unknown>(
-  fn: FC<RenderProps<T, D, V>> | ComponentClass<RenderProps<T, D, V>>
+export const defineComponent = <T, V = any, D extends OBJ = OBJ>(
+  fn: ComponentType<RenderProps<V, D> & T>
 ) => fn

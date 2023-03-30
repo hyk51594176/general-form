@@ -1,13 +1,13 @@
 /* eslint-disable react/destructuring-assignment */
-import React, { useState } from 'react'
-import { RenderProps, RcCom, OBJ, Noop } from './interface'
+import React, { ComponentType, useState } from 'react'
+import { RenderProps, Noop } from './interface'
 import { useDeepEqualEffect } from './useDeepEqualEffect'
 
 type Props = {
   fields: string[]
 } & RenderProps
 
-export default function <T extends OBJ = OBJ>(Comp: RcCom<T>) {
+export default function <T>(Comp: ComponentType<T>) {
   return (props: T & Props) => {
     const [, setState] = useState({})
     useDeepEqualEffect(() => {
@@ -21,6 +21,6 @@ export default function <T extends OBJ = OBJ>(Comp: RcCom<T>) {
         unSubscribe?.()
       }
     }, [props.fields])
-    return React.createElement(Comp, props)
+    return <Comp {...props} />
   }
 }

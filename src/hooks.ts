@@ -11,7 +11,7 @@ export const useForm = <T extends OBJ = OBJ>(data?: T) => {
 type CallBack<T, D> = (state: State<T, D>) => void
 
 export const useFormInstance = () => useContext(Context)
-export const useWatch = <T = unknown, D extends OBJ = any>(
+export const useWatch = <T = unknown, D = any>(
   field: string | string[],
   outForm?: Store | Rpor<any>,
   callBack?: CallBack<T, D>

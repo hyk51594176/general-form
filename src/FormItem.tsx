@@ -1,8 +1,4 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-/* eslint-disable react/destructuring-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable prefer-const */
 import isEqual from 'lodash/isEqual'
 import React, { PropsWithChildren, useMemo, useRef, useState } from 'react'
 import { RenderProps, useFormInstance } from '.'
@@ -10,8 +6,16 @@ import { FormItemProps, Rpor, UpdateType } from './interface'
 import { useDeepEqualLayoutEffect } from './useDeepEqualEffect'
 import { components } from './utils'
 
+const getTriggerType = (rules: FormItemProps['rules']) => {
+  const triggerKey = 'onChange'
+  if (!rules) return triggerKey
+  return (Array.isArray(rules) ? rules : [rules]).reduce((str, { trigger }) => {
+    if (trigger) str = trigger
+    return str
+  }, 'onChange')
+}
 const FormItem: React.FC<FormItemProps> = (props) => {
-  let {
+  const {
     el,
     field,
     span,
@@ -43,23 +47,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
   const unSubscribe = useRef<any>()
   const itemRef = useRef<Rpor<any>>({} as Rpor<any>)
 
-  const setValue = (val: any) => {
-    if (!isEqual(val, itemInstance.current.value)) {
-      itemInstance.current.value = val
-      updateState({})
-    }
-  }
-  const setErrorMsg = (errMsg?: string) => {
-    itemInstance.current.errorMsg = errMsg
-    updateState({})
-  }
-  const setSateShow = (flag: boolean) => {
-    itemInstance.current.show = flag
-    if (field) {
-      contextData.clearValidate([field])
-    }
-    updateState({})
-  }
   const getIsShow = (show: FormItemProps['isShow']) => {
     if (typeof show === 'boolean') {
       return show
@@ -75,7 +62,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
             flag = val?.includes(contextData.getValue(k))
           } else if (typeof val === 'string') {
             try {
-              let fn = new Function(`return ${val}`)()
+              const fn = new Function(`return ${val}`)()
               flag = fn(contextData.getValue(k), contextData)
             } catch (error) {
               flag = false
@@ -97,34 +84,154 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     }
     return true
   }
+
   const itemInstance = useRef({
-    setErrorMsg,
+    setErrorMsg(errMsg?: string) {
+      itemInstance.current.errorMsg = errMsg
+      updateState({})
+    },
+    setSateShow(flag: boolean) {
+      itemInstance.current.show = flag
+      if (field) {
+        contextData.clearValidate([field])
+      }
+      updateState({})
+    },
     errorMsg,
-    setValue,
+    setValue(val: any) {
+      if (!isEqual(val, itemInstance.current.value)) {
+        itemInstance.current.value = val
+        updateState({})
+      }
+    },
     value:
       (field ? contextData.getValue(field) : other.value) ?? other.defaultValue,
     show: getIsShow(isShow),
     rules
   })
-
   const isRequired = useMemo(() => {
     if (!rules) return required
     if (Array.isArray(rules)) return rules.some((item) => item.required)
     return rules.required
   }, [required, rules])
 
-  const getTriggerType = () => {
-    let triggerKey = 'onChange'
-    if (!rules) return triggerKey
-    return (Array.isArray(rules) ? rules : [rules]).reduce(
-      (str, { trigger }) => {
-        if (trigger) str = trigger
-        return str
-      },
-      'onChange'
-    )
+  const textAlign = useMemo(
+    () => labelAlign ?? contextData.labelAlign,
+    [contextData.labelAlign, labelAlign]
+  )
+  const labelStyles = useMemo(
+    () => ({
+      width: labelWidth ?? contextData.labelWidth,
+      textAlign: textAlign === 'top' ? 'left' : textAlign
+    }),
+    [contextData.labelWidth, labelWidth, textAlign]
+  )
+
+  const handlerChange = (e: any, ...args: any[]) => {
+    let value!: any
+    try {
+      value = e.target.value
+    } catch (error) {
+      value = e
+    }
+    if (isEqual(value, itemInstance.current.value)) return
+    if (field) {
+      contextData.onFiledChange(field, {
+        value,
+        e,
+        ...args,
+        rules,
+        oldVal: itemInstance.current.value
+      })
+    }
+    onChange?.(e, ...args)
+  }
+  const setIsShow = (show: FormItemProps['isShow']) => {
+    if (unSubscribe.current) {
+      unSubscribe.current()
+      unSubscribe.current = null
+    }
+    if (typeof show === 'boolean') {
+      itemInstance.current.setSateShow(getIsShow(isShow))
+    } else {
+      const keys = Object.keys(show?.relyOn ?? {})
+      if (keys.length) {
+        itemInstance.current.setSateShow(getIsShow(isShow))
+        unSubscribe.current = contextData.subscribe(keys, () => {
+          itemInstance.current.setSateShow(getIsShow(isShow))
+        })
+      } else {
+        itemInstance.current.setSateShow(true)
+      }
+    }
   }
 
+  useDeepEqualLayoutEffect(() => {
+    if (field && !doNotRegister) {
+      contextData.onLifeCycle(UpdateType.mount, field, itemInstance.current)
+    }
+  }, [field, doNotRegister])
+
+  useDeepEqualLayoutEffect(() => {
+    return () => {
+      if (field) {
+        contextData.onLifeCycle(UpdateType.unmount, field, itemInstance.current)
+      }
+    }
+  }, [field])
+
+  useDeepEqualLayoutEffect(() => {
+    itemInstance.current.setErrorMsg(errorMsg)
+  }, [errorMsg])
+
+  useDeepEqualLayoutEffect(() => {
+    setIsShow(isShow)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isShow])
+
+  useDeepEqualLayoutEffect(() => {
+    itemInstance.current.rules = rules
+  }, [rules])
+
+  const classNames = useMemo(() => {
+    const str: string[] = ['hyk-form-item']
+    const _span = span ?? contextData.span
+    const _offset = offset ?? contextData.offset
+    const topClass = textAlign === 'top' ? 'hyk-form-item-top' : ''
+    const errorClass = itemInstance.current.errorMsg ? 'item_error' : ''
+    if (_span) {
+      str.push(`col-${_span}`)
+    }
+    if (_offset) {
+      str.push(`col-offset-${_offset}`)
+    }
+    const arr = ['xs', 'sm', 'md', 'lg', 'xl']
+    arr.forEach((key) => {
+      const o =
+        props[key as 'xs'] ?? contextData[key as keyof typeof contextData]
+      if (!o) return ''
+      if (typeof o === 'object') {
+        if (o.span) {
+          str.push(`col-${key}-${o.span}`)
+        }
+        if (o.offset) {
+          str.push(`col-${key}-offset-${o.offset}`)
+        }
+      } else {
+        str.push(`col-${key}-${o}`)
+      }
+    })
+    if (topClass) {
+      str.push(topClass)
+    }
+    if (errorClass) {
+      str.push(errorClass)
+    }
+    if (itemClassName) {
+      str.push(itemClassName)
+    }
+    return str.join(' ')
+  }, [contextData, itemClassName, offset, props, span, textAlign])
   const getChildren = () => {
     let child: any = children ?? el
     if (child) {
@@ -152,12 +259,12 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         }
       }
 
-      const triggerType = getTriggerType() as 'onChange'
+      const triggerType = getTriggerType(rules) as 'onChange'
       if (field && triggerType) {
         const fn = propsData[triggerType]
         propsData[triggerType] = (...args: any[]) => {
           fn?.(...args)
-          contextData.validate([field as string])
+          contextData.validate([field])
         }
       }
       if (React.isValidElement<any>(child)) {
@@ -177,119 +284,9 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     }
     return itemInstance.current.value
   }
-  const handlerChange = (e: any, ...args: any[]) => {
-    let value!: any
-    try {
-      value = e.target.value
-    } catch (error) {
-      value = e
-    }
-    if (isEqual(value, itemInstance.current.value)) return
-    if (field) {
-      contextData.onFiledChange(field, {
-        value,
-        e,
-        ...args,
-        rules,
-        oldVal: itemInstance.current.value
-      })
-    }
-    onChange?.(e, ...args)
-  }
-  const setIsShow = (show: FormItemProps['isShow']) => {
-    if (unSubscribe.current) {
-      unSubscribe.current()
-      unSubscribe.current = null
-    }
-    if (typeof show === 'boolean') {
-      setSateShow(getIsShow(isShow))
-    } else {
-      const keys = Object.keys(show?.relyOn ?? {})
-      if (keys.length) {
-        setSateShow(getIsShow(isShow))
-        unSubscribe.current = contextData.subscribe(keys, () => {
-          setSateShow(getIsShow(isShow))
-        })
-      } else {
-        setSateShow(true)
-      }
-    }
-  }
-
-  useDeepEqualLayoutEffect(() => {
-    if (field && !doNotRegister) {
-      contextData.onLifeCycle(UpdateType.mount, field, itemInstance.current)
-    }
-  }, [field, doNotRegister])
-
-  useDeepEqualLayoutEffect(() => {
-    return () => {
-      if (field) {
-        contextData.onLifeCycle(UpdateType.unmount, field, itemInstance.current)
-      }
-    }
-  }, [field])
-
-  useDeepEqualLayoutEffect(() => {
-    setErrorMsg(errorMsg)
-  }, [errorMsg])
-
-  useDeepEqualLayoutEffect(() => {
-    setIsShow(isShow)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isShow])
-
-  useDeepEqualLayoutEffect(() => {
-    itemInstance.current.rules = rules
-  }, [rules])
-
-  const textAlign = labelAlign ?? contextData.labelAlign
-  const labelStyles = {
-    width: labelWidth ?? contextData.labelWidth,
-    textAlign: textAlign === 'top' ? 'left' : textAlign
-  }
-
-  const getClassName = () => {
-    const str: string[] = ['hyk-form-item']
-    const _span = span ?? contextData.span
-    const _offset = offset ?? contextData.offset
-    const topClass = textAlign === 'top' ? 'hyk-form-item-top' : ''
-    const errorClass = itemInstance.current.errorMsg ? 'item_error' : ''
-    if (_span) {
-      str.push(`col-${_span}`)
-    }
-    if (_offset) {
-      str.push(`col-offset-${_offset}`)
-    }
-    // eslint-disable-next-line consistent-return
-    ;['xs', 'sm', 'md', 'lg', 'xl'].forEach((key) => {
-      const o = props[key] ?? contextData[key as keyof typeof contextData]
-      if (!o) return ''
-      if (typeof o === 'object') {
-        if (o.span) {
-          str.push(`col-${key}-${o.span}`)
-        }
-        if (o.offset) {
-          str.push(`col-${key}-offset-${o.offset}`)
-        }
-      } else {
-        str.push(`col-${key}-${o}`)
-      }
-    })
-    if (topClass) {
-      str.push(topClass)
-    }
-    if (errorClass) {
-      str.push(errorClass)
-    }
-    if (itemClassName) {
-      str.push(itemClassName)
-    }
-    return str.join(' ')
-  }
   return (
     <div
-      className={getClassName()}
+      className={classNames}
       style={{
         minWidth: minItemWidth ?? contextData.minItemWidth,
         ...itemStyle,

@@ -28,9 +28,9 @@ export default defineComponent<Props, any[]>((props) => {
               tableField={props.context?.field}
               context={{
                 getValues: () =>
-                  props.context?.getValue(props.context.field as string)[0],
-                subscribe: (list: any[], callBack: any) => {
-                  return props.context?.subscribe(
+                  props.context?.getValue(props.context.field as string)[index],
+                subscribe: (list, callBack) => {
+                  return props.context!.subscribe(
                     list.map(
                       (key) => `${props.context?.field}[${index}][${key}]`
                     ),
