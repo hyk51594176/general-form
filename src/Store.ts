@@ -172,7 +172,17 @@ export default class Store<T extends Record<string, any> = any> {
           console.error(`重复的field字段定义: ${field}`)
         }
       }
-      this.itemInstances[field] = comp
+      if (comp.show) {
+        const value = this.getValue(field)
+        if (value === undefined) {
+          if (comp.value !== undefined) {
+            set(this.formData, field, comp.value)
+          }
+        } else {
+          comp.setValue(value)
+        }
+        this.itemInstances[field] = comp
+      }
     } else if (type === UpdateType.unmount) {
       this.clearValidate([field])
       delete this.itemInstances[field]
