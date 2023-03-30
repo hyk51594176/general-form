@@ -109,6 +109,15 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     show: getIsShow(isShow),
     rules
   })
+  itemInstance.current.rules = rules
+  useDeepEqualLayoutEffect(() => {
+    if (other.value !== undefined && field) {
+      contextData.onFiledChange?.(field, {
+        value: other.value,
+        oldVal: itemInstance.current.value
+      })
+    }
+  }, [other.value, field])
   const isRequired = useMemo(() => {
     if (!rules) return required
     if (Array.isArray(rules)) return rules.some((item) => item.required)
@@ -188,10 +197,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     setIsShow(isShow)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isShow])
-
-  useDeepEqualLayoutEffect(() => {
-    itemInstance.current.rules = rules
-  }, [rules])
 
   const classNames = useMemo(() => {
     const str: string[] = ['hyk-form-item']
@@ -273,9 +278,11 @@ const FormItem: React.FC<FormItemProps> = (props) => {
           ...propsData,
           children: child.props.children ?? content
         })
-      } else if (typeof child === 'function') {
+      } else if (child.isReactClass) {
         const Comp = child
         return <Comp {...propsData} />
+      } else if (typeof child === 'function') {
+        child = child(propsData)
       } else if (typeof child === 'string' && components[child]) {
         const Comp = components[child]
         return <Comp {...propsData} />
@@ -311,4 +318,4 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     </div>
   )
 }
-export default FormItem
+export default React.memo(FormItem)

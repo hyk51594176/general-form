@@ -19,19 +19,19 @@ type Options<T> = {
   onChange?: (arg: EventArg<T>) => void
 }
 export default class Store<T = {}> {
-  options: Options<T> = {
+  private options: Options<T> = {
     submitShow: true
   }
 
   formData!: T
 
-  originFormData!: T
+  private originFormData!: T
 
-  preFromData!: T
+  private preFromData!: T
 
-  eventList: Array<EventItem> = []
+  private eventList: Array<EventItem> = []
 
-  itemInstances: FormItemInstances = {}
+  private itemInstances: FormItemInstances = {}
 
   constructor(defaultData?: T) {
     this.setValues(defaultData)
@@ -39,6 +39,10 @@ export default class Store<T = {}> {
 
   setOptions(options: Options<T>) {
     Object.assign(this.options, options)
+  }
+
+  private getItemInstance = (field: string) => {
+    return this.itemInstances[field]?.find((obj) => obj.show)
   }
 
   subscribe = <J>(fields: string[], callback: SubCallback<J, T>) => {
@@ -56,7 +60,7 @@ export default class Store<T = {}> {
   clearValidate = (params?: string[]) => {
     const fields = this.getFields(params)
     fields.forEach((field) => {
-      const obj = this.itemInstances[field]
+      const obj = this.getItemInstance(field)
       if (obj && obj.errorMsg) {
         obj.setErrorMsg()
       }
@@ -93,26 +97,28 @@ export default class Store<T = {}> {
     const eventKeys = this.eventList.map((o) => o.fields).flat()
     const instanceKeys = Object.keys(this.itemInstances)
     const keys = Array.from(new Set([...eventKeys, ...instanceKeys]))
-    keys.forEach((key) => {
-      const value = get(data, key)
-      const item = this.itemInstances[key]
+    keys.forEach((field) => {
+      const value = get(data, field)
+      const item = this.itemInstances[field]?.[0]
       let oldVal = item?.value
       if (!item) {
-        oldVal = get(this.preFromData, key)
+        oldVal = get(this.preFromData, field)
       }
       if (!isEqual(value, oldVal)) {
-        item?.setValue?.(value)
-
-        this.bootstrap(key, { value, oldVal, row: this.getValues() })
+        this.itemInstances[field]?.forEach((obj) => {
+          obj?.setValue?.(value)
+        })
+        this.bootstrap(field, { value, oldVal, row: this.getValues() })
       }
     })
     this.preFromData = data
   }
 
   validate = (params?: string[]) => {
-    const fields = this.getFields(params).filter((k) => {
-      const obj = this.itemInstances[k]
-      return obj && (this.options.submitShow ? obj.show : true)
+    const fields = this.getFields(params).filter((field) => {
+      return this.itemInstances[field]?.some(
+        (obj) => obj && (this.options.submitShow ? obj.show : true)
+      )
     })
     const data = Array.isArray(this.formData) ? [] : {}
     fields.forEach((k) => {
@@ -121,7 +127,8 @@ export default class Store<T = {}> {
     if (!fields.length) return Promise.resolve(data)
     const validateParams: ValidateParams = fields.reduce(
       ({ rule, source }: ValidateParams, field) => {
-        const obj = this.itemInstances[field]
+        const obj =
+          this.getItemInstance(field) ?? this.itemInstances[field]?.[0]
         if (obj && obj.rules) {
           rule[field] = obj.rules
           source[field] = obj.value
@@ -142,7 +149,8 @@ export default class Store<T = {}> {
       .catch((err) => {
         const { errors = [] } = err
         errors.forEach((obj: any) => {
-          this.itemInstances[obj.field].setErrorMsg(obj.message)
+          const item = this.getItemInstance(obj.field)
+          item?.setErrorMsg(obj.message)
         })
         return Promise.reject(err)
       })
@@ -169,10 +177,11 @@ export default class Store<T = {}> {
 
   onLifeCycle = (type: UpdateType, field: string, comp: FormItemInstance) => {
     if (type === UpdateType.mount) {
-      if (this.itemInstances[field] && this.itemInstances[field].show) {
-        if (this.itemInstances[field] !== comp) {
-          console.error(`重复的field字段定义: ${field}`)
-        }
+      if (this.itemInstances[field]) {
+        this.itemInstances[field].push(comp)
+        console.error(`重复定义的field=>>${field}`)
+      } else {
+        this.itemInstances[field] = [comp]
       }
       if (comp.show) {
         const value = this.getValue(field)
@@ -183,11 +192,12 @@ export default class Store<T = {}> {
         } else {
           comp.setValue(value)
         }
-        this.itemInstances[field] = comp
       }
     } else if (type === UpdateType.unmount) {
-      this.clearValidate([field])
-      delete this.itemInstances[field]
+      comp.setErrorMsg()
+      this.itemInstances[field] = this.itemInstances[field]?.filter(
+        (o) => o !== comp
+      )
     }
   }
 }
