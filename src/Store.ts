@@ -42,7 +42,6 @@ export default class Store<T = {}> {
   }
 
   subscribe = <J>(fields: string[], callback: SubCallback<J, T>) => {
-    console.log('store :', fields)
     const obj = { fields, callback }
     this.eventList.push(obj)
     return () => {
@@ -65,8 +64,6 @@ export default class Store<T = {}> {
   }
 
   bootstrap = (field: string, value: any) => {
-    console.log('store.bootstrap :', field)
-
     this.eventList.forEach((obj) => {
       if (obj.fields.includes(field)) {
         obj.callback?.(field, value)
