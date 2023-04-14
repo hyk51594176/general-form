@@ -296,7 +296,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       className={classNames}
       style={{
         minWidth: minItemWidth ?? contextData.minItemWidth,
-        ...itemStyle,
+        ...(itemStyle ?? {}),
         display: itemInstance.current.show ? undefined : 'none'
       }}
     >

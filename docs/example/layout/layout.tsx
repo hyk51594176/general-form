@@ -2,18 +2,25 @@ import { Common, defineColumns, Form } from '@hanyk/general-form'
 import React, { useMemo } from 'react'
 import { ComponentMap } from '../../components'
 
-type LayoutData = Omit<Common, 'field'>
+export type LayoutData = Omit<Common, 'field'> & { text?: boolean }
 
 type Props = {
   onChange(e: LayoutData): void
 }
-const defaultData = {
+export const layoutData: LayoutData = {
   labelWidth: '80px',
-  labelAlign: 'right'
+  labelAlign: 'right',
+  span: 8,
+  minItemWidth: '100px'
 }
 const Layout: React.FC<Props> = (props: Props) => {
   const columns = useMemo(() => {
     return defineColumns<ComponentMap>([
+      {
+        label: '文本模式',
+        field: 'text',
+        el: 'Switch'
+      },
       {
         label: 'size',
         field: 'size',
@@ -39,15 +46,21 @@ const Layout: React.FC<Props> = (props: Props) => {
         ]
       },
       { label: 'labelWidth', field: 'labelWidth', el: 'Input' },
-      { label: 'minItemWidth', field: 'minItemWidth', el: 'Input' },
+      {
+        label: 'minItemWidth',
+        field: 'minItemWidth',
+        el: 'Input'
+      },
+
       {
         label: 'disabled',
         field: 'disabled',
         el: 'Select',
         style: { width: '100%' },
         options: [
-          { label: 'true', value: true },
-          { label: 'false', value: false }
+          { label: '禁用', value: true },
+          { label: '启用', value: false },
+          { label: '文本', value: 'text' }
         ]
       }
     ])
@@ -57,7 +70,7 @@ const Layout: React.FC<Props> = (props: Props) => {
     <Form
       columns={columns}
       onChange={(e) => props.onChange(e.formData)}
-      defaultData={defaultData}
+      defaultData={layoutData}
       labelWidth="100px"
       span={12}
     />
