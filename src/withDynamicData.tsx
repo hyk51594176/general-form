@@ -93,10 +93,10 @@ export default function <T extends OBJ, V = any>(
     }, [context?.field, params, context?.show])
 
     const data = {
-      [k ?? 'options']: options,
       context,
       getData,
-      ...rest
+      ...rest,
+      [k ?? 'options']: rest[k as keyof typeof rest] ?? options
     } as T
     return <Component {...data} />
   }
