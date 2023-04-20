@@ -1,4 +1,4 @@
-# @dtd/general-form
+# @hanyk/general-form
 
 ```bash
   npm install @hanyk/general-form
