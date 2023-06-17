@@ -175,29 +175,31 @@ export default class Store<T = {}> {
     })
   }
 
-  onLifeCycle = (type: UpdateType, field: string, comp: FormItemInstance) => {
-    if (type === UpdateType.mount) {
-      if (this.itemInstances[field]) {
-        this.itemInstances[field].push(comp)
-        console.error(`重复定义的field=>>${field}`)
-      } else {
-        this.itemInstances[field] = [comp]
-      }
-      if (comp.show) {
-        const value = this.getValue(field)
-        if (value === undefined) {
-          if (comp.value !== undefined) {
-            set(this.formData as Object, field, comp.value)
-          }
-        } else {
-          comp.setValue(value)
+  onLifeCycle = (field: string, comp: FormItemInstance) => {
+    if (this.itemInstances[field]) {
+      this.itemInstances[field].push(comp)
+      console.error(`重复定义的field=>>${field}`)
+    } else {
+      this.itemInstances[field] = [comp]
+    }
+    if (comp.show) {
+      const value = this.getValue(field)
+      if (value === undefined) {
+        if (comp.value !== undefined) {
+          set(this.formData as Object, field, comp.value)
         }
+      } else {
+        comp.setValue(value)
       }
-    } else if (type === UpdateType.unmount) {
+    }
+    return () => {
       comp.setErrorMsg()
       this.itemInstances[field] = this.itemInstances[field]?.filter(
         (o) => o !== comp
       )
+      if (!this.itemInstances[field]?.length) {
+        delete this.itemInstances[field]
+      }
     }
   }
 }

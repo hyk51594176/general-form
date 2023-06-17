@@ -177,17 +177,11 @@ const FormItem: React.FC<FormItemProps> = (props) => {
 
   useDeepEqualLayoutEffect(() => {
     if (field && !doNotRegister) {
-      contextData.onLifeCycle(UpdateType.mount, field, itemInstance.current)
+      itemInstance.current.value =
+        contextData.getValue(field) ?? other.defaultValue
+      return contextData.onLifeCycle(field, itemInstance.current)
     }
   }, [field, doNotRegister])
-
-  useDeepEqualLayoutEffect(() => {
-    return () => {
-      if (field) {
-        contextData.onLifeCycle(UpdateType.unmount, field, itemInstance.current)
-      }
-    }
-  }, [field])
 
   useDeepEqualLayoutEffect(() => {
     itemInstance.current.setErrorMsg(errorMsg)
