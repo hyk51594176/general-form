@@ -83,12 +83,8 @@ export default function <T extends OBJ, V = any>(
 
     useDeepEqualEffect(() => {
       const list = Object.values(params || {}) as string[]
-      let unSubscribe!: Noop | undefined
       if (list.length && context?.field) {
-        unSubscribe = context?.subscribe?.(list, getData)
-      }
-      return () => {
-        unSubscribe?.()
+        return context?.subscribe?.(list, getData)
       }
     }, [context?.field, params, context?.show])
 

@@ -3,7 +3,7 @@ import Context from './Context'
 import { OBJ, Rpor } from './interface'
 import Store from './Store'
 
-type State<T, D> = [T, T | undefined, D, string] | []
+type State<T, D> = [T, D]
 
 export const useForm = <T extends OBJ = OBJ>(data?: T) => {
   return useMemo(() => new Store<T>(data), [])
@@ -22,17 +22,17 @@ export const useWatch = <T = unknown, D = any>(
 
   const [state, setState] = useState<State<T, typeof data>>(
     Array.isArray(field)
-      ? []
-      : [form.getValue(field), undefined, form.getValues(), field]
+      ? [field.map((k) => form.getValue(k)), form?.getValues()]
+      : [form.getValue(field), form?.getValues()]
   )
   useLayoutEffect(() => {
-    return form?.subscribe<T>(
-      Array.isArray(field) ? field : [field],
-      (_field, { value, oldVal, row }) => {
-        setState([value, oldVal, row, _field])
-        callBack?.([value, oldVal, row, _field])
-      }
-    )
+    const isArr = Array.isArray(field)
+    const list = isArr ? field : [field]
+    return form?.subscribe<T>(list, (_field, { value, newValueList, row }) => {
+      const val: State<T, D> = [(isArr ? newValueList : value) as any, row]
+      setState(val)
+      callBack?.(val)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [field])
   return state

@@ -12,7 +12,7 @@ export default () => {
   const [data, setData] = useState<Array<{ name?: string; age?: number }>>([{}])
   const submit = useSubmit()
   const columns = useMemo(() => {
-    return defineColumns<ComponentMap>([
+    return defineColumns<ComponentMap, any>([
       ...data
         .map((_, index) => [
           { label: '姓名', rules, field: `[${index}]name`, el: 'Input' },
@@ -26,9 +26,8 @@ export default () => {
           {
             el: 'AddandDel',
             index,
-            onDataChange: setData,
-
-            dataSource: data
+            showDel: data.length > 1,
+            onDataChange: setData
           }
         ])
         .flat(),
@@ -41,5 +40,5 @@ export default () => {
     ])
   }, [data, submit])
 
-  return <Form columns={columns} defaultData={data} span={6} />
+  return <Form columns={columns} span={6} defaultData={data} />
 }

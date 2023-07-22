@@ -5,7 +5,6 @@ import {
   ComponentType,
   CSSProperties,
   JSXElementConstructor,
-  ReactElement,
   ReactNode
 } from 'react'
 import Store from './Store'
@@ -46,7 +45,7 @@ export type Common = {
   field?: string
 }
 
-export type FormProps<T = any, C extends Comp = Comp> = {
+export type FormProps<T extends Object = {}, C extends Comp = Comp> = {
   columns?: Array<FormItemProps<ComponentProps<C[keyof C]>, T>>
   className?: string
   defaultData?: Partial<T>
@@ -63,7 +62,13 @@ export enum UpdateType {
 }
 export type SubCallback<V = any, D = any> = (
   field: string,
-  value: { value: V; oldVal: V; row: D }
+  value: {
+    value: V
+    oldVal: V
+    row: D
+    newValueList: any[]
+    oldValueList: any[]
+  }
 ) => void
 export interface EventItem {
   fields: string[]
@@ -82,13 +87,15 @@ export interface FormItemInstance {
   rules?: RuleItem | RuleItem[]
   value?: any
   show?: boolean
-  setValue(v: any): void
   setErrorMsg(msg?: string): void
 }
 export interface FormItemInstances {
   [key: string]: Array<FormItemInstance>
 }
-export type FormRef<T = {}> = Omit<Store<T>, 'setOptions'>
+export type FormRef<T extends Object = {}> = Omit<
+  Store<T>,
+  'setOptions' | 'destroy'
+>
 
 export type ContextProp<T extends OBJ = OBJ> = Common & FormRef<T>
 export type Rpor<FormData extends OBJ> = ContextProp<FormData> & {
@@ -118,7 +125,7 @@ export interface Rule extends RuleItem {
 
 export type FormItemProps<
   CP = {},
-  FormData = unknown,
+  FormData extends Object = {},
   EL = unknown
 > = Common & {
   el?: EL | ReactNode | ComponentType<CP>
@@ -141,7 +148,7 @@ export type FormItemProps<
 } & CP
 export type RcCom<T> = ComponentType<T>
 
-export const defineColumns = <T, FormData = any>(
+export const defineColumns = <T, FormData extends Object = {}>(
   columns: Array<FormItemProps<ComponentProps<T[keyof T]>, FormData, keyof T>>
 ) => columns
 export const defineComponent = <T, V = any, D extends OBJ = OBJ>(

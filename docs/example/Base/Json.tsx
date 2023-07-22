@@ -13,9 +13,8 @@ const rules = {
 export default () => {
   const submit = useSubmit()
   const columns = useMemo(() => {
-    return defineColumns<ComponentMap>([
+    return defineColumns<ComponentMap, any>([
       { label: '姓名', rules, field: 'name', el: 'Input' },
-
       { label: '年龄', rules, field: 'age', el: 'Input', type: 'number' },
       {
         label: '性别',

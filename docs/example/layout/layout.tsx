@@ -69,7 +69,9 @@ const Layout: React.FC<Props> = (props: Props) => {
   return (
     <Form
       columns={columns}
-      onChange={(e) => props.onChange(e.formData)}
+      onChange={(e) => {
+        props.onChange({ ...e.formData } as LayoutData)
+      }}
       defaultData={layoutData}
       labelWidth="100px"
       span={12}

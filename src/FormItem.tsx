@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import isEqual from 'lodash/isEqual'
-import React, { PropsWithChildren, useMemo, useRef, useState } from 'react'
+import React, {
+  PropsWithChildren,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import { RenderProps, useFormInstance } from '.'
-import { FormItemProps, Rpor, UpdateType } from './interface'
+import { FormItemProps, Rpor } from './interface'
 import { useDeepEqualLayoutEffect } from './useDeepEqualEffect'
 import { components } from './utils'
 
@@ -14,6 +19,8 @@ const getTriggerType = (rules: FormItemProps['rules']) => {
     return str
   }, 'onChange')
 }
+const responsiveList = ['xs', 'sm', 'md', 'lg', 'xl']
+
 const FormItem: React.FC<FormItemProps> = (props) => {
   const {
     el,
@@ -44,7 +51,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
   } = props
   const contextData = useFormInstance()
   const [, updateState] = useState({})
-  const unSubscribe = useRef<any>()
   const itemRef = useRef<Rpor<any>>({} as Rpor<any>)
 
   const getIsShow = (show: FormItemProps['isShow']) => {
@@ -98,12 +104,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       updateState({})
     },
     errorMsg,
-    setValue(val: any) {
-      if (!isEqual(val, itemInstance.current.value)) {
-        itemInstance.current.value = val
-        updateState({})
-      }
-    },
     value:
       (field ? contextData.getValue(field) : other.value) ?? other.defaultValue,
     show: getIsShow(isShow),
@@ -112,10 +112,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
   itemInstance.current.rules = rules
   useDeepEqualLayoutEffect(() => {
     if (other.value !== undefined && field) {
-      contextData.onFiledChange?.(field, {
-        value: other.value,
-        oldVal: itemInstance.current.value
-      })
+      contextData.setValue(field, other.value)
     }
   }, [other.value, field])
   const isRequired = useMemo(() => {
@@ -143,7 +140,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     } catch (error) {
       value = e
     }
-    if (isEqual(value, itemInstance.current.value)) return
     if (field) {
       contextData.onFiledChange(field, {
         value,
@@ -155,25 +151,14 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     }
     onChange?.(e, ...args)
   }
-  const setIsShow = (show: FormItemProps['isShow']) => {
-    if (unSubscribe.current) {
-      unSubscribe.current()
-      unSubscribe.current = null
-    }
-    if (typeof show === 'boolean') {
-      itemInstance.current.setSateShow(getIsShow(isShow))
-    } else {
-      const keys = Object.keys(show?.relyOn ?? {})
-      if (keys.length) {
-        itemInstance.current.setSateShow(getIsShow(isShow))
-        unSubscribe.current = contextData.subscribe(keys, () => {
-          itemInstance.current.setSateShow(getIsShow(isShow))
-        })
-      } else {
-        itemInstance.current.setSateShow(true)
-      }
-    }
-  }
+  useLayoutEffect(() => {
+    if (!field) return
+    return contextData.subscribe([field], (k, { value }) => {
+      itemInstance.current.value = value
+      updateState({})
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [field])
 
   useDeepEqualLayoutEffect(() => {
     if (field && !doNotRegister) {
@@ -188,7 +173,18 @@ const FormItem: React.FC<FormItemProps> = (props) => {
   }, [errorMsg])
 
   useDeepEqualLayoutEffect(() => {
-    setIsShow(isShow)
+    if (typeof isShow === 'boolean') {
+      itemInstance.current.setSateShow(isShow)
+    } else {
+      const keys = Object.keys(isShow?.relyOn ?? {})
+      if (keys.length) {
+        itemInstance.current.setSateShow(getIsShow(isShow))
+        return contextData.subscribe(keys, () => {
+          itemInstance.current.setSateShow(getIsShow(isShow))
+        })
+      }
+      itemInstance.current.setSateShow(true)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isShow])
 
@@ -204,8 +200,7 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     if (_offset) {
       str.push(`col-offset-${_offset}`)
     }
-    const arr = ['xs', 'sm', 'md', 'lg', 'xl']
-    arr.forEach((key) => {
+    responsiveList.forEach((key) => {
       const o =
         props[key as 'xs'] ?? contextData[key as keyof typeof contextData]
       if (!o) return ''
@@ -230,7 +225,19 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       str.push(itemClassName)
     }
     return str.join(' ')
-  }, [contextData, itemClassName, offset, props, span, textAlign])
+  }, [
+    ...responsiveList.map((key) => props[key]),
+    // @ts-ignore
+    ...responsiveList.map((key) => contextData[key]),
+    itemClassName,
+    contextData.span,
+    contextData.offset,
+    offset,
+    props,
+    span,
+    textAlign,
+    itemInstance.current.errorMsg
+  ])
   const getChildren = () => {
     let child: any = children ?? el
     if (child) {
@@ -257,7 +264,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
           handlerChange(val, ...args)
         }
       }
-
       const triggerType = getTriggerType(rules) as 'onChange'
       if (field && triggerType) {
         const fn = propsData[triggerType]

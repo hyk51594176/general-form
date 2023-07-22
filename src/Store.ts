@@ -2,42 +2,46 @@
 import Schema from 'async-validator'
 import get from 'lodash/get'
 import set from 'lodash/set'
-import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
+import { UnwrapNestedRefs, reactive } from '@vue/reactivity'
+
 import {
   SubCallback,
-  EventItem,
   FormItemInstances,
   ValidateParams,
   EventArg,
-  UpdateType,
-  FormItemInstance
+  FormItemInstance,
+  EventItem
 } from './interface'
+import { WatchStopHandle, watch } from './watch'
 
 type Options<T> = {
   submitShow?: boolean
   onChange?: (arg: EventArg<T>) => void
 }
-export default class Store<T = {}> {
+export default class Store<T extends Object = {}> {
   private options: Options<T> = {
     submitShow: true
   }
 
-  formData!: T
+  formData!: UnwrapNestedRefs<T>
 
   private originFormData!: T
 
-  private preFromData!: T
+  private watchList: Array<EventItem & { unWatch: WatchStopHandle }> = []
 
-  private eventList: Array<EventItem> = []
+  itemInstances: FormItemInstances = {}
 
-  private itemInstances: FormItemInstances = {}
-
-  constructor(defaultData?: T) {
+  constructor(defaultData: T = {} as T) {
     this.setValues(defaultData)
   }
 
-  setOptions(options: Options<T>) {
+  destroy = () => {
+    this.watchList.forEach((obj) => obj.unWatch())
+    this.watchList = []
+  }
+
+  setOptions = (options: Options<T>) => {
     Object.assign(this.options, options)
   }
 
@@ -46,10 +50,27 @@ export default class Store<T = {}> {
   }
 
   subscribe = <J>(fields: string[], callback: SubCallback<J, T>) => {
-    const obj = { fields, callback }
-    this.eventList.push(obj)
+    const unWatch = watch(
+      fields.map((key) => () => get(this.formData, key)),
+      (nv, ov) => {
+        callback(fields[0], {
+          value: nv[0],
+          oldVal: ov[0],
+          row: this.formData as T,
+          newValueList: nv,
+          oldValueList: ov
+        })
+      },
+      {
+        immediate: true,
+        deep: true
+      }
+    )
+    const watchInfo = { fields, callback, unWatch }
+    this.watchList.push(watchInfo)
     return () => {
-      this.eventList = this.eventList.filter((item) => item !== obj)
+      this.watchList = this.watchList.filter((item) => item !== watchInfo)
+      unWatch()
     }
   }
 
@@ -67,51 +88,29 @@ export default class Store<T = {}> {
     })
   }
 
-  bootstrap = (field: string, value: any) => {
-    this.eventList.forEach((obj) => {
-      if (obj.fields.includes(field)) {
-        obj.callback?.(field, value)
-      }
-    })
-  }
+  // eslint-disable-next-line class-methods-use-this
+  bootstrap = (field: string, value: any) => {}
 
   getValue = (field: string) => get(this.formData, field)
 
   getValues = () => this.formData
 
   setValue = (field: string, value: any, validate = true) => {
-    set(this.formData as Object, field, value)
-    this.setValues(this.formData, true)
-    if (this.itemInstances[field]) {
-      if (validate) {
-        this.validate([field])
-      }
+    set(this.formData, field, value)
+    if (validate) {
+      this.validate([field])
     }
   }
 
-  setValues = (data: T = {} as T, isChange?: boolean) => {
-    this.formData = cloneDeep(data)
-    if (!isChange) {
-      this.originFormData = data
-    }
-    const eventKeys = this.eventList.map((o) => o.fields).flat()
-    const instanceKeys = Object.keys(this.itemInstances)
-    const keys = Array.from(new Set([...eventKeys, ...instanceKeys]))
-    keys.forEach((field) => {
-      const value = get(data, field)
-      const item = this.itemInstances[field]?.[0]
-      let oldVal = item?.value
-      if (!item) {
-        oldVal = get(this.preFromData, field)
-      }
-      if (!isEqual(value, oldVal)) {
-        this.itemInstances[field]?.forEach((obj) => {
-          obj?.setValue?.(value)
-        })
-        this.bootstrap(field, { value, oldVal, row: this.getValues() })
-      }
+  setValues = (data: T = {} as T) => {
+    this.originFormData = cloneDeep(data)
+    this.formData = reactive<T>(data)
+    const list = [...this.watchList]
+    this.watchList = []
+    list.forEach((obj) => {
+      obj.unWatch()
+      this.subscribe(obj.fields, obj.callback)
     })
-    this.preFromData = data
   }
 
   validate = (params?: string[]) => {
@@ -127,11 +126,10 @@ export default class Store<T = {}> {
     if (!fields.length) return Promise.resolve(data)
     const validateParams: ValidateParams = fields.reduce(
       ({ rule, source }: ValidateParams, field) => {
-        const obj =
-          this.getItemInstance(field) ?? this.itemInstances[field]?.[0]
+        const obj = this.getItemInstance(field)
         if (obj && obj.rules) {
           rule[field] = obj.rules
-          source[field] = obj.value
+          source[field] = this.getValue(field)
         }
         return { rule, source }
       },
@@ -166,34 +164,22 @@ export default class Store<T = {}> {
   }
 
   onFiledChange = (field: string, options: any) => {
-    this.setValue(field, options.value)
+    this.setValue(field, options.value, true)
     this.options.onChange?.({
       field,
       value: options.value,
       e: options.e,
-      formData: this.formData
+      formData: { ...this.formData } as T
     })
   }
 
   onLifeCycle = (field: string, comp: FormItemInstance) => {
-    if (this.itemInstances[field]) {
+    if (Array.isArray(this.itemInstances[field])) {
       this.itemInstances[field].push(comp)
-      console.error(`重复定义的field=>>${field}`)
     } else {
       this.itemInstances[field] = [comp]
     }
-    if (comp.show) {
-      const value = this.getValue(field)
-      if (value === undefined) {
-        if (comp.value !== undefined) {
-          set(this.formData as Object, field, comp.value)
-        }
-      } else {
-        comp.setValue(value)
-      }
-    }
     return () => {
-      comp.setErrorMsg()
       this.itemInstances[field] = this.itemInstances[field]?.filter(
         (o) => o !== comp
       )

@@ -15,17 +15,18 @@ export default defineComponent<Props>((props) => {
         size="small"
         type="link"
         onClick={() => {
-          props.onDataChange([...(props.context?.getValues() as []), {}])
+          props.context?.getValues().push({})
+          props.onDataChange([...(props.context?.getValues() as [])])
         }}
       >
         添加
       </Button>
-      {props.dataSource.length > 1 && (
+      {props.index > 0 && (
         <Button
           size="small"
           type="link"
           onClick={() => {
-            const d = props.context?.getValues() as []
+            const d = [...(props.context?.getValues() as [])]
             d.splice(props.index, 1)
             props.onDataChange(d)
           }}

@@ -16,7 +16,7 @@ export default () => {
   const form = useForm(defaultData)
   const arr = useWatch('sex', form)
   return (
-    <Form span={12} form={form}>
+    <Form span={12} form={form} onChange={console.log}>
       <FormItem rules={rules} label="姓名" field="name" el="Input" />
       <FormItem
         rules={rules}

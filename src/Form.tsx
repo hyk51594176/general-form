@@ -1,7 +1,8 @@
 import React, {
   PropsWithChildren,
-  useCallback,
+  useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef
 } from 'react'
@@ -9,8 +10,8 @@ import Context from './Context'
 import FormItem from './FormItem'
 import './index.css'
 import { FormProps, FormRef } from './interface'
-import { useDeepEqualLayoutEffect } from './useDeepEqualEffect'
 import Store from './Store'
+import { useDeepEqualEffect } from './useDeepEqualEffect'
 
 const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>(
   (props, ref) => {
@@ -25,13 +26,13 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>(
       ...rest
     } = props
     const store = useRef(form ?? new Store(defaultData))
-    const getRefFn = useCallback(() => store.current, [])
-    useImperativeHandle(ref, getRefFn)
-    useDeepEqualLayoutEffect(() => {
+    useImperativeHandle(ref, () => store.current)
+    useDeepEqualEffect(() => {
       if (defaultData !== undefined) {
         store.current.setValues(defaultData)
       }
     }, [defaultData])
+    useEffect(() => () => store.current.destroy(), [])
     const {
       labelAlign = 'right',
       labelWidth = '80px',
@@ -44,13 +45,13 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>(
       disabled,
       offset
     } = rest
-    useDeepEqualLayoutEffect(() => {
+    useLayoutEffect(() => {
       store.current.setOptions(rest)
     }, [rest])
 
     const value = useMemo(() => {
       return {
-        ...getRefFn(),
+        ...store.current,
         labelAlign,
         labelWidth,
         span,
@@ -64,7 +65,6 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>(
       }
     }, [
       disabled,
-      getRefFn,
       labelAlign,
       labelWidth,
       lg,
