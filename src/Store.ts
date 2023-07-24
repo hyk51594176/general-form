@@ -13,7 +13,7 @@ import {
   FormItemInstance,
   EventItem
 } from './interface'
-import { WatchStopHandle, watch } from './watch'
+import { WatchOptions, WatchStopHandle, watch } from './watch'
 
 type Options<T> = {
   submitShow?: boolean
@@ -28,7 +28,9 @@ export default class Store<T extends Object = {}> {
 
   private originFormData!: T
 
-  private watchList: Array<EventItem & { unWatch: WatchStopHandle }> = []
+  private watchList: Array<
+    EventItem & { unWatch: WatchStopHandle; options?: WatchOptions }
+  > = []
 
   itemInstances: FormItemInstances = {}
 
@@ -49,7 +51,11 @@ export default class Store<T extends Object = {}> {
     return this.itemInstances[field]?.find((obj) => obj.show)
   }
 
-  subscribe = <J>(fields: string[], callback: SubCallback<J, T>) => {
+  subscribe = <J>(
+    fields: string[],
+    callback: SubCallback<J, T>,
+    options?: WatchOptions
+  ) => {
     const unWatch = watch(
       fields.map((key) => () => get(this.formData, key)),
       (nv, ov) => {
@@ -61,12 +67,9 @@ export default class Store<T extends Object = {}> {
           oldValueList: ov
         })
       },
-      {
-        immediate: true,
-        deep: true
-      }
+      options
     )
-    const watchInfo = { fields, callback, unWatch }
+    const watchInfo = { fields, callback, unWatch, options }
     this.watchList.push(watchInfo)
     return () => {
       this.watchList = this.watchList.filter((item) => item !== watchInfo)
@@ -89,11 +92,17 @@ export default class Store<T extends Object = {}> {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  bootstrap = (field: string, value: any) => {}
+  bootstrap = (field: string, value: any) => {
+    this.watchList.forEach((obj) => {
+      if (obj.fields.includes(field)) {
+        obj.callback(field, { value, row: this.formData })
+      }
+    })
+  }
 
   getValue = (field: string) => get(this.formData, field)
 
-  getValues = () => this.formData
+  getValues = () => this.formData as T
 
   setValue = (field: string, value: any, validate = true) => {
     set(this.formData, field, value)
@@ -109,7 +118,7 @@ export default class Store<T extends Object = {}> {
     this.watchList = []
     list.forEach((obj) => {
       obj.unWatch()
-      this.subscribe(obj.fields, obj.callback)
+      this.subscribe(obj.fields, obj.callback, obj.options)
     })
   }
 

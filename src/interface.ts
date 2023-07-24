@@ -45,7 +45,7 @@ export type Common = {
   field?: string
 }
 
-export type FormProps<T extends Object = {}, C extends Comp = Comp> = {
+export type FormProps<T extends Object = any, C extends Comp = Comp> = {
   columns?: Array<FormItemProps<ComponentProps<C[keyof C]>, T>>
   className?: string
   defaultData?: Partial<T>
@@ -56,18 +56,14 @@ export type FormProps<T extends Object = {}, C extends Comp = Comp> = {
   form?: Store<T>
 } & Common
 
-export enum UpdateType {
-  unmount,
-  mount
-}
 export type SubCallback<V = any, D = any> = (
   field: string,
   value: {
     value: V
-    oldVal: V
+    oldVal?: V
     row: D
-    newValueList: any[]
-    oldValueList: any[]
+    newValueList?: any[]
+    oldValueList?: any[]
   }
 ) => void
 export interface EventItem {
@@ -92,10 +88,7 @@ export interface FormItemInstance {
 export interface FormItemInstances {
   [key: string]: Array<FormItemInstance>
 }
-export type FormRef<T extends Object = {}> = Omit<
-  Store<T>,
-  'setOptions' | 'destroy'
->
+export type FormRef<T extends object = {}> = Omit<Store<T>, 'setOptions'>
 
 export type ContextProp<T extends OBJ = OBJ> = Common & FormRef<T>
 export type Rpor<FormData extends OBJ> = ContextProp<FormData> & {
@@ -143,6 +136,8 @@ export type FormItemProps<
   isShow?: boolean | DynamicParameter | undefined
   value?: any
   defaultValue?: any
+  bottomInfo?: React.ReactNode
+  rightInfo?: React.ReactNode
   context?: Partial<FormRef<FormData>>
   [k: string]: any
 } & CP

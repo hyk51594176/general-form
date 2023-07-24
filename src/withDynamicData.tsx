@@ -29,6 +29,7 @@ export default function <T extends OBJ, V = any>(
     ...rest
   }: Props<V> & T) => {
     const [options, setDataSource] = useState<ResData>([])
+    const [loading, setLoading] = useState<boolean>(false)
     const getData = () => {
       if (!context?.show) return
       const data = context?.getValues?.()
@@ -44,6 +45,9 @@ export default function <T extends OBJ, V = any>(
         },
         {} as OBJ
       )
+      if (getList) {
+        setLoading(true)
+      }
       getList?.(_params)
         .then((res = []) => {
           setDataSource(res)
@@ -76,23 +80,27 @@ export default function <T extends OBJ, V = any>(
         .catch(() => {
           setDataSource([])
         })
+        .finally(() => {
+          setLoading(false)
+        })
     }
-    useDeepEqualEffect(() => {
-      getData()
-    }, [params, context?.show])
+    // useDeepEqualEffect(() => {
+    //   getData()
+    // }, [params, context?.show])
 
     useDeepEqualEffect(() => {
       const list = Object.values(params || {}) as string[]
       if (list.length && context?.field) {
-        return context?.subscribe?.(list, getData)
+        return context?.subscribe?.(list, getData, { immediate: true })
       }
     }, [context?.field, params, context?.show])
 
     const data = {
       context,
+      loading,
       getData,
       ...rest,
-      [k ?? 'options']: rest[k as keyof typeof rest] ?? options
+      [k]: rest[k as keyof typeof rest] ?? options
     } as T
     return <Component {...data} />
   }

@@ -17,7 +17,6 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>(
   (props, ref) => {
     const {
       columns = [],
-      notLayout,
       style,
       defaultData,
       className,
@@ -77,12 +76,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>(
     ])
     return (
       <Context.Provider value={value}>
-        <div
-          className={`hyk-form ${
-            notLayout ? 'hyk-form-table' : ''
-          } ${className}`}
-          style={style}
-        >
+        <div className={`hyk-form  ${className ?? ''}`} style={style}>
           {columns.map((obj, index) => (
             <FormItem key={obj.field || String(index)} {...obj} />
           ))}

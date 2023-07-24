@@ -34,8 +34,11 @@ $--breakpoints: (
 .hyk-form {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
   padding: 20px;
+  * {
+    box-sizing: border-box;
+  }
   .hyk-form-item {
     display: inline-flex;
     padding: 0 10px 10px;
@@ -64,6 +67,18 @@ $--breakpoints: (
       position: relative;
       min-width: 100px;
       width: 100%;
+      .hyk-form-item-children {
+        display: flex;
+        align-items: flex-start;
+      }
+      .hyk-form-item-com{
+        width: 100%;
+        flex-shrink: 1;
+      }
+      .hyk-form-item-rightInfo{
+        margin-left: 8px;
+        flex-shrink: 0;
+      }
       .hyk-form-item-error {
         color: #ff4d4f;
         font-size: 12px;
@@ -89,11 +104,11 @@ $--breakpoints: (
   }
   @for $i from 0 through 24 {
     .col-#{$i} {
-      width: (1 / 24 * $i * 100) * 1%;
+      width: (calc(1 / 24) * $i * 100) * 1%;
     }
 
     .col-offset-#{$i} {
-      margin-left: (1 / 24 * $i * 100) * 1%;
+      margin-left: (calc(1 / 24) * $i * 100) * 1%;
     }
   }
 
@@ -103,11 +118,11 @@ $--breakpoints: (
     }
     @for $i from 0 through 24 {
       .col-xs-#{$i} {
-        width: (1 / 24 * $i * 100) * 1%;
+        width: (calc(1 / 24) * $i * 100) * 1%;
       }
 
       .col-xs-offset-#{$i} {
-        margin-left: (1 / 24 * $i * 100) * 1%;
+        margin-left: (calc(1 / 24) * $i * 100) * 1%;
       }
     }
   }
@@ -118,10 +133,10 @@ $--breakpoints: (
     }
     @for $i from 0 through 24 {
       .col-sm-#{$i} {
-        width: (1 / 24 * $i * 100) * 1%;
+        width: (calc(1 / 24) * $i * 100) * 1%;
       }
       .col-sm-offset-#{$i} {
-        margin-left: (1 / 24 * $i * 100) * 1%;
+        margin-left: (calc(1 / 24) * $i * 100) * 1%;
       }
     }
   }
@@ -132,10 +147,10 @@ $--breakpoints: (
     }
     @for $i from 0 through 24 {
       .col-md-#{$i} {
-        width: (1 / 24 * $i * 100) * 1%;
+        width: (calc(1 / 24) * $i * 100) * 1%;
       }
       .col-md-offset-#{$i} {
-        margin-left: (1 / 24 * $i * 100) * 1%;
+        margin-left: (calc(1 / 24) * $i * 100) * 1%;
       }
     }
   }
@@ -146,10 +161,10 @@ $--breakpoints: (
     }
     @for $i from 0 through 24 {
       .col-lg-#{$i} {
-        width: (1 / 24 * $i * 100) * 1%;
+        width: (calc(1 / 24) * $i * 100) * 1%;
       }
       .col-lg-offset-#{$i} {
-        margin-left: (1 / 24 * $i * 100) * 1%;
+        margin-left: (calc(1 / 24) * $i * 100) * 1%;
       }
     }
   }
@@ -160,10 +175,10 @@ $--breakpoints: (
     }
     @for $i from 0 through 24 {
       .col-xl-#{$i} {
-        width: (1 / 24 * $i * 100) * 1%;
+        width: (calc(1 / 24) * $i * 100) * 1%;
       }
       .col-xl-offset-#{$i} {
-        margin-left: (1 / 24 * $i * 100) * 1%;
+        margin-left: (calc(1 / 24) * $i * 100) * 1%;
       }
     }
   }

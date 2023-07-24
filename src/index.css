@@ -1,23 +1,26 @@
 .hyk-form {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
   padding: 20px;
+}
+.hyk-form * {
+  box-sizing: border-box;
 }
 .hyk-form .hyk-form-item {
   display: inline-flex;
-  padding: 0 10px 10px;
   align-items: center;
   min-width: 100px;
+  padding: 0 10px 10px;
 }
 .hyk-form .hyk-form-item .hyk-form-item-label {
-  margin-right: 8px;
   flex-shrink: 0;
+  margin-right: 8px;
+  overflow: hidden;
   color: rgba(0, 0, 0, 0.85);
   font-size: 14px;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .hyk-form .hyk-form-item .required:before {
   display: inline-block;
@@ -25,23 +28,33 @@
   color: #ff4d4f;
   font-size: 14px;
   font-family: SimSun, sans-serif;
-  content: "*";
+  content: '*';
 }
 .hyk-form .hyk-form-item .hyk-form-item-container {
   position: relative;
-  min-width: 100px;
   width: 100%;
+  min-width: 100px;
+}
+.hyk-form .hyk-form-item .hyk-form-item-container .hyk-form-item-children {
+  display: flex;
+  align-items: flex-start;
+}
+.hyk-form .hyk-form-item .hyk-form-item-container .hyk-form-item-com {
+  flex-grow: 1;
+}
+.hyk-form .hyk-form-item .hyk-form-item-container .hyk-form-item-rightInfo {
+  margin-left: 8px;
 }
 .hyk-form .hyk-form-item .hyk-form-item-container .hyk-form-item-error {
-  color: #ff4d4f;
-  font-size: 12px;
   position: absolute;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 100%;
   bottom: -18px;
   left: 0;
+  width: 100%;
+  overflow: hidden;
+  color: #ff4d4f;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .hyk-form .item_error {
   padding-bottom: 20px;

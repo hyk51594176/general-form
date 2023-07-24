@@ -11,10 +11,7 @@ export function useDeepEqualEffect<TDeps = React.DependencyList>(
   depsEqual: DeepIsEqualType<TDeps> = isEqual
 ) {
   const oldDeps = useRef<TDeps | undefined>(undefined)
-  if (
-    oldDeps.current === undefined ||
-    !depsEqual(deps, oldDeps.current as TDeps)
-  ) {
+  if (oldDeps.current === undefined || !depsEqual(deps, oldDeps.current)) {
     oldDeps.current = deps
   }
 
@@ -27,10 +24,7 @@ export function useDeepEqualLayoutEffect<TDeps = React.DependencyList>(
   depsEqual: DeepIsEqualType<TDeps> = isEqual
 ) {
   const oldDeps = useRef<TDeps | undefined>(undefined)
-  if (
-    oldDeps.current === undefined ||
-    !depsEqual(deps, oldDeps.current as TDeps)
-  ) {
+  if (oldDeps.current === undefined || !depsEqual(deps, oldDeps.current)) {
     oldDeps.current = deps
   }
 

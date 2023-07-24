@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {
   PropsWithChildren,
   useLayoutEffect,
@@ -19,9 +18,8 @@ const getTriggerType = (rules: FormItemProps['rules']) => {
     return str
   }, 'onChange')
 }
-const responsiveList = ['xs', 'sm', 'md', 'lg', 'xl']
 
-const FormItem: React.FC<FormItemProps> = (props) => {
+const FormItem = (props: FormItemProps) => {
   const {
     el,
     field,
@@ -47,11 +45,13 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     content,
     doNotRegister,
     context: _context,
+    rightInfo,
+    bottomInfo,
     ...other
   } = props
   const contextData = useFormInstance()
   const [, updateState] = useState({})
-  const itemRef = useRef<Rpor<any>>({} as Rpor<any>)
+  const itemRef = useRef<any>({})
 
   const getIsShow = (show: FormItemProps['isShow']) => {
     if (typeof show === 'boolean') {
@@ -121,17 +121,11 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     return rules.required
   }, [required, rules])
 
-  const textAlign = useMemo(
-    () => labelAlign ?? contextData.labelAlign,
-    [contextData.labelAlign, labelAlign]
-  )
-  const labelStyles = useMemo(
-    () => ({
-      width: labelWidth ?? contextData.labelWidth,
-      textAlign: textAlign === 'top' ? 'left' : textAlign
-    }),
-    [contextData.labelWidth, labelWidth, textAlign]
-  )
+  const textAlign = labelAlign ?? contextData.labelAlign
+  const labelStyles = {
+    width: labelWidth ?? contextData.labelWidth,
+    textAlign: textAlign === 'top' ? 'left' : textAlign
+  }
 
   const handlerChange = (e: any, ...args: any[]) => {
     let value!: any
@@ -153,91 +147,44 @@ const FormItem: React.FC<FormItemProps> = (props) => {
   }
   useLayoutEffect(() => {
     if (!field) return
-    return contextData.subscribe([field], (k, { value }) => {
-      itemInstance.current.value = value
-      updateState({})
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return contextData.subscribe(
+      [field],
+      (k, { value }) => {
+        itemInstance.current.value = value
+        updateState({})
+      },
+      { immediate: true, deep: true }
+    )
   }, [field])
 
-  useDeepEqualLayoutEffect(() => {
-    if (field && !doNotRegister) {
-      itemInstance.current.value =
-        contextData.getValue(field) ?? other.defaultValue
+  useLayoutEffect(() => {
+    if (field) {
       return contextData.onLifeCycle(field, itemInstance.current)
     }
-  }, [field, doNotRegister])
+  }, [field])
 
-  useDeepEqualLayoutEffect(() => {
+  useLayoutEffect(() => {
     itemInstance.current.setErrorMsg(errorMsg)
   }, [errorMsg])
 
   useDeepEqualLayoutEffect(() => {
     if (typeof isShow === 'boolean') {
       itemInstance.current.setSateShow(isShow)
-    } else {
+    } else if (typeof isShow === 'object') {
       const keys = Object.keys(isShow?.relyOn ?? {})
       if (keys.length) {
-        itemInstance.current.setSateShow(getIsShow(isShow))
-        return contextData.subscribe(keys, () => {
-          itemInstance.current.setSateShow(getIsShow(isShow))
-        })
+        return contextData.subscribe(
+          keys,
+          () => {
+            itemInstance.current.setSateShow(getIsShow(isShow))
+          },
+          { immediate: true }
+        )
       }
       itemInstance.current.setSateShow(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isShow])
 
-  const classNames = useMemo(() => {
-    const str: string[] = ['hyk-form-item']
-    const _span = span ?? contextData.span
-    const _offset = offset ?? contextData.offset
-    const topClass = textAlign === 'top' ? 'hyk-form-item-top' : ''
-    const errorClass = itemInstance.current.errorMsg ? 'item_error' : ''
-    if (_span) {
-      str.push(`col-${_span}`)
-    }
-    if (_offset) {
-      str.push(`col-offset-${_offset}`)
-    }
-    responsiveList.forEach((key) => {
-      const o =
-        props[key as 'xs'] ?? contextData[key as keyof typeof contextData]
-      if (!o) return ''
-      if (typeof o === 'object') {
-        if (o.span) {
-          str.push(`col-${key}-${o.span}`)
-        }
-        if (o.offset) {
-          str.push(`col-${key}-offset-${o.offset}`)
-        }
-      } else {
-        str.push(`col-${key}-${o}`)
-      }
-    })
-    if (topClass) {
-      str.push(topClass)
-    }
-    if (errorClass) {
-      str.push(errorClass)
-    }
-    if (itemClassName) {
-      str.push(itemClassName)
-    }
-    return str.join(' ')
-  }, [
-    ...responsiveList.map((key) => props[key]),
-    // @ts-ignore
-    ...responsiveList.map((key) => contextData[key]),
-    itemClassName,
-    contextData.span,
-    contextData.offset,
-    offset,
-    props,
-    span,
-    textAlign,
-    itemInstance.current.errorMsg
-  ])
   const getChildren = () => {
     let child: any = children ?? el
     if (child) {
@@ -291,12 +238,51 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     }
     return itemInstance.current.value
   }
+  const getClassName = () => {
+    const str: string[] = ['hyk-form-item']
+    const _span = span ?? contextData.span
+    const _offset = offset ?? contextData.offset
+    const topClass = textAlign === 'top' ? 'hyk-form-item-top' : ''
+    const errorClass = itemInstance.current.errorMsg ? 'item_error' : ''
+    if (_span) {
+      str.push(`col-${_span}`)
+    }
+    if (_offset) {
+      str.push(`col-offset-${_offset}`)
+    }
+    const arr = ['xs', 'sm', 'md', 'lg', 'xl']
+    arr.forEach((key) => {
+      const o =
+        props[key as 'xs'] ?? contextData[key as keyof typeof contextData]
+      if (!o) return ''
+      if (typeof o === 'object') {
+        if (o.span) {
+          str.push(`col-${key}-${o.span}`)
+        }
+        if (o.offset) {
+          str.push(`col-${key}-offset-${o.offset}`)
+        }
+      } else {
+        str.push(`col-${key}-${o}`)
+      }
+    })
+    if (topClass) {
+      str.push(topClass)
+    }
+    if (errorClass) {
+      str.push(errorClass)
+    }
+    if (itemClassName) {
+      str.push(itemClassName)
+    }
+    return str.join(' ')
+  }
   return (
     <div
-      className={classNames}
+      className={getClassName()}
       style={{
         minWidth: minItemWidth ?? contextData.minItemWidth,
-        ...(itemStyle ?? {}),
+        ...itemStyle,
         display: itemInstance.current.show ? undefined : 'none'
       }}
     >
@@ -310,10 +296,18 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         </label>
       )}
       <div className="hyk-form-item-container">
-        {getChildren()}
-        <span className="hyk-form-item-error">
-          {itemInstance.current.errorMsg}
-        </span>
+        <div className="hyk-form-item-children">
+          <div className="hyk-form-item-com">{getChildren()}</div>
+          {rightInfo && (
+            <div className="hyk-form-item-rightInfo">{rightInfo}</div>
+          )}
+        </div>
+        {itemInstance.current.errorMsg && (
+          <span className="hyk-form-item-error">
+            {itemInstance.current.errorMsg}
+          </span>
+        )}
+        {bottomInfo && <>{bottomInfo}</>}
       </div>
     </div>
   )
