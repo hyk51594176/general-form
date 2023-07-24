@@ -98,7 +98,7 @@ type DynamicParameter = {
   relation?: 'and' | 'or'
   notIn?: boolean
   relyOn: {
-    [k: string]: any[] | undefined
+    [k: string]: any[] | undefined| ((value: any,contextData:ContextProp) => boolean)
   }
 }
 export interface Rule extends RuleItem {

@@ -13,6 +13,7 @@ import Context from './Context'
 import { FormItemProps, UpdateType } from './interface'
 import { components } from './utils'
 
+
 const FormItem: React.FC<FormItemProps> = (props) => {
   let {
     el,
@@ -174,7 +175,19 @@ const FormItem: React.FC<FormItemProps> = (props) => {
       if (typeof show === 'object') {
         const method = show.relation === 'and' ? 'every' : 'some'
         const _isShow = keys[method]((k) => {
-          const flag = show.relyOn[k]?.includes(contextData.getValue(k))
+          const item = show.relyOn[k]
+          let flag
+          if (typeof item === 'function') {
+            flag = item(contextData.getValue(k), contextData)
+          } else {
+            const val = contextData.getValue(k)
+            if (Array.isArray(val)) {
+              flag = item?.some((v) => val.includes(v))
+            } else {
+              flag = item?.includes(contextData.getValue(k))
+            }
+          }
+
           return show.notIn ? !flag : flag
         })
         setSateShow(_isShow)
@@ -220,8 +233,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     itemInstance.current.rules = rules
   }, [rules])
 
-
-
   const computedClass = useMemo(() => {
     const str: string[] = ['hyk-form-item']
     const _span = span ?? contextData.span
@@ -259,12 +270,13 @@ const FormItem: React.FC<FormItemProps> = (props) => {
     }
     return str.join(' ')
   }, [span, contextData, offset, textAlign, _errorMsg, itemClassName, props])
-  return  <div
+  return (
+    <div
       className={computedClass}
       style={{
         minWidth: minItemWidth ?? contextData.minItemWidth,
         ...itemStyle,
-        display:_show ? undefined :'none'
+        display: _show ? undefined : 'none'
       }}
     >
       {label !== undefined && (
@@ -281,6 +293,6 @@ const FormItem: React.FC<FormItemProps> = (props) => {
         <span className="hyk-form-item-error">{_errorMsg}</span>
       </div>
     </div>
- 
+  )
 }
 export default FormItem
