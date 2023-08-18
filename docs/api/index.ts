@@ -1,5 +1,3 @@
-import moment from 'moment'
-
 export const getList = (params: { id?: number } = {}) => {
   const data = [
     { label: '山东省', value: 1, parentId: 0 },
@@ -27,6 +25,5 @@ export const defaultData = {
   sex: 1,
   province: 1,
   city: 3,
-  area: 7,
-  birthday: moment()
+  area: 7
 }

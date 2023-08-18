@@ -1,7 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
-import React, { ComponentType, useState } from 'react'
-import { RenderProps, Noop } from './interface'
-import { useDeepEqualEffect } from './useDeepEqualEffect'
+import React, { ComponentType } from 'react'
+import { RenderProps } from './interface'
+import { useWatch } from './hooks'
 
 type Props = {
   fields: string[]
@@ -9,18 +9,7 @@ type Props = {
 
 export default function <T>(Comp: ComponentType<T>) {
   return (props: T & Props) => {
-    const [, setState] = useState({})
-    useDeepEqualEffect(() => {
-      let unSubscribe!: Noop | undefined
-      if (props.fields?.length) {
-        unSubscribe = props.context?.subscribe?.(props.fields, () => {
-          setState({})
-        })
-      }
-      return () => {
-        unSubscribe?.()
-      }
-    }, [props.fields])
+    useWatch(props.fields, undefined, undefined, { deep: true })
     return <Comp {...props} />
   }
 }

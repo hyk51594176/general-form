@@ -15,15 +15,16 @@ type P<F, T> = F extends Array<string> ? any[] : T
 type Field = string | string[]
 export const useFormInstance = <T extends object = OBJ>() =>
   useContext(Context as unknown as React.Context<ContextProp<T>>)
-export const useWatch = <T, D extends object = OBJ>(
+export function useWatch<T, D extends object = OBJ>(
   field: Field,
   outForm?: Store<D> | Rpor<D>,
   callBack?: CallBack<T, D>,
   options?: WatchOptions
-) => {
+) {
+  type V = Field extends Array<string> ? any[] : T
   const inform = useFormInstance<D>()
   const form = outForm ?? inform
-  const [state, setState] = useState<State<P<typeof field, T>, D>>(
+  const [state, setState] = useState<State<V, D>>(
     Array.isArray(field)
       ? [field.map((k) => form?.getValue(k)), form?.getValues()]
       : [form?.getValue(field), form?.getValues()]
@@ -34,10 +35,7 @@ export const useWatch = <T, D extends object = OBJ>(
     return form?.subscribe<T>(
       list,
       (_field, { value, newValueList = [], row }) => {
-        const val: State<P<typeof field, T>, D> = [
-          isArr ? newValueList : value,
-          row
-        ]
+        const val: State<V, D> = [(isArr ? newValueList : value) as V, row]
         setState(val)
         callBack?.(val)
       },

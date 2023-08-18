@@ -83,6 +83,7 @@ export interface FormItemInstance {
   rules?: RuleItem | RuleItem[]
   value?: any
   show?: boolean
+  defaultValue?: any
   setErrorMsg(msg?: string): void
 }
 export interface FormItemInstances {
@@ -91,10 +92,8 @@ export interface FormItemInstances {
 export type FormRef<T extends object = {}> = Omit<Store<T>, 'setOptions'>
 
 export type ContextProp<T extends OBJ = OBJ> = Common & FormRef<T>
-export type Rpor<FormData extends OBJ> = ContextProp<FormData> & {
-  show?: boolean
-  errorMsg?: string
-}
+export type Rpor<FormData extends OBJ> = ContextProp<FormData> &
+  FormItemInstance
 export type RenderProps<V = any, FormData extends OBJ = OBJ> = {
   size?: string
   disabled?: boolean

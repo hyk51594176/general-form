@@ -3,10 +3,11 @@ import React, {
   useLayoutEffect,
   useMemo,
   useRef,
+  useEffect,
   useState
 } from 'react'
 import { RenderProps, useFormInstance } from '.'
-import { FormItemProps, Rpor } from './interface'
+import { FormItemProps } from './interface'
 import { useDeepEqualLayoutEffect } from './useDeepEqualEffect'
 import { components } from './utils'
 
@@ -47,6 +48,7 @@ const FormItem = (props: FormItemProps) => {
     context: _context,
     rightInfo,
     bottomInfo,
+    defaultValue,
     ...other
   } = props
   const contextData = useFormInstance()
@@ -75,7 +77,7 @@ const FormItem = (props: FormItemProps) => {
               console.error(error)
             }
           } else {
-            flag = val(contextData.getValue(k), contextData)
+            flag = val(contextData.getValue(k), contextData as any)
           }
           return show.notIn ? !flag : flag
         })
@@ -104,17 +106,14 @@ const FormItem = (props: FormItemProps) => {
       updateState({})
     },
     errorMsg,
-    value:
-      (field ? contextData.getValue(field) : other.value) ?? other.defaultValue,
+    defaultValue,
+    value: (field ? contextData.getValue(field) : other.value) ?? defaultValue,
     show: getIsShow(isShow),
     rules
   })
+
   itemInstance.current.rules = rules
-  useDeepEqualLayoutEffect(() => {
-    if (other.value !== undefined && field) {
-      contextData.setValue(field, other.value)
-    }
-  }, [other.value, field])
+
   const isRequired = useMemo(() => {
     if (!rules) return required
     if (Array.isArray(rules)) return rules.some((item) => item.required)
@@ -130,6 +129,9 @@ const FormItem = (props: FormItemProps) => {
   const handlerChange = (e: any, ...args: any[]) => {
     let value!: any
     try {
+      if (typeof e?.stopPropagation === 'function') {
+        e.stopPropagation()
+      }
       value = e.target.value
     } catch (error) {
       value = e
@@ -145,7 +147,8 @@ const FormItem = (props: FormItemProps) => {
     }
     onChange?.(e, ...args)
   }
-  useLayoutEffect(() => {
+
+  useEffect(() => {
     if (!field) return
     return contextData.subscribe(
       [field],
@@ -153,7 +156,7 @@ const FormItem = (props: FormItemProps) => {
         itemInstance.current.value = value
         updateState({})
       },
-      { immediate: true, deep: true }
+      { deep: true }
     )
   }, [field])
 
@@ -170,16 +173,12 @@ const FormItem = (props: FormItemProps) => {
   useDeepEqualLayoutEffect(() => {
     if (typeof isShow === 'boolean') {
       itemInstance.current.setSateShow(isShow)
-    } else if (typeof isShow === 'object') {
+    } else {
       const keys = Object.keys(isShow?.relyOn ?? {})
       if (keys.length) {
-        return contextData.subscribe(
-          keys,
-          () => {
-            itemInstance.current.setSateShow(getIsShow(isShow))
-          },
-          { immediate: true }
-        )
+        return contextData.subscribe(keys, () => {
+          itemInstance.current.setSateShow(getIsShow(isShow))
+        })
       }
       itemInstance.current.setSateShow(true)
     }
@@ -207,9 +206,7 @@ const FormItem = (props: FormItemProps) => {
         children: content,
         value: itemInstance.current.value,
         ...other,
-        onChange: (val: any, ...args: any[]) => {
-          handlerChange(val, ...args)
-        }
+        onChange: handlerChange
       }
       const triggerType = getTriggerType(rules) as 'onChange'
       if (field && triggerType) {

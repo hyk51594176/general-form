@@ -2,6 +2,7 @@
 import Schema from 'async-validator'
 import get from 'lodash/get'
 import set from 'lodash/set'
+import has from 'lodash/has'
 import cloneDeep from 'lodash/cloneDeep'
 import { UnwrapNestedRefs, reactive } from '@vue/reactivity'
 
@@ -57,17 +58,33 @@ export default class Store<T extends Object = {}> {
     options?: WatchOptions
   ) => {
     const unWatch = watch(
-      fields.map((key) => () => get(this.formData, key)),
+      fields.length
+        ? fields.map((key) => () => get(this.formData, key))
+        : [() => this.formData],
       (nv, ov) => {
+        const list = nv.map((obj) => {
+          if (Array.isArray(obj)) {
+            return [...obj]
+          }
+          if (typeof obj === 'object' && obj) {
+            return { ...obj }
+          }
+          return obj
+        })
         callback(fields[0], {
-          value: nv[0],
+          value: list[0],
           oldVal: ov[0],
           row: this.formData as T,
-          newValueList: nv,
+          newValueList: list,
           oldValueList: ov
         })
       },
-      options
+      {
+        flush: 'sync',
+        immediate: true,
+        deep: true,
+        ...options
+      }
     )
     const watchInfo = { fields, callback, unWatch, options }
     this.watchList.push(watchInfo)
@@ -102,9 +119,22 @@ export default class Store<T extends Object = {}> {
 
   getValue = (field: string) => get(this.formData, field)
 
-  getValues = () => this.formData as T
+  getValues = (isShow = false) => {
+    if (isShow) {
+      const fields = this.getFields().filter((field) => {
+        return this.itemInstances[field]?.some((obj) => obj?.show)
+      })
+      const data = {} as T
+      fields.forEach((k) => {
+        set(data, k, this.getValue(k))
+      })
+      return data
+    }
 
-  setValue = (field: string, value: any, validate = true) => {
+    return this.formData as T
+  }
+
+  setValue = (field: string, value: any, validate = false) => {
     set(this.formData, field, value)
     if (validate) {
       this.validate([field])
@@ -113,6 +143,13 @@ export default class Store<T extends Object = {}> {
 
   setValues = (data: T = {} as T) => {
     this.originFormData = cloneDeep(data)
+    Object.entries(this.itemInstances).forEach(([field, list]) => {
+      const item = list.find((obj) => obj.show)
+      if (!has(data, field) && item?.defaultValue !== undefined) {
+        set(data, field, item?.defaultValue)
+      }
+    })
+
     this.formData = reactive<T>(data)
     const list = [...this.watchList]
     this.watchList = []
@@ -120,15 +157,16 @@ export default class Store<T extends Object = {}> {
       obj.unWatch()
       this.subscribe(obj.fields, obj.callback, obj.options)
     })
+    this.clearValidate()
   }
 
-  validate = (params?: string[]) => {
+  validate = <P extends string[]>(params?: P) => {
     const fields = this.getFields(params).filter((field) => {
       return this.itemInstances[field]?.some(
         (obj) => obj && (this.options.submitShow ? obj.show : true)
       )
     })
-    const data = Array.isArray(this.formData) ? [] : {}
+    const data = {} as P extends string[] ? any : T
     fields.forEach((k) => {
       set(data, k, this.getValue(k))
     })
@@ -165,7 +203,6 @@ export default class Store<T extends Object = {}> {
 
   resetFields = (data?: T) => {
     this.setValues(data ?? this.originFormData)
-    this.clearValidate()
   }
 
   resetField = (field: string, value?: any) => {
@@ -174,12 +211,14 @@ export default class Store<T extends Object = {}> {
 
   onFiledChange = (field: string, options: any) => {
     this.setValue(field, options.value, true)
-    this.options.onChange?.({
-      field,
-      value: options.value,
-      e: options.e,
-      formData: { ...this.formData } as T
-    })
+    setTimeout(() => {
+      this.options.onChange?.({
+        field,
+        value: options.value,
+        e: options.e,
+        formData: { ...this.formData } as T
+      })
+    }, 0)
   }
 
   onLifeCycle = (field: string, comp: FormItemInstance) => {
@@ -187,6 +226,9 @@ export default class Store<T extends Object = {}> {
       this.itemInstances[field].push(comp)
     } else {
       this.itemInstances[field] = [comp]
+    }
+    if (this.getValue(field) === undefined && comp.value !== undefined) {
+      this.setValue(field, comp.value)
     }
     return () => {
       this.itemInstances[field] = this.itemInstances[field]?.filter(

@@ -2,7 +2,7 @@ import get from 'lodash/get'
 import has from 'lodash/has'
 import isEqual from 'lodash/isEqual'
 import React, { ComponentType, useState } from 'react'
-import { Noop, OBJ, RenderProps } from './interface'
+import { OBJ, RenderProps } from './interface'
 import { useDeepEqualEffect } from './useDeepEqualEffect'
 
 type ResData = Array<{ label: string; value: number }>
@@ -84,16 +84,14 @@ export default function <T extends OBJ, V = any>(
           setLoading(false)
         })
     }
-    // useDeepEqualEffect(() => {
-    //   getData()
-    // }, [params, context?.show])
 
     useDeepEqualEffect(() => {
       const list = Object.values(params || {}) as string[]
-      if (list.length && context?.field) {
-        return context?.subscribe?.(list, getData, { immediate: true })
+      if (list.length) {
+        return context?.subscribe?.(list, getData)
       }
-    }, [context?.field, params, context?.show])
+      getData()
+    }, [params, context?.show])
 
     const data = {
       context,

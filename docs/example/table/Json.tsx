@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useRef } from 'react'
-import { defineColumns, Form, FormRef } from '@hanyk/general-form'
+import React, { useState, useMemo } from 'react'
+import { defineColumns, Form, useForm } from '@hanyk/general-form'
 import { Button } from 'antd'
 import { ComponentMap } from '../../components'
 import { useSubmit } from '../../hooks'
@@ -15,7 +15,7 @@ export default () => {
     age: '12'
   })
   const submit = useSubmit()
-  const formEl = useRef<FormRef>(null)
+  const formEl = useForm()
   const columns = useMemo(() => {
     return defineColumns<ComponentMap>([
       { label: '姓名', rules, field: `name`, el: 'Input' },
@@ -81,7 +81,7 @@ export default () => {
     <>
       <Button
         onClick={() => {
-          formEl.current?.setValue('address', [
+          formEl.setValue('address', [
             { province: 1, city: 4, area: 9 },
             { province: 1, city: 3, area: 8 }
           ])
@@ -89,7 +89,7 @@ export default () => {
       >
         默认值
       </Button>
-      <Form columns={columns} defaultData={data} span={8} ref={formEl} />
+      <Form columns={columns} defaultData={data} span={8} form={formEl} />
     </>
   )
 }

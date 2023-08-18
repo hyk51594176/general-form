@@ -26,7 +26,7 @@ import {
   callWithErrorHandling,
   warn
 } from './errorHandling'
-import { queueJob } from './scheduler'
+import { queueJob, queuePostFlushCb } from './scheduler'
 
 export type WatchEffect = (onInvalidate: InvalidateCbRegistrator) => void
 
@@ -245,6 +245,8 @@ function doWatch(
   let scheduler: EffectScheduler
   if (flush === 'sync') {
     scheduler = job as any // the scheduler function gets called directly
+  } else if (flush === 'post') {
+    scheduler = () => queuePostFlushCb(job)
   } else {
     // default: 'pre'
     // scheduler = () => {
@@ -259,6 +261,8 @@ function doWatch(
   if (cb) {
     if (immediate) job()
     else oldValue = effect.run()
+  } else if (flush === 'post') {
+    queuePostFlushCb(effect.run.bind(effect))
   } else {
     effect.run()
   }

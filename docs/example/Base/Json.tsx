@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
-import { defineColumns, Form } from '@hanyk/general-form'
-import { getList } from '../../api'
+import { defineColumns, Form, useForm } from '@hanyk/general-form'
+import { defaultData, getList } from '../../api'
 import { useSubmit } from '../../hooks'
 import { ComponentMap } from '../../components'
 
@@ -12,6 +12,8 @@ const rules = {
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const submit = useSubmit()
+  const form = useForm(defaultData)
+
   const columns = useMemo(() => {
     return defineColumns<ComponentMap, any>([
       { label: '姓名', rules, field: 'name', el: 'Input' },
@@ -98,5 +100,5 @@ export default () => {
     ])
   }, [submit])
 
-  return <Form columns={columns} span={12} />
+  return <Form columns={columns} span={12} form={form} />
 }
