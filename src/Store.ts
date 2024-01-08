@@ -199,14 +199,16 @@ export default class Store<T extends Object = {}> {
         errors.forEach((obj: any) => {
           const item = this.getItemInstance(obj.field)
           item?.setErrorMsg(obj.message)
-          const dom = document.querySelector(`[data-field='${obj.field}']`)
-          if (dom && !isScroll && this.options.scrollToError !== false) {
-            isScroll = true
-            dom?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'nearest',
-              inline: 'start'
-            })
+          if (!isScroll) {
+            const dom = document.querySelector(`[data-field='${obj.field}']`)
+            if (dom && this.options.scrollToError !== false) {
+              isScroll = true
+              dom?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'start'
+              })
+            }
           }
         })
         return Promise.reject(err)
