@@ -4,7 +4,7 @@ import get from 'lodash/get'
 import set from 'lodash/set'
 import has from 'lodash/has'
 import cloneDeep from 'lodash/cloneDeep'
-import { UnwrapNestedRefs, reactive } from '@vue/reactivity'
+import { UnwrapRef, ref, toRaw } from '@vue/reactivity'
 
 import {
   SubCallback,
@@ -18,6 +18,7 @@ import { WatchOptions, WatchStopHandle, watch } from './watch'
 
 type Options<T> = {
   submitShow?: boolean
+  scrollToError?: boolean
   onChange?: (arg: EventArg<T>) => void
 }
 export default class Store<T extends Object = {}> {
@@ -25,7 +26,7 @@ export default class Store<T extends Object = {}> {
     submitShow: true
   }
 
-  formData!: UnwrapNestedRefs<T>
+  formData = ref<T>({} as T)
 
   private originFormData!: T
 
@@ -59,8 +60,8 @@ export default class Store<T extends Object = {}> {
   ) => {
     const unWatch = watch(
       fields.length
-        ? fields.map((key) => () => get(this.formData, key))
-        : [() => this.formData],
+        ? fields.map((key) => () => get(this.formData.value, key))
+        : [() => this.formData.value],
       (nv, ov) => {
         const list = nv.map((obj) => {
           if (Array.isArray(obj)) {
@@ -74,7 +75,7 @@ export default class Store<T extends Object = {}> {
         callback(fields[0], {
           value: list[0],
           oldVal: ov[0],
-          row: this.formData as T,
+          row: this.rowData(),
           newValueList: list,
           oldValueList: ov
         })
@@ -82,7 +83,6 @@ export default class Store<T extends Object = {}> {
       {
         flush: 'sync',
         immediate: true,
-        deep: true,
         ...options
       }
     )
@@ -112,12 +112,14 @@ export default class Store<T extends Object = {}> {
   bootstrap = (field: string, value: any) => {
     this.watchList.forEach((obj) => {
       if (obj.fields.includes(field)) {
-        obj.callback(field, { value, row: this.formData })
+        obj.callback(field, { value, row: this.rowData() })
       }
     })
   }
 
-  getValue = (field: string) => get(this.formData, field)
+  rowData = () => toRaw(this.formData.value) as T
+
+  getValue = (field: string) => get(this.rowData(), field)
 
   getValues = (isShow = false) => {
     if (isShow) {
@@ -131,11 +133,11 @@ export default class Store<T extends Object = {}> {
       return data
     }
 
-    return this.formData as T
+    return this.rowData()
   }
 
-  setValue = (field: string, value: any, validate = false) => {
-    set(this.formData, field, value)
+  setValue = (field: string, value: any, validate = true) => {
+    set(this.formData.value as T, field, value)
     if (validate) {
       this.validate([field])
     }
@@ -150,13 +152,7 @@ export default class Store<T extends Object = {}> {
       }
     })
 
-    this.formData = reactive<T>(data)
-    const list = [...this.watchList]
-    this.watchList = []
-    list.forEach((obj) => {
-      obj.unWatch()
-      this.subscribe(obj.fields, obj.callback, obj.options)
-    })
+    this.formData.value = cloneDeep(data) as UnwrapRef<T>
     this.clearValidate()
   }
 
@@ -193,9 +189,19 @@ export default class Store<T extends Object = {}> {
       })
       .catch((err) => {
         const { errors = [] } = err
+        let isScroll = false
         errors.forEach((obj: any) => {
           const item = this.getItemInstance(obj.field)
           item?.setErrorMsg(obj.message)
+          const dom = document.querySelector(`[data-field='${obj.field}']`)
+          if (dom && !isScroll && this.options.scrollToError !== false) {
+            isScroll = true
+            dom?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+              inline: 'start'
+            })
+          }
         })
         return Promise.reject(err)
       })
@@ -205,20 +211,19 @@ export default class Store<T extends Object = {}> {
     this.setValues(data ?? this.originFormData)
   }
 
-  resetField = (field: string, value?: any) => {
-    this.setValue(field, value ?? get(this.originFormData, field))
+  resetField = (field: string, value?: any, validate?: boolean) => {
+    const val = value ?? get(this.originFormData, field)
+    this.setValue(field, val ? cloneDeep(val) : val, validate ?? false)
   }
 
   onFiledChange = (field: string, options: any) => {
-    this.setValue(field, options.value, true)
-    setTimeout(() => {
-      this.options.onChange?.({
-        field,
-        value: options.value,
-        e: options.e,
-        formData: { ...this.formData } as T
-      })
-    }, 0)
+    this.setValue(field, options.value)
+    this.options.onChange?.({
+      field,
+      value: options.value,
+      e: options.e,
+      formData: cloneDeep(this.rowData())
+    })
   }
 
   onLifeCycle = (field: string, comp: FormItemInstance) => {
@@ -228,12 +233,13 @@ export default class Store<T extends Object = {}> {
       this.itemInstances[field] = [comp]
     }
     if (this.getValue(field) === undefined && comp.value !== undefined) {
-      this.setValue(field, comp.value)
+      this.setValue(field, comp.value, false)
     }
     return () => {
       this.itemInstances[field] = this.itemInstances[field]?.filter(
         (o) => o !== comp
       )
+
       if (!this.itemInstances[field]?.length) {
         delete this.itemInstances[field]
       }

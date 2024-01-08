@@ -54,6 +54,7 @@ export type FormProps<T extends Object = any, C extends Comp = Comp> = {
   submitShow?: boolean
   onChange?(arg: EventArg<T>): void
   form?: Store<T>
+  scrollToError?: boolean
 } & Common
 
 export type SubCallback<V = any, D = any> = (
@@ -107,7 +108,7 @@ export type DynamicParameter = {
   relation?: 'and' | 'or'
   notIn?: boolean
   relyOn: {
-    [k: string]: any[] | ((value: any, context: Rpor<any>) => boolean)
+    [k: string]: any[] | ((value: any, context: ContextProp<any>) => boolean)
   }
   external?: boolean
 }

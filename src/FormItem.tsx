@@ -77,7 +77,7 @@ const FormItem = (props: FormItemProps) => {
               console.error(error)
             }
           } else {
-            flag = val(contextData.getValue(k), contextData as any)
+            flag = val(contextData.getValue(k), contextData)
           }
           return show.notIn ? !flag : flag
         })
@@ -249,8 +249,7 @@ const FormItem = (props: FormItemProps) => {
     }
     const arr = ['xs', 'sm', 'md', 'lg', 'xl']
     arr.forEach((key) => {
-      const o =
-        props[key as 'xs'] ?? contextData[key as keyof typeof contextData]
+      const o = props[key as 'xs'] ?? contextData[key as 'xs']
       if (!o) return ''
       if (typeof o === 'object') {
         if (o.span) {
@@ -277,6 +276,7 @@ const FormItem = (props: FormItemProps) => {
   return (
     <div
       className={getClassName()}
+      data-field={field}
       style={{
         minWidth: minItemWidth ?? contextData.minItemWidth,
         ...itemStyle,

@@ -1,8 +1,9 @@
-import { useContext, useLayoutEffect, useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import Context from './Context'
 import { ContextProp, OBJ, Rpor } from './interface'
 import Store from './Store'
 import { WatchOptions } from './watch'
+import { useDeepEqualLayoutEffect } from './useDeepEqualEffect'
 
 type State<T, D> = [T, D]
 
@@ -29,7 +30,7 @@ export function useWatch<T, D extends object = OBJ>(
       ? [field.map((k) => form?.getValue(k)), form?.getValues()]
       : [form?.getValue(field), form?.getValues()]
   )
-  useLayoutEffect(() => {
+  useDeepEqualLayoutEffect(() => {
     const isArr = Array.isArray(field)
     const list = isArr ? field : [field]
     return form?.subscribe<T>(
