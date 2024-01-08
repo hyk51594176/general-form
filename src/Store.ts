@@ -4,7 +4,7 @@ import get from 'lodash/get'
 import set from 'lodash/set'
 import has from 'lodash/has'
 import cloneDeep from 'lodash/cloneDeep'
-import { UnwrapRef, ref, toRaw } from '@vue/reactivity'
+import { UnwrapNestedRefs, reactive, toRaw } from '@vue/reactivity'
 
 import {
   SubCallback,
@@ -26,7 +26,7 @@ export default class Store<T extends Object = {}> {
     submitShow: true
   }
 
-  formData = ref<T>({} as T)
+  formData!: UnwrapNestedRefs<T>
 
   private originFormData!: T
 
@@ -60,8 +60,8 @@ export default class Store<T extends Object = {}> {
   ) => {
     const unWatch = watch(
       fields.length
-        ? fields.map((key) => () => get(this.formData.value, key))
-        : [() => this.formData.value],
+        ? fields.map((key) => () => get(this.formData, key))
+        : [() => this.formData],
       (nv, ov) => {
         const list = nv.map((obj) => {
           if (Array.isArray(obj)) {
@@ -117,7 +117,7 @@ export default class Store<T extends Object = {}> {
     })
   }
 
-  rowData = () => toRaw(this.formData.value) as T
+  rowData = () => toRaw(this.formData) as T
 
   getValue = (field: string) => get(this.rowData(), field)
 
@@ -137,7 +137,7 @@ export default class Store<T extends Object = {}> {
   }
 
   setValue = (field: string, value: any, validate = true) => {
-    set(this.formData.value as T, field, value)
+    set(this.formData, field, value)
     if (validate) {
       this.validate([field])
     }
@@ -152,7 +152,13 @@ export default class Store<T extends Object = {}> {
       }
     })
 
-    this.formData.value = cloneDeep(data) as UnwrapRef<T>
+    this.formData = reactive(cloneDeep(data))
+    const list = [...this.watchList]
+    this.watchList = []
+    list.forEach((obj) => {
+      obj.unWatch()
+      this.subscribe(obj.fields, obj.callback, obj.options)
+    })
     this.clearValidate()
   }
 
@@ -218,12 +224,14 @@ export default class Store<T extends Object = {}> {
 
   onFiledChange = (field: string, options: any) => {
     this.setValue(field, options.value)
-    this.options.onChange?.({
-      field,
-      value: options.value,
-      e: options.e,
-      formData: cloneDeep(this.rowData())
-    })
+    setTimeout(() => {
+      this.options.onChange?.({
+        field,
+        value: options.value,
+        e: options.e,
+        formData: this.rowData()
+      })
+    }, 0)
   }
 
   onLifeCycle = (field: string, comp: FormItemInstance) => {
