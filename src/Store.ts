@@ -152,7 +152,7 @@ export default class Store<T extends Object = {}> {
       }
     })
 
-    this.formData = reactive(cloneDeep(data))
+    this.formData = reactive<T>(cloneDeep(data))
     const list = [...this.watchList]
     this.watchList = []
     list.forEach((obj) => {
@@ -224,14 +224,12 @@ export default class Store<T extends Object = {}> {
 
   onFiledChange = (field: string, options: any) => {
     this.setValue(field, options.value)
-    setTimeout(() => {
-      this.options.onChange?.({
-        field,
-        value: options.value,
-        e: options.e,
-        formData: this.rowData()
-      })
-    }, 0)
+    this.options.onChange?.({
+      field,
+      value: options.value,
+      e: options.e,
+      formData: cloneDeep(this.rowData())
+    })
   }
 
   onLifeCycle = (field: string, comp: FormItemInstance) => {
