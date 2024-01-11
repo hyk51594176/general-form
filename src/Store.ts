@@ -225,7 +225,7 @@ export default class Store<T extends Object = {}> {
 
   resetField = (field: string, value?: any, validate?: boolean) => {
     const val = value ?? get(this.originFormData, field)
-    this.setValue(field, val ? cloneDeep(val) : val, validate ?? false)
+    this.setValue(field, val, validate ?? false)
   }
 
   onFiledChange = (field: string, options: any) => {
