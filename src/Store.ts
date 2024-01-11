@@ -137,7 +137,11 @@ export default class Store<T extends Object = {}> {
   }
 
   setValue = (field: string, value: any, validate = true) => {
-    set(this.formData, field, value)
+    set(
+      this.formData,
+      field,
+      typeof value === 'object' && value ? cloneDeep(value) : value
+    )
     if (validate) {
       this.validate([field])
     }
@@ -230,7 +234,7 @@ export default class Store<T extends Object = {}> {
       field,
       value: options.value,
       e: options.e,
-      formData: cloneDeep(this.rowData())
+      formData: this.rowData()
     })
   }
 
