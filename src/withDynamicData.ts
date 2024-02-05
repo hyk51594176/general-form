@@ -64,7 +64,8 @@ export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
         unSubscribe?.()
       }
     }, [context?.field, params])
-    const data = { [k ?? 'options']: options, ...rest } as T
+    const data = { [k ?? 'options']: options,context, ...rest } as T
+    //@ts-ignore
     return React.createElement(renderProps, data)
   }
 }
