@@ -97,21 +97,25 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     },
     [clearValidate]
   )
-  const setValue = (field: string, value: any) => {
+  const setValue = (field: string, value: any, isValidate: boolean = true) => {
     if (typeof value === 'object') {
       const data = cloneDeep(formData.current)
       set(data, field, value)
       setValues(data)
-      validate([field])
+      if(isValidate){
+        validate([field])
+      }
     } else {
       const oldVal = getValue(field)
       set(formData.current, field, value)
       const item = itemInstances.current[field]
       if (item) {
         item.setValue(value)
-        validate([field])
+        if(isValidate){
+          validate([field])
+        }
       }
-      bootstrap(field, { value, oldVal  })
+      bootstrap(field, { value, oldVal })
     }
   }
 
