@@ -71,7 +71,7 @@ export type FormRef<T extends Object = {}> = {
   subscribe: (fields: string[], callback: EventItem['callback']) => () => void
   getValue: (field: string) => any
   getValues: () => T
-  setValue: (field: string, value: any) => void
+  setValue: (field: string, value: any, isValidate?: boolean) => void
   clearValidate: (field: string[]) => void
   setValues: (data: Partial<T>) => void
   validate: (params?: string[]) => Promise<T>
@@ -98,7 +98,7 @@ type DynamicParameter = {
   relation?: 'and' | 'or'
   notIn?: boolean
   relyOn: {
-    [k: string]: any[] | undefined| ((value: any,contextData:ContextProp) => boolean)
+    [k: string]: any[] | undefined | ((value: any, contextData: ContextProp) => boolean)
   }
 }
 export interface Rule extends RuleItem {

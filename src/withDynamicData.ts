@@ -47,6 +47,9 @@ export default function <T = any>(renderProps: RenderFn<T>, k?: keyof T) {
         )
         if (!flag) {
           ;(rest as any)?.onChange(isArray ? list : list[0])
+          if(context && context.field){
+            context.clearValidate([context.field])
+          }
         }
       }
     }, [rest.value, options])

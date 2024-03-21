@@ -97,12 +97,12 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     },
     [clearValidate]
   )
-  const setValue = (field: string, value: any, isValidate: boolean = true) => {
+  const setValue = (field: string, value: any, isValidate?: boolean) => {
     if (typeof value === 'object') {
       const data = cloneDeep(formData.current)
       set(data, field, value)
       setValues(data)
-      if(isValidate){
+      if (isValidate) {
         validate([field])
       }
     } else {
@@ -111,7 +111,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
       const item = itemInstances.current[field]
       if (item) {
         item.setValue(value)
-        if(isValidate){
+        if (isValidate) {
           validate([field])
         }
       }
@@ -165,7 +165,7 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>((props, ref
     if (eq(options.value, getValue(field))) {
       return
     }
-    setValue(field, options.value)
+    setValue(field, options.value, true)
     if (onChange) {
       onChange({
         field,
