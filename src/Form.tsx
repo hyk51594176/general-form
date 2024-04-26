@@ -11,7 +11,6 @@ import FormItem from './FormItem'
 import './index.css'
 import { FormProps, FormRef } from './interface'
 import Store from './Store'
-import { useDeepEqualEffect } from './useDeepEqualEffect'
 
 const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>(
   (props, ref) => {
@@ -26,11 +25,6 @@ const Form = React.forwardRef<FormRef, PropsWithChildren<FormProps>>(
     } = props
     const store = useRef(form ?? new Store(defaultData))
     useImperativeHandle(ref, () => store.current)
-    useDeepEqualEffect(() => {
-      if (defaultData !== undefined) {
-        store.current.setValues(defaultData)
-      }
-    }, [defaultData])
     useEffect(() => () => store.current.destroy(), [])
     const {
       labelAlign = 'right',

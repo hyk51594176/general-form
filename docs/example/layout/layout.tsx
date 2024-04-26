@@ -1,5 +1,5 @@
-import { Common, defineColumns, Form } from '@hanyk/general-form'
-import React, { useMemo } from 'react'
+import { Common, defineColumns, Form, useForm } from '@hanyk/general-form'
+import React, { useLayoutEffect, useMemo } from 'react'
 import { ComponentMap } from '../../components'
 
 export type LayoutData = Omit<Common, 'field'> & { text?: boolean }
@@ -65,14 +65,17 @@ const Layout: React.FC<Props> = (props: Props) => {
       }
     ])
   }, [])
-
+  const form = useForm()
+  useLayoutEffect(() => {
+    form.setValues(layoutData)
+  }, [layoutData])
   return (
     <Form
+      form={form}
       columns={columns}
       onChange={(e) => {
-        props.onChange({ ...e.formData } as LayoutData)
+        props.onChange({ ...e.formData })
       }}
-      defaultData={layoutData}
       labelWidth="100px"
       span={12}
     />

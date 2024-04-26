@@ -2,9 +2,8 @@
 import Schema from 'async-validator'
 import get from 'lodash/get'
 import set from 'lodash/set'
-import has from 'lodash/has'
 import cloneDeep from 'lodash/cloneDeep'
-import { UnwrapNestedRefs, reactive, toRaw } from '@vue/reactivity'
+import { ref, toRaw } from '@vue/reactivity'
 
 import {
   SubCallback,
@@ -25,9 +24,17 @@ export default class Store<T extends Object = {}> {
   private options: Options<T> = {
     submitShow: true
   }
+  _formData = ref<T>({} as T)
 
-  formData!: UnwrapNestedRefs<T>
-
+  get formData() {
+    return this._formData.value as T
+  }
+  set formData(val: any) {
+    this._formData.value = val
+  }
+  constructor(defaultData: T = {} as T) {
+    this.setValues(defaultData)
+  }
   private originFormData!: T
 
   private watchList: Array<
@@ -35,10 +42,6 @@ export default class Store<T extends Object = {}> {
   > = []
 
   itemInstances: FormItemInstances = {}
-
-  constructor(defaultData: T = {} as T) {
-    this.setValues(defaultData)
-  }
 
   destroy = () => {
     this.watchList.forEach((obj) => obj.unWatch())
@@ -132,7 +135,6 @@ export default class Store<T extends Object = {}> {
       })
       return data
     }
-
     return this.rowData()
   }
 
@@ -149,14 +151,7 @@ export default class Store<T extends Object = {}> {
 
   setValues = (data: T = {} as T) => {
     this.originFormData = cloneDeep(data)
-    Object.entries(this.itemInstances).forEach(([field, list]) => {
-      const item = list.find((obj) => obj.show)
-      if (!has(data, field) && item?.defaultValue !== undefined) {
-        set(data, field, item?.defaultValue)
-      }
-    })
-
-    this.formData = reactive<T>(cloneDeep(data))
+    this.formData = cloneDeep(data)
     const list = [...this.watchList]
     this.watchList = []
     list.forEach((obj) => {
@@ -244,8 +239,8 @@ export default class Store<T extends Object = {}> {
     } else {
       this.itemInstances[field] = [comp]
     }
-    if (this.getValue(field) === undefined && comp.value !== undefined) {
-      this.setValue(field, comp.value, false)
+    if (this.getValue(field) === undefined && comp.defaultValue !== undefined) {
+      this.setValue(field, comp.defaultValue, false)
     }
     return () => {
       this.itemInstances[field] = this.itemInstances[field]?.filter(

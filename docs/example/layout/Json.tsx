@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { defineColumns, Form } from '@hanyk/general-form'
-import { getList, defaultData } from '../../api'
+import { getList } from '../../api'
 import { ComponentMap } from '../../components'
 import Layout, { layoutData } from './layout'
 
@@ -86,7 +86,6 @@ export default () => {
       <Layout onChange={setLayout} />
       <Form
         columns={columns}
-        defaultData={defaultData}
         {...layout}
         style={
           layout.text

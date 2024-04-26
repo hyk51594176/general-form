@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useLayoutEffect, useState } from 'react'
 import { Input } from 'antd'
-import { Form, FormItem } from '@hanyk/general-form'
+import { Form, FormItem, useForm } from '@hanyk/general-form'
 import { useSubmit } from '../../hooks'
 import AddandDel from '../../components/AddandDel'
 
@@ -12,8 +12,12 @@ const rules = {
 export default () => {
   const [data, setData] = useState<Array<{ name?: string; age?: number }>>([{}])
   const submit = useSubmit()
+  const form = useForm()
+  useLayoutEffect(() => {
+    form.setValues(data)
+  }, [data])
   return (
-    <Form defaultData={data} span={6}>
+    <Form defaultData={data} span={8} form={form}>
       {data
         .map((_, index) => {
           return [

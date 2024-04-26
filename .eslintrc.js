@@ -65,6 +65,7 @@ module.exports = {
     'import/no-unresolved': 0,
     'react/destructuring-assignment': 0,
     'consistent-return': 0,
-    'jsx-a11y/label-has-associated-control': 0
+    'jsx-a11y/label-has-associated-control': 0,
+    '@typescript-eslint/explicit-module-boundary-types': 0
   }
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { DatePicker } from 'antd'
 import { Form, FormItem } from '@hanyk/general-form'
-import { getList, defaultData } from '../../api'
+import { getList } from '../../api'
 import { HotSelect } from '../../components'
 import Layout, { layoutData } from './layout'
 
@@ -18,7 +18,6 @@ export default () => {
     <>
       <Layout onChange={setLayout} />
       <Form
-        defaultData={defaultData}
         {...layout}
         style={
           layout.text

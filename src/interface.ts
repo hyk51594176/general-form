@@ -90,7 +90,10 @@ export interface FormItemInstance {
 export interface FormItemInstances {
   [key: string]: Array<FormItemInstance>
 }
-export type FormRef<T extends object = {}> = Omit<Store<T>, 'setOptions'>
+export type FormRef<T extends object = {}> = Omit<
+  Store<T>,
+  'setOptions' | 'formData'
+>
 
 export type ContextProp<T extends OBJ = OBJ> = Common & FormRef<T>
 export type Rpor<FormData extends OBJ> = ContextProp<FormData> &

@@ -11,8 +11,8 @@ specifiers:
   '@umijs/fabric': ^2.8.1
   '@umijs/plugin-sass': ^1.1.1
   '@umijs/test': ^3.0.5
-  '@vue/reactivity': ^3.3.4
-  '@vue/shared': ^3.3.4
+  '@vue/reactivity': ^3.4.25
+  '@vue/shared': ^3.4.25
   antd: ^5.0.0
   async-validator: ^3.5.2
   dumi: ^1.1.0
@@ -50,8 +50,8 @@ devDependencies:
   '@umijs/fabric': 2.14.1
   '@umijs/plugin-sass': 1.1.1
   '@umijs/test': 3.5.41
-  '@vue/reactivity': 3.4.5
-  '@vue/shared': 3.4.5
+  '@vue/reactivity': 3.4.25
+  '@vue/shared': 3.4.25
   antd: 5.8.4_wrrjcync2b7uri2ifzubktew2m
   async-validator: 3.5.2
   dumi: 1.1.53_zvdcumho7mqj3lfknr2wnpofbm
@@ -3981,14 +3981,14 @@ packages:
     hasBin: true
     dev: true
 
-  /@vue/reactivity/3.4.5:
-    resolution: {integrity: sha512-BcWkKvjdvqJwb7BhhFkXPLDCecX4d4a6GATvCduJQDLv21PkPowAE5GKuIE5p6RC07/Lp9FMkkq4AYCTVF5KlQ==}
+  /@vue/reactivity/3.4.25:
+    resolution: {integrity: sha512-mKbEtKr1iTxZkAG3vm3BtKHAOhuI4zzsVcN0epDldU/THsrvfXRKzq+lZnjczZGnTdh3ojd86/WrP+u9M51pWQ==}
     dependencies:
-      '@vue/shared': 3.4.5
+      '@vue/shared': 3.4.25
     dev: true
 
-  /@vue/shared/3.4.5:
-    resolution: {integrity: sha512-6XptuzlMvN4l4cDnDw36pdGEV+9njYkQ1ZE0Q6iZLwrKefKaOJyiFmcP3/KBDHbt72cJZGtllAc1GaHe6XGAyg==}
+  /@vue/shared/3.4.25:
+    resolution: {integrity: sha512-k0yappJ77g2+KNrIaF0FFnzwLvUBLUYr8VOwz+/6vLsmItFp51AcxLL7Ey3iPd7BIRyWPOcqUjMnm7OkahXllA==}
     dev: true
 
   /abab/2.0.6:

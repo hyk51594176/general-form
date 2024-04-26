@@ -18,27 +18,27 @@ npm i @hanyk/general-form
 
 #### props
 
-| 属性          | 说明                                  | 类型                                                | 默认值 |
-| ------------- | ------------------------------------- | --------------------------------------------------- | ------ |
-| columns       | formItem 用到的 props                 | formItem[]                                          | []     |
-| className     | css 类名                              | string                                              |        |
-| style         | style 样式                            | CSSProperties                                       |        |
-| span          | 透传 formItem                         | number                                              |        |
-| size          |                                       | string                                              |        |
-| offset        | 透传 formItem                         | number                                              |        |
-| xs            | <768px 响应式栅格数或者栅格属性对象   | number/object(例如：{span:4, offset:4})             |        |
+| 属性          | 说明                                 | 类型                                                | 默认值 |
+| ------------- | ------------------------------------ | --------------------------------------------------- | ------ |
+| columns       | formItem 用到的 props                | formItem[]                                          | []     |
+| className     | css 类名                             | string                                              |        |
+| style         | style 样式                           | CSSProperties                                       |        |
+| span          | 透传 formItem                        | number                                              |        |
+| size          |                                      | string                                              |        |
+| offset        | 透传 formItem                        | number                                              |        |
+| xs            | <768px 响应式栅格数或者栅格属性对象  | number/object(例如：{span:4, offset:4})             |        |
 | sm            | ≥768px 响应式栅格数或者栅格属性对象  | number/object(例如：{span:4, offset:4})             |        |
 | md            | ≥992px 响应式栅格数或者栅格属性对象  | number/object(例如：{span:4, offset:4})             |        |
 | lg            | ≥1200px 响应式栅格数或者栅格属性对象 | number/object(例如：{span:4, offset:4})             |        |
 | xl            | ≥1920px 响应式栅格数或者栅格属性对象 | number/object(例如：{span:4, offset:4})             |        |
-| labelAligin   | 透传 formItem                         | string                                              | right  |
-| labelWidth    | 透传 formItem                         | string                                              | 80px   |
-| mintItemWidth | 透传 formItem                         | string                                              |        |
-| defaultData   | 要绑定数据对象                        | object/array                                        |        |
-| notLayout     | 是否禁用布局，表格的时候建议开启      | boolean                                             | false  |
-| onChange      | 值变化的 change 事件                  | object{field:'xxx', value:'xxx', formData, e:event} |        |
-| disabled      | 全局禁止编辑                          | boolean                                             |        |
-| submitShow    | 仅显示时提交                          | boolean                                             |   true   |
+| labelAligin   | 透传 formItem                        | string                                              | right  |
+| labelWidth    | 透传 formItem                        | string                                              | 80px   |
+| mintItemWidth | 透传 formItem                        | string                                              |        |
+| defaultData   | 要绑定数据对象 默认值                | object/array                                        |        |
+| notLayout     | 是否禁用布局，表格的时候建议开启     | boolean                                             | false  |
+| onChange      | 值变化的 change 事件                 | object{field:'xxx', value:'xxx', formData, e:event} |        |
+| disabled      | 全局禁止编辑                         | boolean                                             |        |
+| submitShow    | 仅显示时提交                         | boolean                                             | true   |
 
 #### form 实例方法
 
@@ -70,26 +70,26 @@ npm i @hanyk/general-form
 | span                       | 24 栅格布局                                   | number                                                                 |        |
 | offset                     | 24 栅格布局                                   | number                                                                 |        |
 | xs                         | <768px 响应式栅格数或者栅格属性对象           | number/object(例如：{span:4, offset:4})                                |        |
-| sm                         | ≥768px 响应式栅格数或者栅格属性对象          | number/object(例如：{span:4, offset:4})                                |        |
-| md                         | ≥992px 响应式栅格数或者栅格属性对象          | number/object(例如：{span:4, offset:4})                                |        |
-| lg                         | ≥1200px 响应式栅格数或者栅格属性对象         | number/object(例如：{span:4, offset:4})                                |        |
-| xl                         | ≥1920px 响应式栅格数或者栅格属性对象         | number/object(例如：{span:4, offset:4})                                |        |
+| sm                         | ≥768px 响应式栅格数或者栅格属性对象           | number/object(例如：{span:4, offset:4})                                |        |
+| md                         | ≥992px 响应式栅格数或者栅格属性对象           | number/object(例如：{span:4, offset:4})                                |        |
+| lg                         | ≥1200px 响应式栅格数或者栅格属性对象          | number/object(例如：{span:4, offset:4})                                |        |
+| xl                         | ≥1920px 响应式栅格数或者栅格属性对象          | number/object(例如：{span:4, offset:4})                                |        |
 | labelAlign                 | label 对其方式                                | string                                                                 | right  |
 | labelWidth                 | label 的宽度                                  | string                                                                 | 80px   |
 | mintItemWidth              | formItem 最小宽度超出换行                     | string                                                                 |        |
 | mintItemWidth              | formItem 最小宽度超出换行                     | string                                                                 |        |
-| content                    | el对应的children                              | ReactNode                                                              |        |
+| content                    | el 对应的 children                            | ReactNode                                                              |        |
 | isShow                     | 是否展示                                      | boolean/DynamicParameter                                               |        |
-| context                    | 覆盖context                                   |                                                                        |        |
+| context                    | 覆盖 context                                  |                                                                        |        |
 | 其他所有额属性透传输入组件 | el 所对应的组件需要的 props 都可以透传        | any                                                                    |        |
 
 #### DynamicParameter
 
-| 属性     | 说明                               | 类型                        | 默认值 |
-| -------- | ---------------------------------- | --------------------------- | ------ |
+| 属性     | 说明                               | 类型                                                                         | 默认值 |
+| -------- | ---------------------------------- | ---------------------------------------------------------------------------- | ------ |
 | relyOn   | 依赖                               | Object {[k: string]: any[] \| ((value: any, context: Rpor<any>) => boolean)} |        |
-| relation | relyOn 有多个 key 时来确定逻辑关系 | 'and' 、 'or'               | 'or'   |
-| notIn    | 是否取反                           | boolean                     | false  |
+| relation | relyOn 有多个 key 时来确定逻辑关系 | 'and' 、 'or'                                                                | 'or'   |
+| notIn    | 是否取反                           | boolean                                                                      | false  |
 
 ```ts
 export type DynamicParameter = {
@@ -97,19 +97,20 @@ export type DynamicParameter = {
   notIn?: boolean
   relyOn: {
     [k: string]: any[] | ((value: any, context: Rpor<any>) => boolean)
-  },
+  }
   external?: boolean
 }
-
 ```
 
 #### Rules
 
 ```js
 {
-    rules: [{
-        required: true,
-    }, ];
+  rules: [
+    {
+      required: true
+    }
+  ]
 }
 ```
 
@@ -117,68 +118,67 @@ export type DynamicParameter = {
 
 ```js
 {
-    rules: [{
-            required: true,
-            trigger: 'onBlur',
-        },
-        {
-            pattern: /abcd/,
-            message: 'abcd不能缺',
-        },
-        {
-            validator: (rule, value, callback) => {
-                callback('出错了');
-            },
-        },
-    ];
+  rules: [
+    {
+      required: true,
+      trigger: 'onBlur'
+    },
+    {
+      pattern: /abcd/,
+      message: 'abcd不能缺'
+    },
+    {
+      validator: (rule, value, callback) => {
+        callback('出错了')
+      }
+    }
+  ]
 }
 ```
 
-| 参数       | 说明                                                                                                                        | 类型                            | 可选值             | 默认值   |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ------------------ | -------- |
-| required   | 不能为空                                                                                                                    | Boolean                         | true               |          |
-| message    | 出错时候信息                                                                                                                | String                          |                    |          |
-| type       | 被校验数据类型(注意 type:‘number’表示数据类型为 Number, 而不是字符串形式的数字, 字符串形式的数字请用 pattern:/^[0-9]\*$/) | StringString/Array/url/email/… | String             |          |
-| pattern    | 校验正则表达式正则表达式（例如：/^[0-9]\*$/表示字符串形式的 number）                                                        |                                 |                    |          |
-| len        | 长度校验，如果 max、mix 混合配置，len 的优先级最高                                                                          | Number                          |                    |          |
-| min        | 字符最小长度                                                                                                                | Number                          |                    |          |
-| max        | 字符最大长度                                                                                                                | Number                          |                    |          |
-| whitespace | 是否进行空白字符校验（true 进行校验)                                                                                        | Boolean                         |                    |          |
-| validator  | 自定义校验, (校验成功的时候不要忘记执行 callback(), 否则会校验不返回)                                                       | Function(rule, value, callback) |                    |          |
-| trigger    | 触发校验的事件名称                                                                                                          | String/Array                    | onChange/onBlur/… | onChange |
+| 参数       | 说明                                                                                                                      | 类型                            | 可选值            | 默认值   |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ----------------- | -------- |
+| required   | 不能为空                                                                                                                  | Boolean                         | true              |          |
+| message    | 出错时候信息                                                                                                              | String                          |                   |          |
+| type       | 被校验数据类型(注意 type:‘number’表示数据类型为 Number, 而不是字符串形式的数字, 字符串形式的数字请用 pattern:/^[0-9]\*$/) | StringString/Array/url/email/…  | String            |          |
+| pattern    | 校验正则表达式正则表达式（例如：/^[0-9]\*$/表示字符串形式的 number）                                                      |                                 |                   |          |
+| len        | 长度校验，如果 max、mix 混合配置，len 的优先级最高                                                                        | Number                          |                   |          |
+| min        | 字符最小长度                                                                                                              | Number                          |                   |          |
+| max        | 字符最大长度                                                                                                              | Number                          |                   |          |
+| whitespace | 是否进行空白字符校验（true 进行校验)                                                                                      | Boolean                         |                   |          |
+| validator  | 自定义校验, (校验成功的时候不要忘记执行 callback(), 否则会校验不返回)                                                     | Function(rule, value, callback) |                   |          |
+| trigger    | 触发校验的事件名称                                                                                                        | String/Array                    | onChange/onBlur/… | onChange |
 
 #### hooks
 
 ##### useForm
 
 3.0.0 新增，
- 创建 Form 实例，用于管理所有数据状态。
+创建 Form 实例，用于管理所有数据状态。
 
 ##### useFormInstance
 
 3.0.0 新增，
+
 ```tsx | pure
 import React from 'react'
-import { useFormInstance, useForm } from '@hanyk/general-form'; 
+import { useFormInstance, useForm } from '@hanyk/general-form'
 
 const Sub = () => {
-  const form = useFormInstance(); 
+  const form = useFormInstance()
 
-  return <Button onClick={() => form.setValues({})} />; 
-}; 
+  return <Button onClick={() => form.setValues({})} />
+}
 
 export default () => {
-  const form = useForm(); 
+  const form = useForm(defaultData)
 
   return (
-
     <Form form={form}>
       <Sub />
     </Form>
-
-  ); 
-}; 
-
+  )
+}
 ```
 
 #### useWatch
@@ -186,18 +186,18 @@ export default () => {
 3.0.0 新增，用于直接获取 form 中字段对应的值。通过该 Hooks 可以触发当前组件的更新
 
 ```tsx | pure
-import { useWatch, useForm, FormItem, Form } from '@hanyk/general-form'; 
+import { useWatch, useForm, FormItem, Form } from '@hanyk/general-form'
 
 const Demo = () => {
-  const form = useForm();
-  const [value,oldValue,formData] = useWatch('username', form);
-  useWatch(['username']); // 当参数是数组的时候可以监听多个，无返回值，通过form.getValues 获取值
+  const form = useForm()
+  const [value, oldValue, formData] = useWatch('username', form)
+  useWatch(['username']) // 当参数是数组的时候可以监听多个，无返回值，通过form.getValues 获取值
   return (
     <Form form={form}>
       <FormItem name="username">
         <Select options={[]} />
       </FormItem>
     </Form>
-  );
-};
+  )
+}
 ```

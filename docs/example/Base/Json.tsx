@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useLayoutEffect, useMemo } from 'react'
 import { defineColumns, Form, useForm } from '@hanyk/general-form'
 import { defaultData, getList } from '../../api'
 import { useSubmit } from '../../hooks'
@@ -12,8 +12,10 @@ const rules = {
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const submit = useSubmit()
-  const form = useForm(defaultData)
-
+  const form = useForm()
+  useLayoutEffect(() => {
+    form.setValues(defaultData)
+  }, [])
   const columns = useMemo(() => {
     return defineColumns<ComponentMap, any>([
       { label: '姓名', rules, field: 'name', el: 'Input' },

@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react'
-import { defineColumns, Form } from '@hanyk/general-form'
+import React, { useState, useMemo, useLayoutEffect } from 'react'
+import { defineColumns, useForm, Form } from '@hanyk/general-form'
 import { ComponentMap } from '../../components'
 import { useSubmit } from '../../hooks'
 
@@ -11,6 +11,10 @@ const rules = {
 export default () => {
   const [data, setData] = useState<Array<{ name?: string; age?: number }>>([{}])
   const submit = useSubmit()
+  const form = useForm()
+  useLayoutEffect(() => {
+    form.setValues(data)
+  }, [data])
   const columns = useMemo(() => {
     return defineColumns<ComponentMap, any>([
       ...data
@@ -40,5 +44,5 @@ export default () => {
     ])
   }, [data, submit])
 
-  return <Form columns={columns} span={6} defaultData={data} />
+  return <Form columns={columns} form={form} span={8} />
 }

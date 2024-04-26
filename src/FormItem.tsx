@@ -107,7 +107,7 @@ const FormItem = (props: FormItemProps) => {
     },
     errorMsg,
     defaultValue,
-    value: (field ? contextData.getValue(field) : other.value) ?? defaultValue,
+    value: field ? contextData.getValue(field) : undefined,
     show: getIsShow(isShow),
     rules
   })
@@ -161,7 +161,7 @@ const FormItem = (props: FormItemProps) => {
   }, [field])
 
   useLayoutEffect(() => {
-    if (field) {
+    if (field && itemInstance.current.show) {
       return contextData.onLifeCycle(field, itemInstance.current)
     }
   }, [field])
@@ -180,7 +180,6 @@ const FormItem = (props: FormItemProps) => {
           itemInstance.current.setSateShow(getIsShow(isShow))
         })
       }
-      itemInstance.current.setSateShow(true)
     }
   }, [isShow])
 
@@ -273,14 +272,16 @@ const FormItem = (props: FormItemProps) => {
     }
     return str.join(' ')
   }
+  if (!itemInstance.current.show) {
+    return null
+  }
   return (
     <div
       className={getClassName()}
       data-field={field}
       style={{
         minWidth: minItemWidth ?? contextData.minItemWidth,
-        ...itemStyle,
-        display: itemInstance.current.show ? undefined : 'none'
+        ...itemStyle
       }}
     >
       {label !== undefined && (

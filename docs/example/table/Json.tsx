@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useLayoutEffect } from 'react'
 import { defineColumns, Form, useForm } from '@hanyk/general-form'
 import { Button } from 'antd'
 import { ComponentMap } from '../../components'
@@ -15,7 +15,6 @@ export default () => {
     age: '12'
   })
   const submit = useSubmit()
-  const formEl = useForm()
   const columns = useMemo(() => {
     return defineColumns<ComponentMap>([
       { label: '姓名', rules, field: `name`, el: 'Input' },
@@ -76,12 +75,15 @@ export default () => {
       }
     ])
   }, [submit])
-
+  const form = useForm()
+  useLayoutEffect(() => {
+    form.setValues(data)
+  }, [data])
   return (
     <>
       <Button
         onClick={() => {
-          formEl.setValue('address', [
+          form.setValue('address', [
             { province: 1, city: 4, area: 9 },
             { province: 1, city: 3, area: 8 }
           ])
@@ -89,7 +91,7 @@ export default () => {
       >
         默认值
       </Button>
-      <Form columns={columns} defaultData={data} span={8} form={formEl} />
+      <Form columns={columns} span={8} form={form} />
     </>
   )
 }

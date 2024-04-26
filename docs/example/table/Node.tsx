@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Form, FormItem } from '@hanyk/general-form'
+import React, { useLayoutEffect, useState } from 'react'
+import { Form, FormItem, useForm } from '@hanyk/general-form'
 import { useSubmit } from '../../hooks'
 import { getList } from '../../api'
 
@@ -49,8 +49,12 @@ export default () => {
       }
     }
   ]
+  const form = useForm()
+  useLayoutEffect(() => {
+    form.setValues(data)
+  }, [data])
   return (
-    <Form defaultData={data} span={8}>
+    <Form span={8} form={form}>
       <FormItem label="姓名" el="Input" field="name" rules={rules} />
       <FormItem
         label="年龄"

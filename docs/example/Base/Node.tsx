@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import { DatePicker, Input } from 'antd'
 import { Form, FormItem, useForm, useWatch } from '@hanyk/general-form'
 import { getList, defaultData } from '../../api'
@@ -15,6 +15,9 @@ export default () => {
   const submit = useSubmit()
   const form = useForm(defaultData)
   const arr = useWatch('sex', form)
+  useLayoutEffect(() => {
+    form.setValues(defaultData)
+  }, [])
   return (
     <Form span={12} form={form} onChange={console.log}>
       <FormItem rules={rules} label="姓名" field="name" el="Input" />
