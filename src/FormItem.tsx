@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useState
 } from 'react'
-import { RenderProps, useFormInstance } from '.'
+import { RenderProps, useForceUpdate, useFormInstance } from '.'
 import { FormItemProps } from './interface'
 import { useDeepEqualLayoutEffect } from './useDeepEqualEffect'
 import { components } from './utils'
@@ -52,8 +52,8 @@ const FormItem = (props: FormItemProps) => {
     ...other
   } = props
   const contextData = useFormInstance()
-  const [, updateState] = useState({})
-  const itemRef = useRef<any>({})
+  const forceUpdate = useForceUpdate()
+  const childContext = useRef<any>({})
 
   const getIsShow = (show: FormItemProps['isShow']) => {
     if (typeof show === 'boolean') {
@@ -95,15 +95,19 @@ const FormItem = (props: FormItemProps) => {
 
   const itemInstance = useRef({
     setErrorMsg(errMsg?: string) {
-      itemInstance.current.errorMsg = errMsg
-      updateState({})
+      if (errMsg !== itemInstance.current.errorMsg) {
+        itemInstance.current.errorMsg = errMsg
+        forceUpdate()
+      }
     },
     setSateShow(flag: boolean) {
-      itemInstance.current.show = flag
-      if (field) {
+      if (field && itemInstance.current.errorMsg) {
         contextData.clearValidate([field])
       }
-      updateState({})
+      if (flag !== itemInstance.current.show) {
+        itemInstance.current.show = flag
+        forceUpdate()
+      }
     },
     errorMsg,
     defaultValue,
@@ -111,7 +115,6 @@ const FormItem = (props: FormItemProps) => {
     show: getIsShow(isShow),
     rules
   })
-
   itemInstance.current.rules = rules
 
   const isRequired = useMemo(() => {
@@ -153,8 +156,16 @@ const FormItem = (props: FormItemProps) => {
     return contextData.subscribe(
       [field],
       (k, { value }) => {
-        itemInstance.current.value = value
-        updateState({})
+        if (
+          itemInstance.current.show &&
+          value === undefined &&
+          itemInstance.current.defaultValue !== undefined
+        ) {
+          contextData.setValue(field, itemInstance.current.defaultValue, false)
+        } else {
+          itemInstance.current.value = value
+          forceUpdate()
+        }
       },
       { deep: true }
     )
@@ -164,16 +175,14 @@ const FormItem = (props: FormItemProps) => {
     if (field && itemInstance.current.show) {
       return contextData.onLifeCycle(field, itemInstance.current)
     }
-  }, [field])
+  }, [field, itemInstance.current.show])
 
   useLayoutEffect(() => {
     itemInstance.current.setErrorMsg(errorMsg)
   }, [errorMsg])
 
   useDeepEqualLayoutEffect(() => {
-    if (typeof isShow === 'boolean') {
-      itemInstance.current.setSateShow(isShow)
-    } else {
+    if (typeof isShow === 'object') {
       const keys = Object.keys(isShow?.relyOn ?? {})
       if (keys.length) {
         return contextData.subscribe(keys, () => {
@@ -187,7 +196,7 @@ const FormItem = (props: FormItemProps) => {
     let child: any = children ?? el
     if (child) {
       Object.assign(
-        itemRef.current,
+        childContext.current,
         itemInstance.current,
         contextData,
         _context ?? {},
@@ -198,7 +207,7 @@ const FormItem = (props: FormItemProps) => {
         }
       )
       const propsData: PropsWithChildren<RenderProps> = {
-        context: itemRef.current,
+        context: childContext.current,
         field,
         size: other.size ?? contextData.size,
         disabled: other.disabled ?? contextData.disabled,
@@ -221,11 +230,9 @@ const FormItem = (props: FormItemProps) => {
           ...propsData,
           children: child.props.children ?? content
         })
-      } else if (child.isReactClass) {
+      } else if (child.isReactClass || typeof child === 'function') {
         const Comp = child
         return <Comp {...propsData} />
-      } else if (typeof child === 'function') {
-        child = child(propsData)
       } else if (typeof child === 'string' && components[child]) {
         const Comp = components[child]
         return <Comp {...propsData} />

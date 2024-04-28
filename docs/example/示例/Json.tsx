@@ -1,16 +1,9 @@
 import React, { useMemo } from 'react'
 import { defineColumns, Form } from '@hanyk/general-form'
-import { getList, defaultData } from '../../api'
+import { getList } from '../../api'
 import { useSubmit } from '../../hooks'
 import { ComponentMap } from '../../components'
 
-const isShow = {
-  relation: 'and',
-  relyOn: {
-    show: [true],
-    sex: [0]
-  }
-}
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const submit = useSubmit()
@@ -92,5 +85,5 @@ export default () => {
     ])
   }, [])
 
-  return <Form columns={columns} defaultData={defaultData} span={8} />
+  return <Form columns={columns} span={8} />
 }

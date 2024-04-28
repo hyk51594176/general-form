@@ -17,11 +17,16 @@ export default () => {
     form.setValues(data)
   }, [data])
   return (
-    <Form defaultData={data} span={8} form={form}>
+    <Form span={8} form={form}>
       {data
         .map((_, index) => {
           return [
-            <FormItem rules={rules} label="姓名" field={`[${index}].name`}>
+            <FormItem
+              rules={rules}
+              label="姓名"
+              field={`[${index}].name`}
+              defaultValue="123"
+            >
               <Input />
             </FormItem>,
             <FormItem rules={rules} label="年龄" field={`[${index}].age`}>

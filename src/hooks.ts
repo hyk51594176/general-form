@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react'
+import { useCallback, useContext, useMemo, useState } from 'react'
 import Context from './Context'
 import { ContextProp, OBJ, Rpor } from './interface'
 import Store from './Store'
@@ -45,4 +45,9 @@ export function useWatch<T, D extends object = OBJ>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [field])
   return state
+}
+
+export function useForceUpdate() {
+  const [, setState] = useState({})
+  return useCallback(() => setState({}), [])
 }

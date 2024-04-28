@@ -17,7 +17,7 @@ import TableBtn from './TableBtn'
 import Text from './Text'
 
 export const HotSelect = withDynamicData<ComponentProps<typeof Select>>(
-  (props) => <Select {...props} style={{ width: '100%' }} />
+  (props) => <Select {...props} style={{ width: '100%' }} allowClear />
 )
 const RadioGroup = Radio.Group
 const components = {

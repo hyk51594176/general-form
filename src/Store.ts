@@ -32,8 +32,10 @@ export default class Store<T extends Object = {}> {
   set formData(val: any) {
     this._formData.value = val
   }
-  constructor(defaultData: T = {} as T) {
-    this.setValues(defaultData)
+  constructor(defaultData?: T) {
+    if (defaultData) {
+      this.setValues(defaultData)
+    }
   }
   private originFormData!: T
 
@@ -53,7 +55,7 @@ export default class Store<T extends Object = {}> {
   }
 
   private getItemInstance = (field: string) => {
-    return this.itemInstances[field]?.find((obj) => obj.show)
+    return this.itemInstances[field]
   }
 
   subscribe = <J>(
@@ -126,9 +128,7 @@ export default class Store<T extends Object = {}> {
 
   getValues = (isShow = false) => {
     if (isShow) {
-      const fields = this.getFields().filter((field) => {
-        return this.itemInstances[field]?.some((obj) => obj?.show)
-      })
+      const fields = this.getFields()
       const data = {} as T
       fields.forEach((k) => {
         set(data, k, this.getValue(k))
@@ -152,21 +152,11 @@ export default class Store<T extends Object = {}> {
   setValues = (data: T = {} as T) => {
     this.originFormData = cloneDeep(data)
     this.formData = cloneDeep(data)
-    const list = [...this.watchList]
-    this.watchList = []
-    list.forEach((obj) => {
-      obj.unWatch()
-      this.subscribe(obj.fields, obj.callback, obj.options)
-    })
     this.clearValidate()
   }
 
   validate = <P extends string[]>(params?: P) => {
-    const fields = this.getFields(params).filter((field) => {
-      return this.itemInstances[field]?.some(
-        (obj) => obj && (this.options.submitShow ? obj.show : true)
-      )
-    })
+    const fields = this.getFields(params)
     const data = {} as P extends string[] ? any : T
     fields.forEach((k) => {
       set(data, k, this.getValue(k))
@@ -234,22 +224,12 @@ export default class Store<T extends Object = {}> {
   }
 
   onLifeCycle = (field: string, comp: FormItemInstance) => {
-    if (Array.isArray(this.itemInstances[field])) {
-      this.itemInstances[field].push(comp)
-    } else {
-      this.itemInstances[field] = [comp]
+    if (this.itemInstances[field]) {
+      console.error(`field: ${field} already exists`)
     }
-    if (this.getValue(field) === undefined && comp.defaultValue !== undefined) {
-      this.setValue(field, comp.defaultValue, false)
-    }
+    this.itemInstances[field] = comp
     return () => {
-      this.itemInstances[field] = this.itemInstances[field]?.filter(
-        (o) => o !== comp
-      )
-
-      if (!this.itemInstances[field]?.length) {
-        delete this.itemInstances[field]
-      }
+      delete this.itemInstances[field]
     }
   }
 }

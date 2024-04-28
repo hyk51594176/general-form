@@ -88,7 +88,7 @@ export interface FormItemInstance {
   setErrorMsg(msg?: string): void
 }
 export interface FormItemInstances {
-  [key: string]: Array<FormItemInstance>
+  [key: string]: FormItemInstance
 }
 export type FormRef<T extends object = {}> = Omit<
   Store<T>,

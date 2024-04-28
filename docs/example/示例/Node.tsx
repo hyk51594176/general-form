@@ -15,7 +15,7 @@ const isShow = {
 export default () => {
   const submit = useSubmit()
   return (
-    <Form defaultData={defaultData} span={8} onChange={(e) => {}}>
+    <Form span={8} onChange={(e) => {}}>
       <FormItem label="姓名" field="name">
         <Input />
       </FormItem>

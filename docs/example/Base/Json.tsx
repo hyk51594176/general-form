@@ -66,7 +66,6 @@ export default () => {
         span: 8,
         getList,
         params: { id: 'province' },
-
         isShow: {
           notIn: true,
           relation: 'and',
