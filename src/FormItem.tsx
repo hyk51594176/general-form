@@ -3,8 +3,7 @@ import React, {
   useLayoutEffect,
   useMemo,
   useRef,
-  useEffect,
-  useState
+  useEffect
 } from 'react'
 import { RenderProps, useForceUpdate, useFormInstance } from '.'
 import { FormItemProps } from './interface'

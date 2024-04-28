@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { useCallback, useContext, useMemo, useState } from 'react'
 import Context from './Context'
 import { ContextProp, OBJ, Rpor } from './interface'
@@ -12,7 +13,6 @@ export const useForm = <T extends OBJ = OBJ>(data?: T) => {
 }
 type CallBack<T, D> = (state: State<T | any[], D>) => void
 
-type P<F, T> = F extends Array<string> ? any[] : T
 type Field = string | string[]
 export const useFormInstance = <T extends object = OBJ>() =>
   useContext(Context as unknown as React.Context<ContextProp<T>>)

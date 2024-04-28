@@ -13,7 +13,8 @@
     "test": "umi-test",
     "test:coverage": "umi-test --coverage",
     "prepublishOnly": "npm run build",
-    "postpublish": "npm run deploy"
+    "postpublish": "npm run deploy",
+    "fix": "eslint --ext .ts,.tsx src/ --fix"
   },
   "files": [
     "dist"

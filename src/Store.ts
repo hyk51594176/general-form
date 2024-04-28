@@ -24,19 +24,23 @@ export default class Store<T extends Object = {}> {
   private options: Options<T> = {
     submitShow: true
   }
+
   _formData = ref<T>({} as T)
 
   get formData() {
     return this._formData.value as T
   }
+
   set formData(val: any) {
     this._formData.value = val
   }
+
   constructor(defaultData?: T) {
     if (defaultData) {
       this.setValues(defaultData)
     }
   }
+
   private originFormData!: T
 
   private watchList: Array<
